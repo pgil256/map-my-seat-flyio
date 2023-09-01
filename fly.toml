@@ -12,7 +12,6 @@ primary_region = "mia"
   release_command = "npx knex migrate:latest --knexfile /app/backend/knexfile.js"
 
 [env]
-  DATABASE_URL = "postgresql://gilhooleyp:Ellie123%3F%21%3F%21@map-my-seat.internal:5432/map-my-seat-db"
   NODE_ENV = "production"
   PORT = "8080"
 
