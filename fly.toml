@@ -1,0 +1,40 @@
+# fly.toml app configuration file generated for map-my-seat on 2023-08-31T22:03:05-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "map-my-seat"
+primary_region = "mia"
+
+[build]
+
+[deploy]
+  release_command = "npx knex migrate:latest --knexfile /app/backend/knexfile.js"
+
+[env]
+  DATABASE_URL = "postgresql://gilhooleyp:Ellie123%3F%21%3F%21@map-my-seat.internal:5432/map-my-seat-db"
+  NODE_ENV = "production"
+  PORT = "8080"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.tcp_checks]]
+    interval = "15s"
+    timeout = "2s"
+    grace_period = "1s"

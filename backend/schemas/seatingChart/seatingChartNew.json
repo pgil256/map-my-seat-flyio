@@ -1,0 +1,567 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "array",
+    "default": [],
+    "title": "Root Schema",
+    "items": {
+        "type": "object",
+        "default": {},
+        "title": "A Schema",
+        "required": [
+            "classroomId",
+            "name",
+            "seatingChart"
+        ],
+        "properties": {
+            "classroomId": {
+                "type": "integer",
+                "default": 0,
+                "title": "The classroomId Schema",
+                "examples": [
+                    1
+                ]
+            },
+            "name": {
+                "type": "string",
+                "default": "",
+                "title": "The name Schema",
+                "examples": [
+                    "testUser p1"
+                ]
+            },
+            "seatingChart": {
+                "type": "array",
+                "default": [],
+                "title": "The seatingChart Schema",
+                "items": {
+                    "type": "object",
+                    "title": "A Schema",
+                    "required": [
+                        "id",
+                        "class",
+                        "name"
+                    ],
+                    "properties": {
+                        "id": {
+                            "type": "string",
+                            "title": "The id Schema",
+                            "examples": [
+                                "5-0",
+                                "1-2",
+                                "3-2",
+                                "5-2",
+                                "7-2",
+                                "9-2",
+                                "11-2",
+                                "1-4",
+                                "3-4",
+                                "5-4",
+                                "7-4",
+                                "9-4",
+                                "11-4",
+                                "1-6",
+                                "3-6",
+                                "5-6",
+                                "7-6",
+                                "9-6",
+                                "11-6",
+                                "1-8",
+                                "3-8",
+                                "5-8"
+                            ]
+                        },
+                        "class": {
+                            "type": "string",
+                            "title": "The class Schema",
+                            "examples": [
+                                "teacher-desk",
+                                "desk"
+                            ]
+                        },
+                        "name": {
+                            "type": "string",
+                            "title": "The name Schema",
+                            "examples": [
+                                "Mr. Gilhooley",
+                                "Phang, Joseph Dong",
+                                "Hamlin, Ella Margaret",
+                                "Robinson, Thomas William",
+                                "Goh Ramirez, Beatriz",
+                                "Tetrault, Sharon Elizabeth",
+                                "Quincy, Giavana Hope",
+                                "Donahue, Rashaun",
+                                "Consta, Isabella",
+                                "Comolyn, Kevin",
+                                "Famala, Ryder S",
+                                "Stanley, Reighna",
+                                "Compano, Carter",
+                                "Savannah-Cintago, Andrea",
+                                "Imbala-Fernandez, Jocelyn",
+                                "Telhen-Lumando, Brissa",
+                                "Blockom, Anthony",
+                                "Wilgun, Delaney",
+                                "Daven, Leiam",
+                                "Alderman, Blaison",
+                                "Brenner, Jamisyn",
+                                "Plato, Hailey Jade"
+                            ]
+                        }
+                    },
+                    "examples": [{
+                        "id": "5-0",
+                        "class": "teacher-desk",
+                        "name": "Mr. Gilhooley"
+                    },
+                    {
+                        "id": "1-2",
+                        "class": "desk",
+                        "name": "Phang, Joseph Dong"
+                    },
+                    {
+                        "id": "3-2",
+                        "class": "desk",
+                        "name": "Hamlin, Ella Margaret"
+                    },
+                    {
+                        "id": "5-2",
+                        "class": "desk",
+                        "name": "Robinson, Thomas William"
+                    },
+                    {
+                        "id": "7-2",
+                        "class": "desk",
+                        "name": "Goh Ramirez, Beatriz"
+                    },
+                    {
+                        "id": "9-2",
+                        "class": "desk",
+                        "name": "Tetrault, Sharon Elizabeth"
+                    },
+                    {
+                        "id": "11-2",
+                        "class": "desk",
+                        "name": "Quincy, Giavana Hope"
+                    },
+                    {
+                        "id": "1-4",
+                        "class": "desk",
+                        "name": "Donahue, Rashaun"
+                    },
+                    {
+                        "id": "3-4",
+                        "class": "desk",
+                        "name": "Consta, Isabella"
+                    },
+                    {
+                        "id": "5-4",
+                        "class": "desk",
+                        "name": "Comolyn, Kevin"
+                    },
+                    {
+                        "id": "7-4",
+                        "class": "desk",
+                        "name": "Famala, Ryder S"
+                    },
+                    {
+                        "id": "9-4",
+                        "class": "desk",
+                        "name": "Stanley, Reighna"
+                    },
+                    {
+                        "id": "11-4",
+                        "class": "desk",
+                        "name": "Compano, Carter"
+                    },
+                    {
+                        "id": "1-6",
+                        "class": "desk",
+                        "name": "Savannah-Cintago, Andrea"
+                    },
+                    {
+                        "id": "3-6",
+                        "class": "desk",
+                        "name": "Imbala-Fernandez, Jocelyn"
+                    },
+                    {
+                        "id": "5-6",
+                        "class": "desk",
+                        "name": "Telhen-Lumando, Brissa"
+                    },
+                    {
+                        "id": "7-6",
+                        "class": "desk",
+                        "name": "Blockom, Anthony"
+                    },
+                    {
+                        "id": "9-6",
+                        "class": "desk",
+                        "name": "Wilgun, Delaney"
+                    },
+                    {
+                        "id": "11-6",
+                        "class": "desk",
+                        "name": "Daven, Leiam"
+                    },
+                    {
+                        "id": "1-8",
+                        "class": "desk",
+                        "name": "Alderman, Blaison"
+                    },
+                    {
+                        "id": "3-8",
+                        "class": "desk",
+                        "name": "Brenner, Jamisyn"
+                    },
+                    {
+                        "id": "5-8",
+                        "class": "desk",
+                        "name": "Plato, Hailey Jade"
+                    }]
+                },
+                "examples": [
+                    [{
+                        "id": "5-0",
+                        "class": "teacher-desk",
+                        "name": "Mr. Gilhooley"
+                    },
+                    {
+                        "id": "1-2",
+                        "class": "desk",
+                        "name": "Phang, Joseph Dong"
+                    },
+                    {
+                        "id": "3-2",
+                        "class": "desk",
+                        "name": "Hamlin, Ella Margaret"
+                    },
+                    {
+                        "id": "5-2",
+                        "class": "desk",
+                        "name": "Robinson, Thomas William"
+                    },
+                    {
+                        "id": "7-2",
+                        "class": "desk",
+                        "name": "Goh Ramirez, Beatriz"
+                    },
+                    {
+                        "id": "9-2",
+                        "class": "desk",
+                        "name": "Tetrault, Sharon Elizabeth"
+                    },
+                    {
+                        "id": "11-2",
+                        "class": "desk",
+                        "name": "Quincy, Giavana Hope"
+                    },
+                    {
+                        "id": "1-4",
+                        "class": "desk",
+                        "name": "Donahue, Rashaun"
+                    },
+                    {
+                        "id": "3-4",
+                        "class": "desk",
+                        "name": "Consta, Isabella"
+                    },
+                    {
+                        "id": "5-4",
+                        "class": "desk",
+                        "name": "Comolyn, Kevin"
+                    },
+                    {
+                        "id": "7-4",
+                        "class": "desk",
+                        "name": "Famala, Ryder S"
+                    },
+                    {
+                        "id": "9-4",
+                        "class": "desk",
+                        "name": "Stanley, Reighna"
+                    },
+                    {
+                        "id": "11-4",
+                        "class": "desk",
+                        "name": "Compano, Carter"
+                    },
+                    {
+                        "id": "1-6",
+                        "class": "desk",
+                        "name": "Savannah-Cintago, Andrea"
+                    },
+                    {
+                        "id": "3-6",
+                        "class": "desk",
+                        "name": "Imbala-Fernandez, Jocelyn"
+                    },
+                    {
+                        "id": "5-6",
+                        "class": "desk",
+                        "name": "Telhen-Lumando, Brissa"
+                    },
+                    {
+                        "id": "7-6",
+                        "class": "desk",
+                        "name": "Blockom, Anthony"
+                    },
+                    {
+                        "id": "9-6",
+                        "class": "desk",
+                        "name": "Wilgun, Delaney"
+                    },
+                    {
+                        "id": "11-6",
+                        "class": "desk",
+                        "name": "Daven, Leiam"
+                    },
+                    {
+                        "id": "1-8",
+                        "class": "desk",
+                        "name": "Alderman, Blaison"
+                    },
+                    {
+                        "id": "3-8",
+                        "class": "desk",
+                        "name": "Brenner, Jamisyn"
+                    },
+                    {
+                        "id": "5-8",
+                        "class": "desk",
+                        "name": "Plato, Hailey Jade"
+                    }]
+                ]
+            }
+        },
+        "examples": [{
+            "classroomId": 1,
+            "name": "testUser p1",
+            "seatingChart": [{
+                "id": "5-0",
+                "class": "teacher-desk",
+                "name": "Mr. Gilhooley"
+            },
+            {
+                "id": "1-2",
+                "class": "desk",
+                "name": "Phang, Joseph Dong"
+            },
+            {
+                "id": "3-2",
+                "class": "desk",
+                "name": "Hamlin, Ella Margaret"
+            },
+            {
+                "id": "5-2",
+                "class": "desk",
+                "name": "Robinson, Thomas William"
+            },
+            {
+                "id": "7-2",
+                "class": "desk",
+                "name": "Goh Ramirez, Beatriz"
+            },
+            {
+                "id": "9-2",
+                "class": "desk",
+                "name": "Tetrault, Sharon Elizabeth"
+            },
+            {
+                "id": "11-2",
+                "class": "desk",
+                "name": "Quincy, Giavana Hope"
+            },
+            {
+                "id": "1-4",
+                "class": "desk",
+                "name": "Donahue, Rashaun"
+            },
+            {
+                "id": "3-4",
+                "class": "desk",
+                "name": "Consta, Isabella"
+            },
+            {
+                "id": "5-4",
+                "class": "desk",
+                "name": "Comolyn, Kevin"
+            },
+            {
+                "id": "7-4",
+                "class": "desk",
+                "name": "Famala, Ryder S"
+            },
+            {
+                "id": "9-4",
+                "class": "desk",
+                "name": "Stanley, Reighna"
+            },
+            {
+                "id": "11-4",
+                "class": "desk",
+                "name": "Compano, Carter"
+            },
+            {
+                "id": "1-6",
+                "class": "desk",
+                "name": "Savannah-Cintago, Andrea"
+            },
+            {
+                "id": "3-6",
+                "class": "desk",
+                "name": "Imbala-Fernandez, Jocelyn"
+            },
+            {
+                "id": "5-6",
+                "class": "desk",
+                "name": "Telhen-Lumando, Brissa"
+            },
+            {
+                "id": "7-6",
+                "class": "desk",
+                "name": "Blockom, Anthony"
+            },
+            {
+                "id": "9-6",
+                "class": "desk",
+                "name": "Wilgun, Delaney"
+            },
+            {
+                "id": "11-6",
+                "class": "desk",
+                "name": "Daven, Leiam"
+            },
+            {
+                "id": "1-8",
+                "class": "desk",
+                "name": "Alderman, Blaison"
+            },
+            {
+                "id": "3-8",
+                "class": "desk",
+                "name": "Brenner, Jamisyn"
+            },
+            {
+                "id": "5-8",
+                "class": "desk",
+                "name": "Plato, Hailey Jade"
+            }]
+        }]
+    },
+    "examples": [
+        [{
+            "classroomId": 1,
+            "name": "testUser p1",
+            "seatingChart": [{
+                "id": "5-0",
+                "class": "teacher-desk",
+                "name": "Mr. Gilhooley"
+            },
+            {
+                "id": "1-2",
+                "class": "desk",
+                "name": "Phang, Joseph Dong"
+            },
+            {
+                "id": "3-2",
+                "class": "desk",
+                "name": "Hamlin, Ella Margaret"
+            },
+            {
+                "id": "5-2",
+                "class": "desk",
+                "name": "Robinson, Thomas William"
+            },
+            {
+                "id": "7-2",
+                "class": "desk",
+                "name": "Goh Ramirez, Beatriz"
+            },
+            {
+                "id": "9-2",
+                "class": "desk",
+                "name": "Tetrault, Sharon Elizabeth"
+            },
+            {
+                "id": "11-2",
+                "class": "desk",
+                "name": "Quincy, Giavana Hope"
+            },
+            {
+                "id": "1-4",
+                "class": "desk",
+                "name": "Donahue, Rashaun"
+            },
+            {
+                "id": "3-4",
+                "class": "desk",
+                "name": "Consta, Isabella"
+            },
+            {
+                "id": "5-4",
+                "class": "desk",
+                "name": "Comolyn, Kevin"
+            },
+            {
+                "id": "7-4",
+                "class": "desk",
+                "name": "Famala, Ryder S"
+            },
+            {
+                "id": "9-4",
+                "class": "desk",
+                "name": "Stanley, Reighna"
+            },
+            {
+                "id": "11-4",
+                "class": "desk",
+                "name": "Compano, Carter"
+            },
+            {
+                "id": "1-6",
+                "class": "desk",
+                "name": "Savannah-Cintago, Andrea"
+            },
+            {
+                "id": "3-6",
+                "class": "desk",
+                "name": "Imbala-Fernandez, Jocelyn"
+            },
+            {
+                "id": "5-6",
+                "class": "desk",
+                "name": "Telhen-Lumando, Brissa"
+            },
+            {
+                "id": "7-6",
+                "class": "desk",
+                "name": "Blockom, Anthony"
+            },
+            {
+                "id": "9-6",
+                "class": "desk",
+                "name": "Wilgun, Delaney"
+            },
+            {
+                "id": "11-6",
+                "class": "desk",
+                "name": "Daven, Leiam"
+            },
+            {
+                "id": "1-8",
+                "class": "desk",
+                "name": "Alderman, Blaison"
+            },
+            {
+                "id": "3-8",
+                "class": "desk",
+                "name": "Brenner, Jamisyn"
+            },
+            {
+                "id": "5-8",
+                "class": "desk",
+                "name": "Plato, Hailey Jade"
+            }]
+        }]
+    ]
+}

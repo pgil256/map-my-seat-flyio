@@ -1,0 +1,53 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "username",
+        "schoolYear",
+        "title",
+        "number"
+    ],
+    "properties": {
+        "username": {
+            "type": "string",
+            "default": "",
+            "title": "The username Schema",
+            "examples": [
+                "string"
+            ]
+        },
+        "schoolYear": {
+            "type": "string",
+            "default": "",
+            "title": "The schoolYear Schema",
+            "examples": [
+                "2022-2023"
+            ]
+        },
+        "title": {
+            "type": "string",
+            "default": "",
+            "title": "The title Schema",
+            "examples": [
+                "Seatchart 1"
+            ]
+        },
+        "number": {
+            "type": "integer",
+            "default": 0,
+            "title": "The number Schema",
+            "examples": [
+                1
+            ]
+        }
+    },
+    "examples": [{
+        "username": "string",
+        "schoolYear": "2022-2023",
+        "title": "Seatchart 1",
+        "number": 1
+    }]
+}

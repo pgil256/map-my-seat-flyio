@@ -1,0 +1,28 @@
+A. TITLE AND URL 
+
+    This app is entitled "Map-my-seat." It is deployed at:
+
+
+B. PURPOSE
+
+    This app is primarily oriented towardss K-12 teachers who want an automated method of configuring their seating charts. It prcoures all relevant information about your students and preferences inasfar as classroom orientation. 
+
+C. FEATURES
+     The app has a lot of form rendering, so I tried to keep the struture of them as organized as possible. The periods and students paths are comprised entirely of forms for CRUD operations. The other major routes, classrooms and seating charts, involve dynamic tables that incorporate dayta from the aforementioned periods and students routes and allow them to render and save seating charts based on user specification of classroom layout and specifications for student seating. Data in this application (save for SQL incremenetal identification) is entirely populated by users. Although it is a RESTful application (admin users have access to non-admin data), it there is no reason why this application could not be run locally be a user and still use all its features.
+
+D. TESTING
+    Each test is located adjacent to the file they are test. Make sure jest is installed and run it through the command line via "npm test" withhin the associated path.
+
+E. FLOW
+    A user signs up, adds their current course load, adds the students for each course load, configures their classroom layout, specifies seating paramaters, and retrieves a seating chart for each respective class.
+
+F. API
+    The API will remain as it is a simple node.js application I developed (for view in "backend" directory).
+
+F. TECHNOLOGY
+
+    This app runs on React 18.2.0 as well as node 20.2.0 on my device and was built through Create React app. It uses SASS styling modules to configure the CSS.
+    To run backend, run postgresql server (sudo service postgresql start on linux) on port 5432, run node backend (npm start) and react frontend (npm start).
+G. OTHER INFO
+
+    My ultimate goal was to increase the productivity and workload of teacher by automating the process of orienting writing a seating chart. This can be a tedious process, and there is limnited technology addressing this specific need.
