@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SeatingApi from "../api.js";
 import UserContext from "../auth/UserContext";
-import Alert from "../common/Alert";
+import MakeAlert from "../common/MakeAlert";
 import {
   Stack,
   Box,
@@ -282,9 +282,9 @@ const PeriodForm = () => {
               </Center>
 
               <Center>
-                {formErrors.length ? <Alert messages={formErrors} /> : null}
+                {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
                 {saveConfirmed ? (
-                  <Alert messages={["Changes saved successfully."]} />
+                  <MakeAlert messages={["Changes saved successfully."]} />
                 ) : null}
               </Center>
             </form>

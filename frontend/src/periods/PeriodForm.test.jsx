@@ -33,12 +33,12 @@ describe("ClassroomForm", () => {
 
     await Promise.resolve();
     expect(wrapper.exists("form")).toBeTruthy();
-    expect(wrapper.exists(Alert)).toBeFalsy();
+    expect(wrapper.exists(MakeAlert)).toBeFalsy();
     expect(wrapper.exists(ClassroomRedirect)).toBeTruthy();
     expect(wrapper.exists(Classroom)).toBeTruthy();
   });
 
-  it("should render an alert when saveConfirmed is truthy", async () => {
+  it("should render an MakeAlert when saveConfirmed is truthy", async () => {
     useClassroomSpy.mockResolvedValue({
       classroomId: "testid",
       seatAlphabetical: true,
@@ -54,8 +54,8 @@ describe("ClassroomForm", () => {
     await Promise.resolve();
     wrapper.setState({ saveConfirmed: ["Changes saved successfully"] });
     
-    expect(wrapper.exists(Alert)).toBeTruthy();
-    expect(wrapper.find(Alert).prop("messages")).toEqual(["Changes saved successfully"]);
+    expect(wrapper.exists(MakeAlert)).toBeTruthy();
+    expect(wrapper.find(MakeAlert).prop("messages")).toEqual(["Changes saved successfully"]);
   });
 
   it("should render an error message if SeatingApi.createOrGetClassroom() fails", async () => {
@@ -63,8 +63,8 @@ describe("ClassroomForm", () => {
 
     await Promise.resolve();
 
-    expect(wrapper.exists(Alert)).toBeTruthy();
-    expect(wrapper.find(Alert).prop("messages")).toEqual(["Error while retrieving or creating classroom: Unable to create classroom"]);
+    expect(wrapper.exists(MakeAlert)).toBeTruthy();
+    expect(wrapper.find(MakeAlert).prop("messages")).toEqual(["Error while retrieving or creating classroom: Unable to create classroom"]);
   });
 
   it("should update form data state when handleChange is called on an input", () => {    

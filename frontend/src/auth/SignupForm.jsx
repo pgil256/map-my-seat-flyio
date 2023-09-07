@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Alert from "../common/Alert";
+import MakeAlert from "../common/MakeAlert";
 import {
   Box,
   Button,
@@ -156,7 +156,7 @@ const SignupForm = ({ signup }) => {
                     Sign up
                   </Button>
                 </Center>
-                {formErrors.length ? <Alert messages={formErrors} /> : null}
+                {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
               </form>
             </Stack>
           </Center>

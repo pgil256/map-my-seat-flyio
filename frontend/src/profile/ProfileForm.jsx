@@ -75,8 +75,8 @@ const ProfileForm = () => {
           <FormLabel htmlFor="firstName">First Name</FormLabel>
           <Input
             type="text"
-            name="FirstName" // changed from name='LastName' to name='FirstName'
-            value={formData.firstName} // changed from formData.lastName to formData.firstName
+            name="FirstName" 
+            value={formData.firstName}
             onChange={handleChange}
           />
         </FormControl>
@@ -96,14 +96,14 @@ const ProfileForm = () => {
         </Button>
 
         {formErrors.length ? (
-          <Alert status="error" marginTop="4">
+          <MakeAlert status="error" marginTop="4">
             <AlertIcon />
             {formErrors.map((error, index) => (
               <Box key={index} ml="2">
                 {error}
               </Box>
             ))}
-          </Alert>
+          </MakeAlert>
         ) : null}
 
         {saveConfirmed.length ? (

@@ -3,7 +3,7 @@ import Classroom from "./Classroom.jsx";
 import ClassroomRedirect from "./ClassroomRedirect.jsx";
 import SeatingApi from "../api.js";
 import UserContext from "../auth/UserContext";
-import Alert from "../common/Alert";
+import MakeAlert from "../common/MakeAlert";
 import {
   Center,
   Box,
@@ -275,13 +275,9 @@ const ClassroomForm = () => {
                   Save Changes
                 </Button>
               </Center>
-
-              {saveConfirmed ? (
-                <Alert status="success" variant="subtle" fontSize="md">
-                  {saveConfirmed}
-                </Alert>
-              ) : null}
-
+                            {saveConfirmed ? (
+                  <MakeAlert status="success" variant="subtle" fontSize="md" messages={["Changes saved successfully."]} />
+                ) : null}
               <Box w="100%" id="classroomRedirectButtons">
                 <ClassroomRedirect classroomId={classroomId} />
               </Box>

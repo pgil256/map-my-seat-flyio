@@ -3,8 +3,9 @@ import { useParams } from "react-router-dom";
 import SeatingApi from "../api.js";
 import LoadingSpinner from "../common/LoadingSpinner";
 import UserContext from "../auth/UserContext";
-import Alert from "../common/Alert";
+import MakeAlert from "../common/MakeAlert";
 import Papa from "papaparse";
+
 
 import {
   Box,
@@ -375,9 +376,9 @@ const StudentForm = () => {
                     </Button>
                   </Center>
 
-                  {formErrors.length ? <Alert messages={formErrors} /> : null}
+                  {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
                   {saveConfirmed.length ? (
-                    <Alert messages={saveConfirmed} />
+                    <MakeAlert messages={saveConfirmed} />
                   ) : null}
                 </Stack>
               </Center>
@@ -542,9 +543,9 @@ const StudentForm = () => {
                       Delete Student
                     </Button>
 
-                    {formErrors.length ? <Alert messages={formErrors} /> : null}
+                    {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
                     {saveConfirmed.length ? (
-                      <Alert messages={saveConfirmed} />
+                      <MakeAlert messages={saveConfirmed} />
                     ) : null}
                   </form>
                 </Stack>
@@ -643,7 +644,7 @@ const StudentForm = () => {
                                 </Center>
                                 <Stack mt={4} direction={"row"} spacing={4}>
                                   <Button
-                                    onClick={() => setSelectedStudent(index)}
+                                    onClick={() => setSelectedStudent(student)}
                                     flex={1}
                                     fontSize={"sm"}
                                     rounded={"full"}

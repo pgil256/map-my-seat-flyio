@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 
 import { useNavigate } from "react-router-dom";
-import Alert from "../common/Alert";
+import MakeAlert from "../common/MakeAlert";
 
 //Login form; upon submission navigate to homepage
 const LoginForm = ({ login }) => {
@@ -95,7 +95,7 @@ const LoginForm = ({ login }) => {
                   Log in
                 </Button>
               </Center>
-              {formErrors.length ? <Alert messages={formErrors} /> : null}
+              {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
             </form>
           </Stack>
         </Box>
