@@ -1,0 +1,33 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "firstName",
+        "lastName"
+    ],
+    "properties": {
+        "firstName": {
+            "type": "string",
+            "default": "",
+            "title": "The firstName Schema",
+            "examples": [
+                "string"
+            ]
+        },
+        "lastName": {
+            "type": "string",
+            "default": "",
+            "title": "The lastName Schema",
+            "examples": [
+                "string"
+            ]
+        }
+    },
+    "examples": [{
+        "firstName": "string",
+        "lastName": "string"
+    }]
+}

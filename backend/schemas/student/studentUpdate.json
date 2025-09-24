@@ -1,0 +1,93 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "studentId",
+        "name",
+        "grade",
+        "gender",
+        "isESE",
+        "has504",
+        "isELL",
+        "isEBD"
+    ],
+    "properties": {
+        "studentId": {
+            "type": "integer",
+            "default": 0,
+            "title": "The studentId Schema",
+            "examples": [
+                1
+            ]
+        },
+        "name": {
+            "type": "string",
+            "default": "",
+            "title": "The name Schema",
+            "examples": [
+                "Joe Phang"
+            ]
+        },
+        "grade": {
+            "type": "integer",
+            "default": 0,
+            "title": "The grade Schema",
+            "examples": [
+                11
+            ]
+        },
+        "gender": {
+            "type": "string",
+            "default": "",
+            "title": "The gender Schema",
+            "examples": [
+                "M"
+            ]
+        },
+        "isESE": {
+            "type": "boolean",
+            "default": false,
+            "title": "The isESE Schema",
+            "examples": [
+                false
+            ]
+        },
+        "has504": {
+            "type": "boolean",
+            "default": false,
+            "title": "The has504 Schema",
+            "examples": [
+                true
+            ]
+        },
+        "isELL": {
+            "type": "boolean",
+            "default": false,
+            "title": "The isELL Schema",
+            "examples": [
+                false
+            ]
+        },
+        "isEBD": {
+            "type": "boolean",
+            "default": false,
+            "title": "The isEBD Schema",
+            "examples": [
+                false
+            ]
+        }
+    },
+    "examples": [{
+        "studentId": 1,
+        "name": "Joe Phang",
+        "grade": 11,
+        "gender": "M",
+        "isESE": false,
+        "has504": true,
+        "isELL": false,
+        "isEBD": false
+    }]
+}

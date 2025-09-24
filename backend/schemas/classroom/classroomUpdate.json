@@ -1,0 +1,93 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "$id": "http://example.com/example.json",
+    "type": "object",
+    "default": {},
+    "title": "Root Schema",
+    "required": [
+        "seatAlphabetical",
+        "seatRandomize",
+        "seatHighLow",
+        "seatMaleFemale",
+        "eseIsPriority",
+        "fiveZeroFourIsPriority",
+        "ebdIsPriority",
+        "seatingConfig"
+    ],
+    "properties": {
+        "seatAlphabetical": {
+            "type": "boolean",
+            "default": false,
+            "title": "The seatAlphabetical Schema",
+            "examples": [
+                true
+            ]
+        },
+        "seatRandomize": {
+            "type": "boolean",
+            "default": false,
+            "title": "The seatRandomize Schema",
+            "examples": [
+                false
+            ]
+        },
+        "seatHighLow": {
+            "type": "boolean",
+            "default": false,
+            "title": "The seatHighLow Schema",
+            "examples": [
+                false
+            ]
+        },
+        "seatMaleFemale": {
+            "type": "boolean",
+            "default": false,
+            "title": "The seatMaleFemale Schema",
+            "examples": [
+                false
+            ]
+        },
+        "eseIsPriority": {
+            "type": "boolean",
+            "default": false,
+            "title": "The eseIsPriority Schema",
+            "examples": [
+                false
+            ]
+        },
+        "fiveZeroFourIsPriority": {
+            "type": "boolean",
+            "default": false,
+            "title": "The fiveZeroFourIsPriority Schema",
+            "examples": [
+                false
+            ]
+        },
+        "ebdIsPriority": {
+            "type": "boolean",
+            "default": false,
+            "title": "The ebdIsPriority Schema",
+            "examples": [
+                false
+            ]
+        },
+        "seatingConfig": {
+            "type": "string",
+            "default": "",
+            "title": "The seatingConfig Schema",
+            "examples": [
+                "[[null,null,null,null,null,\"teacher-desk\",null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null],[null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\"],[null,null,null,null,null,null,null,null,null,null,null,null],[null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\"],[null,null,null,null,null,null,null,null,null,null,null,null],[null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\"],[null,null,null,null,null,null,null,null,null,null,null],[null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\"],[null,null,null,null,null,null,null,null,null,null,null,null],[null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\"],[null,null,null,null,null,null,null,null,null,null,null,null]]"
+            ]
+        }
+    },
+    "examples": [{
+        "seatAlphabetical": true,
+        "seatRandomize": false,
+        "seatHighLow": false,
+        "seatMaleFemale": false,
+        "eseIsPriority": false,
+        "fiveZeroFourIsPriority": false,
+        "ebdIsPriority": false,
+        "seatingConfig": "[[null,null,null,null,null,\"teacher-desk\",null,null,null,null,null],[null,null,null,null,null,null,null,null,null,null,null,null],[null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\"],[null,null,null,null,null,null,null,null,null,null,null,null],[null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\"],[null,null,null,null,null,null,null,null,null,null,null,null],[null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\"],[null,null,null,null,null,null,null,null,null,null,null],[null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\"],[null,null,null,null,null,null,null,null,null,null,null,null],[null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\",null,\"desk\"],[null,null,null,null,null,null,null,null,null,null,null,null]]"
+    }]
+}

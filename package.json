@@ -1,0 +1,25 @@
+{
+  "name": "map-my-seat",
+  "version": "1.0.0",
+  "description": "Automated seating chart generator for K-12 teachers",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "migrate": "cd backend && npx knex migrate:latest",
+    "migrate:rollback": "cd backend && npx knex migrate:rollback",
+    "seed": "cd backend && npx knex seed:run"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
