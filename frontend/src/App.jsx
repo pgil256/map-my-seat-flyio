@@ -5,7 +5,7 @@ import Navigation from "./navigation/Navigation";
 import AppRouter from "./routes/AppRouter";
 import SeatingApi, { ApiError } from "./api";
 import UserContext from "./auth/UserContext";
-import jwt from "jsonwebtoken";
+import { jwtDecode } from "jwt-decode";
 import LoadingSpinner from "./common/LoadingSpinner";
 import { ToastProvider, useAppToast } from "./common/ToastContext";
 import ErrorBoundary from "./common/ErrorBoundary";
@@ -31,7 +31,7 @@ function AppContent({ token, setToken }) {
       async function getCurrentUser() {
         if (token) {
           try {
-            let { username } = jwt.decode(token);
+            let { username } = jwtDecode(token);
             SeatingApi.token = token;
             let currentUser = await SeatingApi.getCurrentUser(username);
             setCurrentUser(currentUser);
