@@ -5,18 +5,21 @@
   "installCommand": "npm install",
   "devCommand": "cd frontend && npm run dev",
   "functions": {
-    "api/*.js": {
+    "api/[[...path]].js": {
       "runtime": "@vercel/node@3.2.0"
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
+      "src": "/api/(.*)",
+      "dest": "/api/[[...path]]"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ],
   "env": {
