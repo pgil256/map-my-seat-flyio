@@ -5,6 +5,7 @@ const { BCRYPT_WORK_FACTOR } = require("../config");
 
 async function commonBeforeAll() {
   // Delete in correct order due to foreign key constraints
+  await db.raw("DELETE FROM student_constraints");
   await db.raw("DELETE FROM seating_charts");
   await db.raw("DELETE FROM students");
   await db.raw("DELETE FROM classrooms");
