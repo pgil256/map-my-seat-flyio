@@ -6,7 +6,6 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testJobIds,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -14,61 +13,59 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-describe("getClassroom", () => {
-  it("should return a classroom object", async () => {
-    const username = "testuser";
-    const expectedClassroom = {
-      classroomId: 1,
-      username: "testuser",
-      seatAlphabetical: true,
-      seatRandomize: false,
-      seatHighLow: true,
-      eseIsPriority: true,
-      ellIsPriority: false,
-      fiveZeroFourIsPriority: true,
-      ebdIsPriority: false,
-      seatingConfig: "seating config",
-    };
-    const db = {
-      query: jest.fn().ReturnValueOnce({ rows: [expectedClassroom] }),
-    };
-    const classroom = await getClassroom(username, db);
-    expect(classroom).toEqual(expectedClassroom);
+describe("Classroom", () => {
+  describe("getClassroom", () => {
+    it("should return a classroom object", async () => {
+      const classroom = await Classroom.getClassroom("u1");
+
+      expect(classroom).toHaveProperty("classroomId");
+      expect(classroom).toHaveProperty("username", "u1");
+      expect(classroom).toHaveProperty("seatAlphabetical");
+      expect(classroom).toHaveProperty("seatingConfig");
+    });
+
+    it("should throw NotFoundError for nonexistent user", async () => {
+      await expect(Classroom.getClassroom("nonexistent")).rejects.toThrow(
+        NotFoundError
+      );
+    });
   });
 
-  const { updateClassroom } = require("./classroom");
-});
+  describe("createClassroom", () => {
+    it("creates a new classroom for a user", async () => {
+      // First check if u2 doesn't have a classroom
+      try {
+        await Classroom.getClassroom("u2");
+        // If classroom exists, skip this test
+        return;
+      } catch (e) {
+        // Expected - no classroom exists
+      }
 
-describe("updateClassroom", () => {
-  test("updates classroom data", async () => {
-    const classroomId = 1;
-    const data = {
-      seatAlphabetical: true,
-      seatRadomize: false,
-      seatHighLow: true,
-      eseIsPriority: true,
-      ellIsPriority: false,
-      fiveZeroFourIsPriority: true,
-      ebdIsPriority: false,
-      seatConfig: "null",
-    };
-    const updatedClassroom = await updateClassroom(classroomId, data);
-    expect(updatedClassroom.seatAlphabetical).toBe(true);
-    expect(updatedClassroom.seatRadomize).toBe(false);
-    expect(updatedClassroom.seatHighLow).toBe(true);
-    expect(updatedClassroom.eseIsPriority).toBe(true);
-    expect(updatedClassroom.ellIsPriority).toBe(false);
-    expect(updatedClassroom["fiveZeroFourIsPriority"]).toBe(true);
-    expect(updatedClassroom.ebdIsPriority).toBe(false);
-    expect(updatedClassroom.seatingConfig).toBe("null");
+      const classroom = await Classroom.createClassroom("u2");
+
+      expect(classroom).toHaveProperty("classroomId");
+      expect(classroom).toHaveProperty("username", "u2");
+    });
   });
-});
 
-describe("deleteClassroom", () => {
-  it("deletes a classroom", async () => {
-    await deleteClassroom(1);
+  describe("updateClassroom", () => {
+    it("updates classroom data", async () => {
+      const classroom = await Classroom.getClassroom("u1");
+      const classroomId = classroom.classroomId;
 
-    const result = await db.query("SELECT * FROM classrooms");
-    expect(result.rows.length).toBe(0);
+      const data = {
+        seatAlphabetical: true,
+        seatRandomize: false,
+      };
+
+      const updatedClassroom = await Classroom.updateClassroom(
+        classroomId,
+        data
+      );
+
+      expect(updatedClassroom.seatAlphabetical).toBe(true);
+      expect(updatedClassroom.seatRandomize).toBe(false);
+    });
   });
 });

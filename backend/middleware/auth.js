@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
+const { UnauthorizedError } = require("../expressError");
 
 // Validate token and store in res.locals
 function authenticateJWT(req, res, next) {
@@ -10,21 +11,21 @@ function authenticateJWT(req, res, next) {
       res.locals.user = jwt.verify(token, SECRET_KEY);
     }
   } catch (err) {
-    console.error("Error in JWT authentication:", err);
+    // Invalid token - don't set user, will be handled by auth middleware
   }
   return next();
 }
 
 function isLoggedIn(req, res, next) {
   if (!res.locals.user) {
-    console.log("User is not logged in");
+    return next(new UnauthorizedError("Must be logged in"));
   }
   return next();
 }
 
 function adminOnly(req, res, next) {
   if (!res.locals.user || !res.locals.user.isAdmin) {
-    console.log("Access restricted to admins only");
+    return next(new UnauthorizedError("Admin access required"));
   }
   return next();
 }
@@ -32,9 +33,10 @@ function adminOnly(req, res, next) {
 function adminOrCorrectUser(req, res, next) {
   const user = res.locals.user;
   if (!user) {
-    console.log("No authenticated user");
-  } else if (!(user.isAdmin || user.username === req.params.username)) {
-    console.log("User not authorized");
+    return next(new UnauthorizedError("Must be logged in"));
+  }
+  if (!(user.isAdmin || user.username === req.params.username)) {
+    return next(new UnauthorizedError("Not authorized"));
   }
   return next();
 }

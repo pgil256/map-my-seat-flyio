@@ -1,87 +1,77 @@
 const request = require("supertest");
 const app = require("../app");
-const Classroom = require("../models/classroom");
-const SeatingChart = require("../models/SeatingChart");
+const db = require("../db");
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterEach,
+  commonAfterAll,
+  getU1Token,
+  getU2Token,
+} = require("./_testCommon");
 
-describe("Classroom", () => {
+beforeAll(commonBeforeAll);
+beforeEach(commonBeforeEach);
+afterEach(commonAfterEach);
+afterAll(commonAfterAll);
 
-  describe("POST /:username", () => {
-    it("should create a new classroom", async () => {
+describe("Classroom Routes", () => {
+  describe("GET /classrooms/:username", () => {
+    test("User can get their own classroom", async () => {
       const res = await request(app)
-        .post(`/classrooms/${classroom.username}`)
-        .send({
-          name: "New Classroom",
-          capacity: 20,
-          location: "Room 102",
-        })
+        .get("/classrooms/u1")
+        .set("Authorization", `Bearer ${getU1Token()}`)
+        .expect(200);
+
+      expect(res.body.classroom).toBeDefined();
+      expect(res.body.classroom).toHaveProperty("classroomId");
+      expect(res.body.classroom).toHaveProperty("seatingConfig");
+    });
+
+    test("User cannot get another user's classroom", async () => {
+      await request(app)
+        .get("/classrooms/u1")
+        .set("Authorization", `Bearer ${getU2Token()}`)
+        .expect(401);
+    });
+
+    test("Unauthenticated request fails", async () => {
+      await request(app).get("/classrooms/u1").expect(401);
+    });
+  });
+
+  describe("POST /classrooms/:username", () => {
+    test("User can create a classroom", async () => {
+      const res = await request(app)
+        .post("/classrooms/u2")
+        .set("Authorization", `Bearer ${getU2Token()}`)
         .expect(201);
 
-      expect(res.body.classrooms).toHaveProperty("id");
-      expect(res.body.classrooms.name).toBe("New Classroom");
-      expect(res.body.classrooms.capacity).toBe(20);
-      expect(res.body.classrooms.location).toBe("Room 102");
+      expect(res.body.classroom).toBeDefined();
+      expect(res.body.classroom).toHaveProperty("classroomId");
     });
   });
 
-  describe("GET /:username", () => {
-    it("should retrieve a classroom by username", async () => {
-      const res = await request(app)
-        .get(`/classrooms/${classroom.username}`)
-        .expect(200);
+  describe("PATCH /classrooms/:username/:classroomId", () => {
+    test("User can update their classroom", async () => {
+      // First get the classroom to get its ID
+      const getRes = await request(app)
+        .get("/classrooms/u1")
+        .set("Authorization", `Bearer ${getU1Token()}`);
 
-      expect(res.body.classrooms).toHaveProperty("id");
-      expect(res.body.classrooms.name).toBe(classroom.name);
-      expect(res.body.classrooms.capacity).toBe(classroom.number);
-      expect(res.body.classrooms.location).toBe(classroom.seatingConfig);
-    });
-  });
+      const classroomId = getRes.body.classroom.classroomId;
 
-  describe("PATCH /:classroomId", () => {
-    it("should update a classroom", async () => {
       const res = await request(app)
-        .patch(`/classrooms/${classroom.id}`)
+        .patch(`/classrooms/u1/${classroomId}`)
         .send({
-          name: "Updated Classroom",
-          capacity: 25,
-          seatingConfig:null
+          seatAlphabetical: false,
+          seatRandomize: true,
         })
+        .set("Authorization", `Bearer ${getU1Token()}`)
         .expect(200);
 
-      expect(res.body.classrooms).toHaveProperty("id");
-      expect(res.body.classrooms.name).toBe("Updated Classroom");
-      expect(res.body.classrooms.number).toBe(25);
-      expect(res.body.classrooms.seatingConfig).toBe("null");
-    });
-  });
-
-  describe("DELETE /:classroomId", () => {
-    it("should delete a classroom", async () => {
-      const res = await request(app)
-        .delete(`/classrooms/${classroom.id}`)
-        .expect(200);
-
-      expect(res.body.deleted).toBe(classroom.id);
-
-      const deletedClassroom = await Classroom.get(classroom.id);
-      expect(deletedClassroom).toBeUndefined();
+      expect(res.body.classroom.seatAlphabetical).toBe(false);
+      expect(res.body.classroom.seatRandomize).toBe(true);
     });
   });
 });
-
-
-describe("SeatingCharts", () => {
-  describe("POST /:classroomId/seating-charts", () => {
-    it("should create a new seating chart", async () => {
-      const res = await request(app)
-        .post(`/classrooms/${classroom.id}/seating-charts`)
-        .send({
-          number: 2,
-          name:New
-          seatingChart:'[]'
-        })
-        .expect(201);
-
-      expect(res.body.seatingChart).toHavePropery("number");
-      expect(res.body.seatingChart).toHavePropery("name");
-    });
-

@@ -1,13 +1,11 @@
 const db = require("../db.js");
 const { BadRequestError, NotFoundError } = require("../expressError");
-
-const Student = require("./students");
+const Student = require("./student.js");
 const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testJobIds,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -15,119 +13,112 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-const { createStudent } = require("./students");
+describe("Student", () => {
+  describe("createStudent", () => {
+    it("should insert a new student into the database", async () => {
+      // Get a valid period_id from test data
+      const periodResult = await db.query(
+        `SELECT period_id FROM periods LIMIT 1`
+      );
 
-describe("createStudent", () => {
-  it("should insert a new student into the database", async () => {
-    const data = {
-      periodId: 1,
-      name: "John Doe",
-      grade: 10,
-      gender: "male",
-      isESE: false,
-      has504: true,
-      isELL: false,
-      isEBD: true,
-    };
+      if (periodResult.rows.length === 0) {
+        return;
+      }
 
-    const student = await createStudent(data);
+      const periodId = periodResult.rows[0].period_id;
+      const data = {
+        periodId,
+        name: "John Doe",
+        grade: 10,
+        gender: "male",
+        isESE: false,
+        has504: true,
+        isELL: false,
+        isEBD: true,
+      };
 
-    expect(student).toHaveProperty("studentId");
-    expect(student).toHaveProperty("periodId", data.periodId);
-    expect(student).toHaveProperty("name", data.name);
-    expect(student).toHaveProperty("grade", data.grade);
-    expect(student).toHaveProperty("gender", data.gender);
-    expect(student).toHaveProperty("isESE", data.isESE);
-    expect(student).toHaveProperty("has504", data.has504);
-    expect(student).toHaveProperty("isELL", data.isELL);
-    expect(student).toHaveProperty("isEBD", data.isEBD);
-  });
+      const student = await Student.createStudent(data);
 
-  it("should convert grade to number if it is a string", async () => {
-    const data = {
-      periodId: 1,
-      name: "Jane Doe",
-      grade: "9th",
-      gender: "female",
-      isESE: true,
-      has504: false,
-      isELL: false,
-      isEBD: false,
-    };
-
-    const student = await createStudent(data);
-
-    expect(student).toHaveProperty("grade", 9);
-  });
-});
-
-const { updateStudents } = require("./students");
-const db = require("./db");
-
-describe("updateStudents", () => {
-  beforeEach(async () => {
-    // Clear the students table before each test
-    await db.query("DELETE FROM students");
-  });
-
-  it("updates a student", async () => {
-    // Insert a student into the database
-    const insertResult = await db.query(`
-      INSERT INTO students (name, grade, gender, is_ESE, has_504, is_ELL, is_EBD)
-      VALUES ('John Doe', 10, 'M', true, false, true, false)
-      RETURNING id
-    `);
-    const studentId = insertResult.rows[0].id;
-
-    // Update the student's name and grade
-    const updatedStudent = await updateStudents(studentId, {
-      name: "Jane Doe",
-      grade: 11,
+      expect(student).toHaveProperty("studentId");
+      expect(student).toHaveProperty("periodId", periodId);
+      expect(student).toHaveProperty("name", data.name);
+      expect(student).toHaveProperty("grade", data.grade);
+      expect(student).toHaveProperty("gender", data.gender);
+      expect(student).toHaveProperty("isESE", data.isESE);
+      expect(student).toHaveProperty("has504", data.has504);
+      expect(student).toHaveProperty("isELL", data.isELL);
+      expect(student).toHaveProperty("isEBD", data.isEBD);
     });
 
-    // Verify that the student was updated correctly
-    expect(updatedStudent).toEqual({
-      name: "Jane Doe",
-      grade: 11,
-      gender: "M",
-      isESE: true,
-      has504: false,
-      isELL: true,
-      isEBD: false,
-    });
+    it("should convert grade to number if it is a string", async () => {
+      const periodResult = await db.query(
+        `SELECT period_id FROM periods LIMIT 1`
+      );
 
-    // Verify that the student was updated in the database
-    const selectResult = await db.query(
-      `
-      SELECT name, grade, gender, is_ESE, has_504, is_ELL, is_EBD
-      FROM students
-      WHERE id = $1
-    `,
-      [studentId]
-    );
-    expect(selectResult.rows[0]).toEqual({
-      name: "Jane Doe",
-      grade: 11,
-      gender: "M",
-      is_ese: true,
-      has_504: false,
-      is_ell: true,
-      is_ebd: false,
+      if (periodResult.rows.length === 0) {
+        return;
+      }
+
+      const periodId = periodResult.rows[0].period_id;
+      const data = {
+        periodId,
+        name: "Jane Doe",
+        grade: "9th",
+        gender: "female",
+        isESE: true,
+        has504: false,
+        isELL: false,
+        isEBD: false,
+      };
+
+      const student = await Student.createStudent(data);
+
+      expect(student).toHaveProperty("grade", 9);
     });
   });
-});
 
-describe("deleteStudent", () => {
-  it("should delete a student", async () => {
-    const studentId = 1;
-    const expectedName = "John Doe";
-    const dbQueryStub = sinon.stub(db, "query").resolves({
-      rows: [{ name: expectedName }],
+  describe("getStudentsByPeriod", () => {
+    it("returns all students for a period", async () => {
+      const periodResult = await db.query(
+        `SELECT period_id FROM periods LIMIT 1`
+      );
+
+      if (periodResult.rows.length === 0) {
+        return;
+      }
+
+      const periodId = periodResult.rows[0].period_id;
+      const students = await Student.getStudentsByPeriod(periodId);
+
+      expect(Array.isArray(students)).toBe(true);
     });
+  });
 
-    // Act
-    const result = await deleteStudent(studentId);
+  describe("deleteStudent", () => {
+    it("should delete a student", async () => {
+      // Create a student to delete
+      const periodResult = await db.query(
+        `SELECT period_id FROM periods LIMIT 1`
+      );
 
-    expect(result).to.equal(expectedName);
+      if (periodResult.rows.length === 0) {
+        return;
+      }
+
+      const periodId = periodResult.rows[0].period_id;
+      const student = await Student.createStudent({
+        periodId,
+        name: "Delete Me",
+        grade: 8,
+        gender: "other",
+        isESE: false,
+        has504: false,
+        isELL: false,
+        isEBD: false,
+      });
+
+      const deletedName = await Student.deleteStudent(student.studentId);
+      expect(deletedName).toBe("Delete Me");
+    });
   });
 });

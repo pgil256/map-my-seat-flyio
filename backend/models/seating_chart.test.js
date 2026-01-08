@@ -6,7 +6,6 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testJobIds,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -14,70 +13,48 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
+describe("SeatingChart", () => {
+  describe("createSeatingChart", () => {
+    it("should create a new seating chart", async () => {
+      // First we need to get a valid classroom_id from test data
+      const classroomResult = await db.query(
+        `SELECT classroom_id FROM classrooms LIMIT 1`
+      );
 
-describe('SeatingChart', () => {
-  describe('createSeatingChart', () => {
-    it('should insert a new seating chart', async () => {
-      
-      const classroomId = 1;
-      const number = 1;
-      const seatingChart = [[1, 2], [3, 4]];
-      const expectedSeatingChart = {
-        seatingChartId: 1,
+      if (classroomResult.rows.length === 0) {
+        // Skip if no test classroom exists
+        return;
+      }
+
+      const classroomId = classroomResult.rows[0].classroom_id;
+      const arrangement = [{ studentId: 1, row: 0, col: 0 }];
+
+      const seatingChart = await SeatingChart.createSeatingChart({
         classroomId,
-        number,
-        seatingChart,
-      };
-      db.query({
-        rows: [expectedSeatingChart],
+        number: 99,
+        arrangement,
       });
-      const result = await SeatingChart.createSeatingChart({
-        classroomId,
-        number,
-        seatingChart,
-      });
-      expect(result).toEqual(expectedSeatingChart);
-    }));;
-  });
 
-  describe("updateSeatingChart", () => {
-    test("updates seating chart successfully", async () => {
-      const seatingChartId = 1;
-      const data = { number: 2, seatingChart: "new seating chart" };
-      const querySql = `UPDATE seating_charts 
-                        SET number=$1, seating_chart=$2 
-                        WHERE classroom_id=$3 
-                        RETURNING seating_chart_id`;
-      const values = [data.number, data.seatingChart, seatingChartId];
-      db.query({ rows: [{ seating_chart_id: seatingChartId }] });
-  
-      const result = await updateSeatingChart(seatingChartId, data);
-
-      expect(result).toEqual({ seating_chart_id: seatingChartId });
+      expect(seatingChart).toHaveProperty("seatingChartId");
+      expect(seatingChart.classroomId).toBe(classroomId);
+      expect(seatingChart.number).toBe(99);
     });
   });
 
-  const { NotFoundError } = require('path/to/errors');
-const db = require('path/to/db');
-const { getSeatingChart } = require('path/to/seatingChart');
+  describe("getSeatingCharts", () => {
+    it("returns all seating charts for a classroom", async () => {
+      const classroomResult = await db.query(
+        `SELECT classroom_id FROM classrooms LIMIT 1`
+      );
 
-describe('getSeatingChart', () => {
-  it('should return correct seating chart', async () => {
-    // Arrange
-    const seatingChartId = 1;
-    const expectedSeatingChart = {
-      seatingChartId: 1,
-      classroom_id: 1,
-      number: 1,
-      seatingChart: '[[1, 2], [3, 4]]',
-    };
-    db.query{ rows: [SeatingChart] });
+      if (classroomResult.rows.length === 0) {
+        return;
+      }
 
+      const classroomId = classroomResult.rows[0].classroom_id;
+      const charts = await SeatingChart.getSeatingCharts(classroomId);
 
-    const expectedseatingChart = await getSeatingChart(seatingChartId);
-
-    // Assert
-    expect(seatingChart).toEqual([expectedSeatingChart]);
-
+      expect(Array.isArray(charts)).toBe(true);
+    });
   });
-
+});

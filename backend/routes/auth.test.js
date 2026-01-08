@@ -1,61 +1,52 @@
 const request = require("supertest");
 const app = require("../app");
 const db = require("../db");
-const User = require("../models/user");
-const { createToken } = require("../helpers/tokens");
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterEach,
+  commonAfterAll,
+} = require("./_testCommon");
 
-beforeAll(async () => {
-  await db.connect();
-});
-
-afterAll(async () => {
-  await db.disconnect();
-});
+beforeAll(commonBeforeAll);
+beforeEach(commonBeforeEach);
+afterEach(commonAfterEach);
+afterAll(commonAfterAll);
 
 describe("POST /auth/token", () => {
   test("returns a token upon successful login", async () => {
-    const user = await User.create({
-      username: "testuser",
-      password: "password",
-      firstName: "Test",
-      lastName: "User",
-      email: "testuser@example.com",
-      isAdmin: false,
-    });
-
     const response = await request(app)
       .post("/auth/token")
       .send({
-        username: "testuser",
-        password: "password",
+        username: "u1",
+        password: "password1",
       })
       .expect(200);
 
     expect(response.body).toHaveProperty("token");
-    expect(response.body.token).toEqual(createToken(user));
   });
 
-  test("returns a 400 error if invalid login credentials are provided", async () => {
+  test("returns 401 for invalid credentials", async () => {
     const response = await request(app)
       .post("/auth/token")
       .send({
-        username: "testuser",
+        username: "u1",
         password: "wrongpassword",
       })
-      .expect(400);
+      .expect(401);
 
     expect(response.body).toHaveProperty("error");
-    expect(response.body.error).toContain("Invalid username/password");
   });
 });
 
-describe("POST /authregister", () => {
+describe("POST /auth/register", () => {
   test("returns a token upon successful registration", async () => {
     const response = await request(app)
-      .post("/authregister")
+      .post("/auth/register")
       .send({
         username: "newuser",
-        password: "password",
+        password: "password123",
+        title: "Mr.",
         firstName: "New",
         lastName: "User",
         email: "newuser@example.com",
@@ -65,18 +56,31 @@ describe("POST /authregister", () => {
     expect(response.body).toHaveProperty("token");
   });
 
-  test("returns a 400 error if invalid registration data is provided", async () => {
+  test("returns 400 for missing required fields", async () => {
     const response = await request(app)
-      .post("/authregister")
+      .post("/auth/register")
       .send({
         username: "newuser",
         password: "password",
-        firstName: "New",
-        lastName: "User",
       })
       .expect(400);
 
     expect(response.body).toHaveProperty("error");
-    expect(response.body.error).toContain('instance requires property "email"');
+  });
+
+  test("returns 400 for duplicate username", async () => {
+    const response = await request(app)
+      .post("/auth/register")
+      .send({
+        username: "u1",
+        password: "password123",
+        title: "Mr.",
+        firstName: "Dupe",
+        lastName: "User",
+        email: "dupe@example.com",
+      })
+      .expect(400);
+
+    expect(response.body).toHaveProperty("error");
   });
 });

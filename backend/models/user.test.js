@@ -1,12 +1,11 @@
 const db = require("../db.js");
-const { BadRequestError, NotFoundError } = require("../expressError");
-const Company = require("./company.js");
+const { BadRequestError, NotFoundError, UnauthorizedError } = require("../expressError");
+const User = require("./user.js");
 const {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  testJobIds,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -14,49 +13,92 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
-const { authenticate } = require('.');
-
-describe('authenticate', () => {
-  it('should return a user object if the username and password are valid', async () => {
-
-    const username = 'testuser';
-    const password = 'testpassword';
-    const dbQuery({
-      rows: [{ username, password: '$2b$10$K5JZJ...' }]
+describe("User", () => {
+  describe("authenticate", () => {
+    it("should return a user object for valid credentials", async () => {
+      const user = await User.authenticate("u1", "password1");
+      expect(user).toEqual({
+        username: "u1",
+        email: "u1@email.com",
+        title: "Mr.",
+        firstName: "U1F",
+        lastName: "U1L",
+        isAdmin: false,
+      });
     });
 
-    const expectedUser = { username };
+    it("should throw UnauthorizedError for invalid password", async () => {
+      await expect(User.authenticate("u1", "wrongpassword")).rejects.toThrow(
+        UnauthorizedError
+      );
+    });
 
-  
-    const user = await authenticate(username, password, dbQuery);
-    expect(user).toEqual(expectedUser);
+    it("should throw UnauthorizedError for invalid username", async () => {
+      await expect(
+        User.authenticate("nonexistent", "password")
+      ).rejects.toThrow(UnauthorizedError);
+    });
   });
-});
 
+  describe("register", () => {
+    it("should create a new user", async () => {
+      const newUser = await User.register({
+        username: "newuser",
+        password: "password123",
+        email: "new@test.com",
+        title: "Ms.",
+        firstName: "New",
+        lastName: "User",
+        isAdmin: false,
+      });
 
-  describe('update', () => {
-    it('should update user data', async () => {
-      const username = 'testuser';
-      const data = {
-        firstName: 'Test',
-        lastName: 'User',
-        password: 'password123'
-      };
-      const updatedUser = await update(username, data);
-      expect(updatedUser.firstName).toEqual(data.firstName);
-      expect(updatedUser.lastName).toEqual(data.lastName);
-      expect(updatedUser.password).not.toEqual(data.password);
+      expect(newUser).toEqual({
+        username: "newuser",
+        email: "new@test.com",
+        title: "Ms.",
+        firstName: "New",
+        lastName: "User",
+        isAdmin: false,
+      });
     });
-});
 
-const { NotFoundError } = require('../errors');
-const db = require('../db');
-const { remove } = require('./users');
+    it("should throw BadRequestError for duplicate username", async () => {
+      await expect(
+        User.register({
+          username: "u1",
+          password: "password123",
+          email: "different@test.com",
+          title: "Dr.",
+          firstName: "Dupe",
+          lastName: "User",
+          isAdmin: false,
+        })
+      ).rejects.toThrow(BadRequestError);
+    });
+  });
 
-describe('remove', () => {
-  it('removes a user from the database', async () => {
-    await remove('testuser');
-    const result = await db.query('SELECT * FROM users WHERE username = $1', ['testuser']);
-    expect(result.rows.length).toBe(0);
+  describe("get", () => {
+    it("should return user data", async () => {
+      const user = await User.get("u1");
+      expect(user).toEqual({
+        username: "u1",
+        email: "u1@email.com",
+        title: "Mr.",
+        firstName: "U1F",
+        lastName: "U1L",
+        isAdmin: false,
+      });
+    });
+
+    it("should throw NotFoundError for nonexistent user", async () => {
+      await expect(User.get("nonexistent")).rejects.toThrow(NotFoundError);
+    });
+  });
+
+  describe("remove", () => {
+    it("removes a user from the database", async () => {
+      await User.remove("u2");
+      await expect(User.get("u2")).rejects.toThrow(NotFoundError);
+    });
   });
 });

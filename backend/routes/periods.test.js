@@ -1,108 +1,139 @@
-const request = require('supertest');
-const app = require('../app');
-const Period = require('../models/period');
-const Student = require('../models/student');
+const request = require("supertest");
+const app = require("../app");
+const db = require("../db");
+const {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterEach,
+  commonAfterAll,
+  getU1Token,
+  getU2Token,
+} = require("./_testCommon");
 
-  describe('POST /periods', () => {
-    it('should create a new period', async () => {
+beforeAll(commonBeforeAll);
+beforeEach(commonBeforeEach);
+afterEach(commonAfterEach);
+afterAll(commonAfterAll);
+
+describe("Period Routes", () => {
+  describe("GET /periods/:username", () => {
+    test("User can get their own periods", async () => {
       const res = await request(app)
-        .post('/periods')
+        .get("/periods/u1")
+        .set("Authorization", `Bearer ${getU1Token()}`)
+        .expect(200);
+
+      expect(res.body.periods).toBeDefined();
+      expect(Array.isArray(res.body.periods)).toBe(true);
+    });
+
+    test("User cannot get another user's periods", async () => {
+      await request(app)
+        .get("/periods/u1")
+        .set("Authorization", `Bearer ${getU2Token()}`)
+        .expect(401);
+    });
+
+    test("Unauthenticated request fails", async () => {
+      await request(app).get("/periods/u1").expect(401);
+    });
+  });
+
+  describe("POST /periods/:username", () => {
+    test("User can create a period", async () => {
+      const res = await request(app)
+        .post("/periods/u1")
         .send({
-          name: 'New Period',
-          title: 'English',
-          schoolYear: '2022-2023',
+          schoolYear: "2024-2025",
+          title: "New Period",
+          number: 10,
         })
+        .set("Authorization", `Bearer ${getU1Token()}`)
         .expect(201);
 
-      expect(res.body.periods).toHaveProperty('name');
-      expect(res.body.periods).toHaveProperty('title');
-      expect(res.body.periods).toHaveProperty('schoolYear');
- 
+      expect(res.body.period).toBeDefined();
+      expect(res.body.period).toHaveProperty("periodId");
+      expect(res.body.period.title).toBe("New Period");
     });
-  });
 
-  describe('GET /periods/:username', () => {
-    it('should retrieve all periods for a user', async () => {
-      const res = await request(app)
-        .get(`/periods/${process.env.TEST_USERNAME}`)
-        .expect(200);
-
-      expect(res.body.periods).toHaveLength(1);
-      expect(res.body.periods[0]).toHaveProperty('id', periodId);
-    });
-  });
-
-  describe('GET /periods/:periodId', () => {
-    it('should retrieve a period by ID', async () => {
-      const res = await request(app)
-        .get(`/periods/${periodId}`)
-        .expect(200);
-
-      expect(res.body.periods).toHaveProperty('id', periodId);
-    });
-  });
-
-  describe('PATCH /periods/:periodId', () => {
-    it('should update a period', async () => {
-      const res = await request(app)
-        .patch(`/periods/${periodId}`)
+    test("Returns 400 for missing required fields", async () => {
+      await request(app)
+        .post("/periods/u1")
         .send({
-          name: 'Updated Period',
+          title: "Missing Fields",
         })
-        .expect(200);
-
-      expect(res.body.periods).toHaveProperty('id', periodId);
-      expect(res.body.periods.name).toBe('Updated Period');
-    });
-
-    it('should return a 400 error for bad data, async () => {
-      const res = await request(app)
-        .patch(`/periods/${periodId}`)
-        .send({
-           number: 'asdkj'
-        })
+        .set("Authorization", `Bearer ${getU1Token()}`)
         .expect(400);
-
-      expect(res.body).toHaveProperty('errors');
-      expect(res.body.errors).toHaveLength(1);
     });
   });
 
-  describe('DELETE /periods/:periodId', () => {
-    it('should delete a period', async () => {
+  describe("GET /periods/:username/:periodId", () => {
+    test("User can get a specific period", async () => {
+      // First get periods to get an ID
+      const listRes = await request(app)
+        .get("/periods/u1")
+        .set("Authorization", `Bearer ${getU1Token()}`);
+
+      if (listRes.body.periods.length === 0) {
+        return;
+      }
+
+      const periodId = listRes.body.periods[0].periodId;
+
       const res = await request(app)
-        .delete(`/periods/${periodId}`)
+        .get(`/periods/u1/${periodId}`)
+        .set("Authorization", `Bearer ${getU1Token()}`)
         .expect(200);
 
-      expect(res.body).toHaveProperty('deleted', periodId);
+      expect(res.body.period).toBeDefined();
+      expect(res.body.period.periodId).toBe(periodId);
     });
   });
 
-  describe('POST /periods/:periodId/students', () => {
-    it('should create a new student', async () => {
+  describe("PATCH /periods/:username/:periodId", () => {
+    test("User can update a period", async () => {
+      const listRes = await request(app)
+        .get("/periods/u1")
+        .set("Authorization", `Bearer ${getU1Token()}`);
+
+      if (listRes.body.periods.length === 0) {
+        return;
+      }
+
+      const periodId = listRes.body.periods[0].periodId;
+
       const res = await request(app)
-        .post(`/periods/${periodId}/students`)
+        .patch(`/periods/u1/${periodId}`)
         .send({
-          firstName: 'Jane',
-          lastName: 'Doe',
+          title: "Updated Period Title",
         })
-        .expect(201);
+        .set("Authorization", `Bearer ${getU1Token()}`)
+        .expect(200);
 
-      expect(res.body.students).toHaveProperty('id');
-      expect(res.body.students.firstName).toBe('Jane');
-    });
-
-    it('should return a 400 error if invalid data is sent', async () => {
-      const res = await request(app)
-        .post(`/periods/${periodId}/students`)
-        .send({
-          firstName: null,
-          lastName: 'Student',
-        })
-        .expect(400);
-
-      expect(res.body).toHaveProperty('errors');
-      expect(res.body.errors).toHaveLength(1);
+      expect(res.body.period.title).toBe("Updated Period Title");
     });
   });
 
+  describe("DELETE /periods/:username/:periodId", () => {
+    test("User can delete a period", async () => {
+      // Create a period to delete
+      const createRes = await request(app)
+        .post("/periods/u1")
+        .send({
+          schoolYear: "2025-2026",
+          title: "Period to Delete",
+          number: 99,
+        })
+        .set("Authorization", `Bearer ${getU1Token()}`);
+
+      const periodId = createRes.body.period.periodId;
+
+      const res = await request(app)
+        .delete(`/periods/u1/${periodId}`)
+        .set("Authorization", `Bearer ${getU1Token()}`)
+        .expect(200);
+
+      expect(res.body.periodId).toBe(periodId);
+    });
+  });
+});

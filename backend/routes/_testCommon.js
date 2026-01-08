@@ -1,67 +1,94 @@
-const db = require('../db.js');
-const User = require('../models/user');
-const Period = require('../models/period')
-const classroom = require('../models/classroom');
-const { createToken } = require('../helpers/tokens');
+const bcrypt = require("bcrypt");
 
+const db = require("../db.js");
+const User = require("../models/user");
+const { createToken } = require("../helpers/tokens");
+const { BCRYPT_WORK_FACTOR } = require("../config");
+
+let u1Token;
+let u2Token;
+let adminToken;
 
 async function commonBeforeAll() {
-  await db.query('DELETE FROM users');
-  await db.query('DELETE FROM companies');
+  // Delete in correct order due to foreign key constraints
+  await db.query("DELETE FROM seating_charts");
+  await db.query("DELETE FROM students");
+  await db.query("DELETE FROM classrooms");
+  await db.query("DELETE FROM periods");
+  await db.query("DELETE FROM users");
 
-  await Classroom.create({
-    classroomId: 1,
-    username: 'testuser',
-    seatAlphabetical: true,
-    seatRandomize: false,
-    seatHighLow: true,
-    eseIsPriority: true,
-    ellIsPriority: false,
-    fiveZeroFourIsPriority: true,
-    ebdIsPriority: false,
-    seatingConfig: 'seating config'
-  });
-  await User.register({
-    username: 'u1',
-    firstName: 'U1F',
-    title:'Mr.',
-    lastName: 'U1L',
-    email: 'user1@user.com',
-    password: 'password1',
-    isAdmin: false,
-  });
+  // Insert test users
+  await db.query(
+    `INSERT INTO users(username, password, title, first_name, last_name, email, is_admin)
+     VALUES ('u1', $1, 'Mr.', 'U1F', 'U1L', 'u1@email.com', false),
+            ('u2', $2, 'Ms.', 'U2F', 'U2L', 'u2@email.com', false),
+            ('admin', $3, 'Dr.', 'Admin', 'User', 'admin@email.com', true)`,
+    [
+      await bcrypt.hash("password1", BCRYPT_WORK_FACTOR),
+      await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
+      await bcrypt.hash("adminpassword", BCRYPT_WORK_FACTOR),
+    ]
+  );
 
+  // Insert test periods
+  await db.query(`
+    INSERT INTO periods (user_username, school_year, title, number)
+    VALUES ('u1', '2023-2024', 'Math Period 1', 1),
+           ('u1', '2023-2024', 'Math Period 2', 2)
+  `);
 
-  const student = await Student.create({
-    periodId: 1,
-    name: "John Doe",
-    grade: 10,
-    gender: "male",
-    isESE: false,
-    has504: true,
-    isELL: false,
-    isEBD: true,
-  });
+  // Insert test classroom
+  await db.query(`
+    INSERT INTO classrooms(
+      user_username,
+      seat_alphabetical,
+      randomize,
+      seat_high_low,
+      seat_male_female,
+      ESE_is_priority,
+      ELL_is_priority,
+      fivezerofour_is_priority,
+      EBD_is_priority,
+      seating_config
+    )
+    VALUES(
+      'u1',
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      '[[null,null,"desk"],[null,null,"desk"]]'
+    )
+  `);
 
+  // Create tokens
+  u1Token = createToken({ username: "u1", isAdmin: false });
+  u2Token = createToken({ username: "u2", isAdmin: false });
+  adminToken = createToken({ username: "admin", isAdmin: true });
+}
 
 async function commonBeforeEach() {
-  await db.query('BEGIN');
+  await db.query("BEGIN");
 }
 
 async function commonAfterEach() {
-  await db.query('ROLLBACK');
+  await db.query("ROLLBACK");
 }
 
 async function commonAfterAll() {
   await db.end();
 }
 
-
 module.exports = {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
-  u1Token,
-  u2Token,
+  getU1Token: () => u1Token,
+  getU2Token: () => u2Token,
+  getAdminToken: () => adminToken,
 };
