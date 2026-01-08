@@ -7,39 +7,53 @@ import {
   Heading,
   Flex,
   FormLabel,
+  FormControl,
+  FormErrorMessage,
   Stack,
   useColorModeValue,
 } from "@chakra-ui/react";
 
 import { useNavigate } from "react-router-dom";
 import MakeAlert from "../common/MakeAlert";
+import useFormValidation, { validators } from "../hooks/useFormValidation";
 
-//Login form; upon submission navigate to homepage
 const LoginForm = ({ login }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
   const [formErrors, setFormErrors] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validationRules = {
+    username: [validators.required("Username is required")],
+    password: [validators.required("Password is required")],
+  };
+
+  const {
+    values: formData,
+    errors,
+    handleChange,
+    handleBlur,
+    validateAll,
+  } = useFormValidation({ username: "", password: "" }, validationRules);
 
   async function handleSubmit(evt) {
     evt.preventDefault();
-    let res = await login(formData);
-    if (res.success) {
-      navigate("/");
-    }
-    setFormErrors(res.errors);
-  }
+    if (!validateAll()) return;
 
-  const handleChange = (evt) => {
-    const { name, value } = evt.target;
-    setFormData((l) => ({ ...l, [name]: value }));
-  };
+    setIsSubmitting(true);
+    try {
+      let res = await login(formData);
+      if (res.success) {
+        navigate("/");
+      } else {
+        setFormErrors(res.errors);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <Flex
-      Flex
       width={"100vw"}
       height={"100vh"}
       alignContent={"center"}
@@ -61,36 +75,43 @@ const LoginForm = ({ login }) => {
               <Box textAlign="center">
                 <Heading>Login</Heading>
               </Box>
-              <FormLabel htmlFor="username">Username</FormLabel>
-              <Input
-                name="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Username"
-                required
-              />
-              <FormLabel htmlFor="password">Password</FormLabel>
-              <Input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                autoComplete="current-password"
-                required
-              />
-              <br />
-              <br />
-              <Center>
+              <FormControl isInvalid={!!errors.username} mb={4}>
+                <FormLabel htmlFor="username">Username</FormLabel>
+                <Input
+                  id="username"
+                  name="username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Username"
+                />
+                <FormErrorMessage>{errors.username}</FormErrorMessage>
+              </FormControl>
+              <FormControl isInvalid={!!errors.password} mb={4}>
+                <FormLabel htmlFor="password">Password</FormLabel>
+                <Input
+                  id="password"
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  autoComplete="current-password"
+                />
+                <FormErrorMessage>{errors.password}</FormErrorMessage>
+              </FormControl>
+              <Center mt={6}>
                 <Button
+                  type="submit"
                   colorScheme={"blue"}
-                  display={"center"}
                   bg={"blue.400"}
                   rounded={"full"}
                   px={6}
+                  isLoading={isSubmitting}
+                  loadingText="Logging in..."
                   _hover={{
                     bg: "blue.500",
                   }}
-                  onClick={handleSubmit}
                 >
                   Log in
                 </Button>

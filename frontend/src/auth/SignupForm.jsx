@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MakeAlert from "../common/MakeAlert";
+import useFormValidation, { validators } from "../hooks/useFormValidation";
 import {
   Box,
   Button,
@@ -10,41 +11,73 @@ import {
   Heading,
   Flex,
   FormLabel,
+  FormControl,
+  FormErrorMessage,
   Stack,
   useColorModeValue,
 } from "@chakra-ui/react";
 
-//Signup form;
 const SignupForm = ({ signup }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    title: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-  });
   const [formErrors, setFormErrors] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validationRules = {
+    username: [
+      validators.required("Username is required"),
+      validators.minLength(3, "Username must be at least 3 characters"),
+      validators.pattern(/^[^.]+$/, "Username cannot contain periods"),
+    ],
+    password: [
+      validators.required("Password is required"),
+      validators.minLength(5, "Password must be at least 5 characters"),
+    ],
+    email: [
+      validators.required("Email is required"),
+      validators.email("Please enter a valid email"),
+    ],
+    firstName: [validators.required("First name is required")],
+    lastName: [validators.required("Last name is required")],
+  };
+
+  const {
+    values: formData,
+    errors,
+    handleChange,
+    handleBlur,
+    validateAll,
+    setFieldValue,
+  } = useFormValidation(
+    {
+      username: "",
+      password: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      title: "Mr.",
+    },
+    validationRules
+  );
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (formData.username.includes(".")) {
-      return setFormErrors("Periods may not be included in username");
-    }
-    let res = await signup(formData);
+    if (!validateAll()) return;
 
-    //Create null classroom to go along with new user
-    if (res.success) {
-      navigate("/");
-    } else {
-      setFormErrors(res.errors);
+    setIsSubmitting(true);
+    try {
+      let res = await signup(formData);
+      if (res.success) {
+        navigate("/");
+      } else {
+        setFormErrors(res.errors);
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((data) => ({ ...data, [name]: value }));
+  const handleTitleChange = (e) => {
+    setFieldValue("title", e.target.value);
   };
 
   return (
@@ -64,7 +97,6 @@ const SignupForm = ({ signup }) => {
           bg={useColorModeValue("white", "gray.700")}
           boxShadow={"lg"}
           p={10}
-          mb
         >
           <Center>
             <Stack spacing={5}>
@@ -74,81 +106,101 @@ const SignupForm = ({ signup }) => {
                 </Box>
                 <Box style={{ display: "flex", flexDirection: "row" }}>
                   <Box mr={"4"} mt="4" mb="4">
-                    <FormLabel htmlFor="username">Username</FormLabel>
-                    <Input
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                    />
-                    <br />
-                    <FormLabel htmlFor="password">Password</FormLabel>
-                    <Input
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                    />
-                    <br />
-                    <FormLabel>Email</FormLabel>
-                    <Input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                    />
+                    <FormControl isInvalid={!!errors.username} mb={3}>
+                      <FormLabel htmlFor="username">Username</FormLabel>
+                      <Input
+                        id="username"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                      <FormErrorMessage>{errors.username}</FormErrorMessage>
+                    </FormControl>
+                    <FormControl isInvalid={!!errors.password} mb={3}>
+                      <FormLabel htmlFor="password">Password</FormLabel>
+                      <Input
+                        id="password"
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                      <FormErrorMessage>{errors.password}</FormErrorMessage>
+                    </FormControl>
+                    <FormControl isInvalid={!!errors.email} mb={3}>
+                      <FormLabel htmlFor="email">Email</FormLabel>
+                      <Input
+                        id="email"
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                      <FormErrorMessage>{errors.email}</FormErrorMessage>
+                    </FormControl>
                   </Box>
                   <Box mt="4" mb="4">
-                    {" "}
-                    {/* Added padding to top and bottom */}
                     <FormLabel htmlFor="title">Title:</FormLabel>
-                    <Stack direction="row">
+                    <Stack direction="row" mb={3}>
                       <Radio
-                        type="radio"
                         name="title"
                         value="Mr."
-                        onChange={handleChange}
-                        checked={formData.title === "Mr."}
+                        onChange={handleTitleChange}
+                        isChecked={formData.title === "Mr."}
                       />
                       <FormLabel htmlFor="Mr">Mr.</FormLabel>
                       <Radio
-                        type="radio"
                         name="title"
                         value="Mrs."
-                        onChange={handleChange}
-                        checked={formData.title === "Mrs."}
+                        onChange={handleTitleChange}
+                        isChecked={formData.title === "Mrs."}
                       />
                       <FormLabel htmlFor="Mrs.">Mrs.</FormLabel>
                       <Radio
-                        type="radio"
                         name="title"
                         value="Ms."
-                        onChange={handleChange}
-                        checked={formData.title === "Ms."}
+                        onChange={handleTitleChange}
+                        isChecked={formData.title === "Ms."}
                       />
                       <FormLabel htmlFor="Ms.">Ms.</FormLabel>
                     </Stack>
-                    <FormLabel htmlFor="firstName">First name</FormLabel>
-                    <Input
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                    />
-                    <FormLabel htmlFor="lastName">Last name</FormLabel>
-                    <Input
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                    />
+                    <FormControl isInvalid={!!errors.firstName} mb={3}>
+                      <FormLabel htmlFor="firstName">First name</FormLabel>
+                      <Input
+                        id="firstName"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                      <FormErrorMessage>{errors.firstName}</FormErrorMessage>
+                    </FormControl>
+                    <FormControl isInvalid={!!errors.lastName} mb={3}>
+                      <FormLabel htmlFor="lastName">Last name</FormLabel>
+                      <Input
+                        id="lastName"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                      />
+                      <FormErrorMessage>{errors.lastName}</FormErrorMessage>
+                    </FormControl>
                   </Box>
                 </Box>
 
                 <Center>
                   <Button
-                    onClick={handleSubmit}
+                    type="submit"
                     colorScheme={"blue"}
                     bg={"blue.400"}
                     rounded={"full"}
                     px={6}
+                    isLoading={isSubmitting}
+                    loadingText="Signing up..."
                     _hover={{
                       bg: "green.500",
                     }}
