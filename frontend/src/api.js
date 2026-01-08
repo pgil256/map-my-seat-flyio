@@ -1,10 +1,22 @@
 import axios from "axios";
 
 // Dynamic base URL for different environments
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ||
-  (import.meta.env.MODE === 'production' ? '/api' : 'http://localhost:3001');
+const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.MODE === "production" ? "/api" : "http://localhost:3001");
 
-//Class for interactive API requests
+// API Error class for structured error handling
+export class ApiError extends Error {
+  constructor(message, code, status, details = null) {
+    super(message);
+    this.name = "ApiError";
+    this.code = code;
+    this.status = status;
+    this.details = details;
+  }
+}
+
+// Class for interactive API requests
 class SeatingApi {
   static token;
 
@@ -13,8 +25,8 @@ class SeatingApi {
 
     const url = `${BASE_URL}${endpoint}`;
     const headers = {
-      'Authorization': `Bearer ${SeatingApi.token}`,
-      'Content-Type': 'application/json'
+      Authorization: `Bearer ${SeatingApi.token}`,
+      "Content-Type": "application/json",
     };
     const params = method === "get" ? data : {};
 
@@ -22,14 +34,52 @@ class SeatingApi {
       return (await axios({ url, method, data, params, headers })).data;
     } catch (err) {
       console.error("API Error:", err.response);
-      let message = err.response.data.error.message;
-      throw Array.isArray(message) ? message : [message];
+
+      // Handle network errors
+      if (!err.response) {
+        throw new ApiError(
+          "Unable to connect to server. Please check your internet connection.",
+          "NETWORK_ERROR",
+          0
+        );
+      }
+
+      // Extract error details from response
+      const { status } = err.response;
+      const responseData = err.response.data;
+
+      // Handle new standardized error format
+      if (responseData.error && responseData.code) {
+        throw new ApiError(
+          responseData.error,
+          responseData.code,
+          status,
+          responseData.details
+        );
+      }
+
+      // Handle legacy error format for backwards compatibility
+      if (responseData.error?.message) {
+        const message = responseData.error.message;
+        throw new ApiError(
+          Array.isArray(message) ? message.join(", ") : message,
+          "LEGACY_ERROR",
+          status
+        );
+      }
+
+      // Fallback for unknown error format
+      throw new ApiError(
+        "An unexpected error occurred",
+        "UNKNOWN_ERROR",
+        status
+      );
     }
   }
 
-  //Various routes to send to API
+  // Various routes to send to API
 
-  //Routes related to user
+  // Routes related to user
   static async getCurrentUser(username) {
     let res = await this.request(`/users/${username}`);
     return res.user;
@@ -50,7 +100,7 @@ class SeatingApi {
     return res.user;
   }
 
-  //Period specific routes
+  // Period specific routes
 
   static async createPeriod(username, data) {
     let res = await this.request(`/periods/${username}`, data, "post");
@@ -68,18 +118,30 @@ class SeatingApi {
   }
 
   static async updatePeriod(username, periodId, data) {
-    let res = await this.request(`/periods/${username}/${periodId}`, data, "patch");
+    let res = await this.request(
+      `/periods/${username}/${periodId}`,
+      data,
+      "patch"
+    );
     return res.period;
   }
 
   static async deletePeriod(username, periodId) {
-    let res = await this.request(`/periods/${username}/${periodId}`, {}, "delete");
+    let res = await this.request(
+      `/periods/${username}/${periodId}`,
+      {},
+      "delete"
+    );
     return res.periodId;
   }
 
-  //Student specific Routes
+  // Student specific Routes
   static async createStudent(username, periodId, data) {
-    let res = await this.request(`/periods/${username}/${periodId}/students`, data, "post");
+    let res = await this.request(
+      `/periods/${username}/${periodId}/students`,
+      data,
+      "post"
+    );
     return res.student;
   }
 
@@ -101,7 +163,7 @@ class SeatingApi {
     return res.studentId;
   }
 
-  //Classroom specific routes
+  // Classroom specific routes
 
   static async getClassroom(username) {
     let res = await this.request(`/classrooms/${username}`);
@@ -114,7 +176,11 @@ class SeatingApi {
   }
 
   static async updateClassroom(username, classroomId, data) {
-    let res = await this.request(`/classrooms/${username}/${classroomId}`, data, "patch");
+    let res = await this.request(
+      `/classrooms/${username}/${classroomId}`,
+      data,
+      "patch"
+    );
     return res.classroom;
   }
 
@@ -130,12 +196,16 @@ class SeatingApi {
   }
 
   static async getSeatingCharts(username, classroomId) {
-    let res = await this.request(`/classrooms/${username}/${classroomId}/seating-charts`);
+    let res = await this.request(
+      `/classrooms/${username}/${classroomId}/seating-charts`
+    );
     return res.seatingCharts;
   }
 
   static async getSeatingChart(username, classroomId, seatingChartId) {
-    let res = await this.request(`/classrooms/${username}/${classroomId}/seating-charts/${seatingChartId}`);
+    let res = await this.request(
+      `/classrooms/${username}/${classroomId}/seating-charts/${seatingChartId}`
+    );
     return res.seatingChart;
   }
 
@@ -149,7 +219,11 @@ class SeatingApi {
   }
 
   static async deleteSeatingChart(username, classroomId, seatingChartId) {
-    let res = await this.request(`/classrooms/${username}/${classroomId}/seating-charts/${seatingChartId}`, {}, "delete");
+    let res = await this.request(
+      `/classrooms/${username}/${classroomId}/seating-charts/${seatingChartId}`,
+      {},
+      "delete"
+    );
     return res.seatingChart.number;
   }
 }
