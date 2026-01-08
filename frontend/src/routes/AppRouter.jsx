@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../home/Home";
 import ClassroomForm from "../classroom/ClassroomForm";
+import ClassroomList from "../classroom/ClassroomList";
 import StudentForm from "../students/StudentForm";
 import LoginForm from "../auth/LoginForm";
 import PeriodForm from "../periods/PeriodForm";
@@ -37,6 +38,14 @@ const AppRouter = ({ login, signup }) => {
 
         <Route exact='true' path='/classrooms' element={<PrivateRoute />}>
           <Route exact='true' path='/classrooms' element={<ClassroomForm />} />
+        </Route>
+
+        <Route path='/classrooms/:username' element={<PrivateRoute />}>
+          <Route path='/classrooms/:username' element={<ClassroomList />} />
+        </Route>
+
+        <Route path='/classrooms/:username/:classroomId' element={<PrivateRoute />}>
+          <Route path='/classrooms/:username/:classroomId' element={<ClassroomForm />} />
         </Route>
 
         {/* <Route
