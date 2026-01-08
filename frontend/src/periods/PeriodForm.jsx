@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import SeatingApi from "../api.js";
 import UserContext from "../auth/UserContext";
 import MakeAlert from "../common/MakeAlert";
+import EmptyState from "../common/EmptyState";
 import {
   Stack,
   Box,
@@ -308,73 +309,78 @@ const PeriodForm = () => {
             </Box>
           </Center>
           <CardBody>
-            <SimpleGrid columns={3} spacing={2}>
-              {periods && Object.values(periods).length
-                ? Object.values(periods).map((period, index) => (
-                    <>
-                      <Box py={4}>
-                        <Box
-                          maxW={"280px"}
-                          w={"full"}
-                          bg={"white"}
-                          boxShadow={"2xl"}
-                          rounded={"lg"}
-                          p={2}
-                          textAlign={"center"}
-                        >
-                          <Heading fontSize={"2xl"} fontFamily={"body"}>
-                            Period {period.number}
-                          </Heading>
-                          <Center>
-                            <Stack direction="row">
-                              <Text fontWeight={600} color={"gray.500"} mb={2}>
-                                {period.title}
-                              </Text>
-                              <Text fontWeight={600} color={"gray.500"}>
-                                {period.schoolYear}
-                              </Text>
-                            </Stack>
-                          </Center>
+            {periods && periods.length === 0 ? (
+              <EmptyState
+                title="No periods yet"
+                description="Create your first class period to start adding students and generating seating charts."
+                actionLabel="Create Period"
+                onAction={() => document.getElementById("titleInput")?.focus()}
+              />
+            ) : (
+              <SimpleGrid columns={3} spacing={2}>
+                {periods.map((period, index) => (
+                  <Box py={4} key={period.periodId}>
+                    <Box
+                      maxW={"280px"}
+                      w={"full"}
+                      bg={"white"}
+                      boxShadow={"2xl"}
+                      rounded={"lg"}
+                      p={2}
+                      textAlign={"center"}
+                    >
+                      <Heading fontSize={"2xl"} fontFamily={"body"}>
+                        Period {period.number}
+                      </Heading>
+                      <Center>
+                        <Stack direction="row">
+                          <Text fontWeight={600} color={"gray.500"} mb={2}>
+                            {period.title}
+                          </Text>
+                          <Text fontWeight={600} color={"gray.500"}>
+                            {period.schoolYear}
+                          </Text>
+                        </Stack>
+                      </Center>
 
-                          <Stack mt={2} direction={"row"} spacing={2}>
-                            <Button
-                              onClick={() => handleEdit(index)}
-                              flex={1}
-                              fontSize={"sm"}
-                              _focus={{
-                                bg: "gray.200",
-                              }}
-                            >
-                              Edit Period
-                            </Button>
-                            <Button
-                              onClick={() =>
-                                navigate(`/periods/${period.periodId}`)
-                              }
-                              flex={1}
-                              fontSize={"sm"}
-                              bg={"blue.400"}
-                              color={"white"}
-                              boxShadow={
-                                "0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)"
-                              }
-                              _hover={{
-                                bg: "blue.500",
-                              }}
-                              _focus={{
-                                bg: "blue.500",
-                              }}
-                            >
-                              Add Students
-                            </Button>
-                          </Stack>
-                        </Box>
-                        <Spacer />
-                      </Box>
-                    </>
-                  ))
-                : null}
-            </SimpleGrid>
+                      <Stack mt={2} direction={"row"} spacing={2}>
+                        <Button
+                          onClick={() => handleEdit(index)}
+                          flex={1}
+                          fontSize={"sm"}
+                          _focus={{
+                            bg: "gray.200",
+                          }}
+                        >
+                          Edit Period
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            navigate(`/periods/${period.periodId}`)
+                          }
+                          flex={1}
+                          fontSize={"sm"}
+                          bg={"blue.400"}
+                          color={"white"}
+                          boxShadow={
+                            "0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)"
+                          }
+                          _hover={{
+                            bg: "blue.500",
+                          }}
+                          _focus={{
+                            bg: "blue.500",
+                          }}
+                        >
+                          Add Students
+                        </Button>
+                      </Stack>
+                    </Box>
+                    <Spacer />
+                  </Box>
+                ))}
+              </SimpleGrid>
+            )}
           </CardBody>
         </Card>
       </Flex>

@@ -4,6 +4,7 @@ import SeatingApi from "../api.js";
 import LoadingSpinner from "../common/LoadingSpinner";
 import UserContext from "../auth/UserContext";
 import MakeAlert from "../common/MakeAlert";
+import EmptyState from "../common/EmptyState";
 import Papa from "papaparse";
 
 
@@ -591,79 +592,86 @@ const StudentForm = () => {
             </Box>
           </Center>
           <CardBody>
-            <Box overflowY={"auto"} maxHeight="280px">
-              <SimpleGrid columns={5} spacing={2}>
-                {students && Object.values(students).length
-                  ? Object.values(students).map((student, index) => (
-                      <React.Fragment key={student.studentId}>
-                        <Flex py={5} position="relative">
-                          <Box
-                            maxW={"510px"}
-                            w={"full"}
-                            bg={"white"}
-                            boxShadow={"2xl"}
-                            rounded={"lg"}
-                            p={5}
-                            textAlign={"center"}
+            {students && students.length === 0 ? (
+              <EmptyState
+                title="No students yet"
+                description="Add students individually using the form, or upload a CSV file with your class roster."
+                actionLabel="Add First Student"
+                onAction={() => document.querySelector('input[name="name"]')?.focus()}
+              />
+            ) : (
+              <Box overflowY={"auto"} maxHeight="280px">
+                <SimpleGrid columns={5} spacing={2}>
+                  {students.map((student) => (
+                    <React.Fragment key={student.studentId}>
+                      <Flex py={5} position="relative">
+                        <Box
+                          maxW={"510px"}
+                          w={"full"}
+                          bg={"white"}
+                          boxShadow={"2xl"}
+                          rounded={"lg"}
+                          p={5}
+                          textAlign={"center"}
+                        >
+                          <Heading
+                            fontSize={"2xl"}
+                            fontFamily={"body"}
+                            style={{ cursor: "pointer" }}
                           >
-                            <Heading
-                              fontSize={"2xl"}
-                              fontFamily={"body"}
-                              style={{ cursor: "pointer" }}
-                            >
-                              {student.name}
-                            </Heading>
-                            <Collapse in={allCardsExpanded}>
-                              <>
-                                <Center>
-                                  <Stack
-                                    fontWeight={600}
-                                    fontSize={"sm"}
-                                    color={"gray.500"}
-                                    m={1}
-                                    mt={2}
-                                    w="350px"
-                                  >
-                                    <SimpleGrid spacing={1} columns={2}>
-                                      <Text>Grade: {student.grade}</Text>
-                                      <Text>M/F: {student.gender}</Text>
-                                      <Text>
-                                        ESE: {student.isESE ? "Yes" : "No"}
-                                      </Text>
-                                      <Text>
-                                        504: {student.has504 ? "Yes" : "No"}
-                                      </Text>
-                                      <Text>
-                                        ELL: {student.isELL ? "Yes" : "No"}
-                                      </Text>
-                                      <Text>
-                                        EBD: {student.isEBD ? "Yes" : "No"}
-                                      </Text>
-                                    </SimpleGrid>
-                                  </Stack>
-                                </Center>
-                                <Stack mt={4} direction={"row"} spacing={4}>
-                                  <Button
-                                    onClick={() => setSelectedStudent(student)}
-                                    flex={1}
-                                    fontSize={"sm"}
-                                    rounded={"full"}
-                                    _focus={{
-                                      bg: "gray.200",
-                                    }}
-                                  >
-                                    Edit Student
-                                  </Button>
+                            {student.name}
+                          </Heading>
+                          <Collapse in={allCardsExpanded}>
+                            <>
+                              <Center>
+                                <Stack
+                                  fontWeight={600}
+                                  fontSize={"sm"}
+                                  color={"gray.500"}
+                                  m={1}
+                                  mt={2}
+                                  w="350px"
+                                >
+                                  <SimpleGrid spacing={1} columns={2}>
+                                    <Text>Grade: {student.grade}</Text>
+                                    <Text>M/F: {student.gender}</Text>
+                                    <Text>
+                                      ESE: {student.isESE ? "Yes" : "No"}
+                                    </Text>
+                                    <Text>
+                                      504: {student.has504 ? "Yes" : "No"}
+                                    </Text>
+                                    <Text>
+                                      ELL: {student.isELL ? "Yes" : "No"}
+                                    </Text>
+                                    <Text>
+                                      EBD: {student.isEBD ? "Yes" : "No"}
+                                    </Text>
+                                  </SimpleGrid>
                                 </Stack>
-                              </>
-                            </Collapse>
-                          </Box>
-                        </Flex>
-                      </React.Fragment>
-                    ))
-                  : null}
-              </SimpleGrid>
-            </Box>
+                              </Center>
+                              <Stack mt={4} direction={"row"} spacing={4}>
+                                <Button
+                                  onClick={() => setSelectedStudent(student)}
+                                  flex={1}
+                                  fontSize={"sm"}
+                                  rounded={"full"}
+                                  _focus={{
+                                    bg: "gray.200",
+                                  }}
+                                >
+                                  Edit Student
+                                </Button>
+                              </Stack>
+                            </>
+                          </Collapse>
+                        </Box>
+                      </Flex>
+                    </React.Fragment>
+                  ))}
+                </SimpleGrid>
+              </Box>
+            )}
           </CardBody>
         </Card>
       </Flex>
