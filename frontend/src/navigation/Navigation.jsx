@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import UserContext from "../auth/UserContext";
+import MobileNav from "./MobileNav";
 import {
   Box,
   Flex,
@@ -17,25 +18,35 @@ const Navigation = ({ logout }) => {
     return (
       <Container maxW="container.xl" px={0}>
         <Box bg="teal.400" w="100%" p={4} color="white">
-          <Breadcrumb spacing="8px" separator="|" fontSize="lg">
-            {['/', '/periods', '/classrooms', '/profile'].map((path, index) => (
-              <BreadcrumbItem key={path}>
-                <BreadcrumbLink
-                  as={Link}
-                  to={path}
-                  _hover={{ textDecoration: 'underline' }}
-                  _active={{ color: "teal.600" }}
-                >
-                  {['Home', 'Set Up Classes', 'Create Classroom', 'Profile'][index]}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            ))}
-            <BreadcrumbItem>
-              <BreadcrumbLink as={Link} to="/" onClick={logout}>
-                Logout
+          <Flex justify="space-between" align="center">
+            <Box display={{ base: "none", md: "block" }}>
+              <Breadcrumb spacing="8px" separator="|" fontSize="lg">
+                {['/', `/periods/${currentUser.username}`, `/classrooms/${currentUser.username}`, `/profile/${currentUser.username}`].map((path, index) => (
+                  <BreadcrumbItem key={path}>
+                    <BreadcrumbLink
+                      as={Link}
+                      to={path}
+                      _hover={{ textDecoration: 'underline' }}
+                      _active={{ color: "teal.600" }}
+                    >
+                      {['Home', 'Set Up Classes', 'Create Classroom', 'Profile'][index]}
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                ))}
+                <BreadcrumbItem>
+                  <BreadcrumbLink as={Link} to="/" onClick={logout}>
+                    Logout
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              </Breadcrumb>
+            </Box>
+            <Box display={{ base: "block", md: "none" }} ml="auto">
+              <BreadcrumbLink as={Link} to="/" fontSize="lg" fontWeight="bold">
+                Map My Seat
               </BreadcrumbLink>
-            </BreadcrumbItem>
-          </Breadcrumb>
+            </Box>
+            <MobileNav currentUser={currentUser} logout={logout} />
+          </Flex>
         </Box>
       </Container>
     );
@@ -45,21 +56,29 @@ const Navigation = ({ logout }) => {
     return (
       <Container maxW="container.xl" px={0}>
         <Box bg="teal.400" w="100%" p={4} color="white">
-          <Flex justifyContent="space-between">
-            <Breadcrumb fontWeight="medium" fontSize="lg" spacing="8px" separator="|">
-              {['/', '/login', '/signup'].map((path, index) => (
-                <BreadcrumbItem key={path}>
-                  <BreadcrumbLink
-                    as={Link}
-                    to={path}
-                    _hover={{ textDecoration: 'underline' }}
-                    _active={{ color: "teal.600" }}
-                  >
-                    {['Home', 'Log In', 'Sign Up'][index]}
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-              ))}
-            </Breadcrumb>
+          <Flex justify="space-between" align="center">
+            <Box display={{ base: "none", md: "block" }}>
+              <Breadcrumb fontWeight="medium" fontSize="lg" spacing="8px" separator="|">
+                {['/', '/login', '/signup'].map((path, index) => (
+                  <BreadcrumbItem key={path}>
+                    <BreadcrumbLink
+                      as={Link}
+                      to={path}
+                      _hover={{ textDecoration: 'underline' }}
+                      _active={{ color: "teal.600" }}
+                    >
+                      {['Home', 'Log In', 'Sign Up'][index]}
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                ))}
+              </Breadcrumb>
+            </Box>
+            <Box display={{ base: "block", md: "none" }} ml="auto">
+              <BreadcrumbLink as={Link} to="/" fontSize="lg" fontWeight="bold">
+                Map My Seat
+              </BreadcrumbLink>
+            </Box>
+            <MobileNav currentUser={currentUser} logout={logout} />
           </Flex>
         </Box>
       </Container>
