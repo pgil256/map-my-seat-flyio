@@ -7,6 +7,7 @@ import SeatingApi from "./api";
 import UserContext from "./auth/UserContext";
 import jwt from "jsonwebtoken";
 import LoadingSpinner from "./common/LoadingSpinner";
+import { ToastProvider } from "./common/ToastContext";
 export const TOKEN_STORAGE_ID = "seating-token";
 
 function App() {
@@ -82,12 +83,14 @@ function App() {
   //Modify homepage based on user context
   return (
       <BrowserRouter>
-        <UserContext.Provider value={{ currentUser, setCurrentUser }}>
-          <div id="main">
-            <Navigation logout={logout} />
-            <AppRouter login={login} signup={signup} />
-          </div>
-        </UserContext.Provider>
+        <ToastProvider>
+          <UserContext.Provider value={{ currentUser, setCurrentUser }}>
+            <div id="main">
+              <Navigation logout={logout} />
+              <AppRouter login={login} signup={signup} />
+            </div>
+          </UserContext.Provider>
+        </ToastProvider>
       </BrowserRouter>
   );
 }
