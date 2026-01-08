@@ -34,13 +34,13 @@ async function commonBeforeAll() {
     INSERT INTO classrooms(
       user_username,
       seat_alphabetical,
-      randomize,
+      seat_randomize,
       seat_high_low,
       seat_male_female,
-      ESE_is_priority,
-      ELL_is_priority,
+      ese_is_priority,
+      ell_is_priority,
       fivezerofour_is_priority,
-      EBD_is_priority,
+      ebd_is_priority,
       seating_config
     )
     VALUES(

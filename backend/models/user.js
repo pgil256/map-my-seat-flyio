@@ -14,13 +14,22 @@ class User {
 
   static async authenticate(username, password) {
     const user = await db('users')
+      .select([
+        'username',
+        'password',
+        'title',
+        db.raw('first_name AS "firstName"'),
+        db.raw('last_name AS "lastName"'),
+        'email',
+        db.raw('is_admin AS "isAdmin"')
+      ])
       .where('username', username)
       .first();
 
     if (user) {
       const isValid = await bcrypt.compare(password, user.password);
       if (isValid === true) {
-        const { password, ...userWithoutPassword } = user;
+        const { password: pwd, ...userWithoutPassword } = user;
         return userWithoutPassword;
       }
     }

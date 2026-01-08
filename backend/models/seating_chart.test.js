@@ -17,16 +17,16 @@ describe("SeatingChart", () => {
   describe("createSeatingChart", () => {
     it("should create a new seating chart", async () => {
       // First we need to get a valid classroom_id from test data
-      const classroomResult = await db.query(
-        `SELECT classroom_id FROM classrooms LIMIT 1`
-      );
+      const classroom = await db('classrooms')
+        .select('classroom_id')
+        .first();
 
-      if (classroomResult.rows.length === 0) {
+      if (!classroom) {
         // Skip if no test classroom exists
         return;
       }
 
-      const classroomId = classroomResult.rows[0].classroom_id;
+      const classroomId = classroom.classroom_id;
       const arrangement = [{ studentId: 1, row: 0, col: 0 }];
 
       const seatingChart = await SeatingChart.createSeatingChart({
@@ -43,15 +43,15 @@ describe("SeatingChart", () => {
 
   describe("getSeatingCharts", () => {
     it("returns all seating charts for a classroom", async () => {
-      const classroomResult = await db.query(
-        `SELECT classroom_id FROM classrooms LIMIT 1`
-      );
+      const classroom = await db('classrooms')
+        .select('classroom_id')
+        .first();
 
-      if (classroomResult.rows.length === 0) {
+      if (!classroom) {
         return;
       }
 
-      const classroomId = classroomResult.rows[0].classroom_id;
+      const classroomId = classroom.classroom_id;
       const charts = await SeatingChart.getSeatingCharts(classroomId);
 
       expect(Array.isArray(charts)).toBe(true);
