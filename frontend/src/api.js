@@ -170,9 +170,28 @@ class SeatingApi {
     return res.classroom;
   }
 
+  static async getClassrooms(username) {
+    let res = await this.request(`/classrooms/${username}/all`);
+    return res.classrooms;
+  }
+
   static async createClassroom(username) {
     let res = await this.request(`/classrooms/${username}`, {}, "post");
     return res.classroom;
+  }
+
+  static async createClassroomWithName(username, name) {
+    let res = await this.request(`/classrooms/${username}`, { name }, "post");
+    return res.classroom;
+  }
+
+  static async deleteClassroom(username, classroomId) {
+    let res = await this.request(
+      `/classrooms/${username}/${classroomId}`,
+      {},
+      "delete"
+    );
+    return res.deleted;
   }
 
   static async updateClassroom(username, classroomId, data) {
@@ -225,6 +244,39 @@ class SeatingApi {
       "delete"
     );
     return res.seatingChart.number;
+  }
+
+  static async duplicateSeatingChart(username, classroomId, seatingChartId, label) {
+    let res = await this.request(
+      `/classrooms/${username}/${classroomId}/seating-charts/${seatingChartId}/duplicate`,
+      { label },
+      "post"
+    );
+    return res.seatingChart;
+  }
+
+  // Student Constraint Routes
+
+  static async getConstraints(username, periodId) {
+    let res = await this.request(`/constraints/${username}/${periodId}`);
+    return res.constraints;
+  }
+
+  static async createConstraint(username, periodId, data) {
+    let res = await this.request(
+      `/constraints/${username}/${periodId}`,
+      data,
+      "post"
+    );
+    return res.constraint;
+  }
+
+  static async deleteConstraint(username, periodId, constraintId) {
+    await this.request(
+      `/constraints/${username}/${periodId}/${constraintId}`,
+      {},
+      "delete"
+    );
   }
 }
 
