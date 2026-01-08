@@ -8,6 +8,7 @@ import UserContext from "./auth/UserContext";
 import jwt from "jsonwebtoken";
 import LoadingSpinner from "./common/LoadingSpinner";
 import { ToastProvider } from "./common/ToastContext";
+import ErrorBoundary from "./common/ErrorBoundary";
 export const TOKEN_STORAGE_ID = "seating-token";
 
 function App() {
@@ -82,6 +83,7 @@ function App() {
 
   //Modify homepage based on user context
   return (
+    <ErrorBoundary>
       <BrowserRouter>
         <ToastProvider>
           <UserContext.Provider value={{ currentUser, setCurrentUser }}>
@@ -92,6 +94,7 @@ function App() {
           </UserContext.Provider>
         </ToastProvider>
       </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 
