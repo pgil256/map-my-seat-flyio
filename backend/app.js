@@ -9,6 +9,7 @@ const authRoutes = require("./routes/auth");
 const usersRoutes = require("./routes/users");
 const classroomsRoutes = require("./routes/classrooms");
 const periodsRoutes = require("./routes/periods");
+const constraintsRoutes = require("./routes/constraints");
 const path = require('path');
 const morgan = require("morgan");
 
@@ -23,6 +24,7 @@ app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/classrooms", classroomsRoutes);
 app.use("/periods", periodsRoutes);
+app.use("/constraints", constraintsRoutes);
 
 
 // Point to the frontend's built directory
