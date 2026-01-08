@@ -8,6 +8,7 @@ const authRoutes = require("../backend/routes/auth");
 const usersRoutes = require("../backend/routes/users");
 const classroomsRoutes = require("../backend/routes/classrooms");
 const periodsRoutes = require("../backend/routes/periods");
+const constraintsRoutes = require("../backend/routes/constraints");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/classrooms", classroomsRoutes);
 app.use("/api/periods", periodsRoutes);
+app.use("/api/constraints", constraintsRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
