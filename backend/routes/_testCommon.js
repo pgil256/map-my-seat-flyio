@@ -11,34 +11,33 @@ let adminToken;
 
 async function commonBeforeAll() {
   // Delete in correct order due to foreign key constraints
-  await db.query("DELETE FROM seating_charts");
-  await db.query("DELETE FROM students");
-  await db.query("DELETE FROM classrooms");
-  await db.query("DELETE FROM periods");
-  await db.query("DELETE FROM users");
+  await db.raw("DELETE FROM seating_charts");
+  await db.raw("DELETE FROM students");
+  await db.raw("DELETE FROM classrooms");
+  await db.raw("DELETE FROM periods");
+  await db.raw("DELETE FROM users");
 
   // Insert test users
-  await db.query(
+  const password1 = await bcrypt.hash("password1", BCRYPT_WORK_FACTOR);
+  const password2 = await bcrypt.hash("password2", BCRYPT_WORK_FACTOR);
+  const adminPassword = await bcrypt.hash("adminpassword", BCRYPT_WORK_FACTOR);
+  await db.raw(
     `INSERT INTO users(username, password, title, first_name, last_name, email, is_admin)
-     VALUES ('u1', $1, 'Mr.', 'U1F', 'U1L', 'u1@email.com', false),
-            ('u2', $2, 'Ms.', 'U2F', 'U2L', 'u2@email.com', false),
-            ('admin', $3, 'Dr.', 'Admin', 'User', 'admin@email.com', true)`,
-    [
-      await bcrypt.hash("password1", BCRYPT_WORK_FACTOR),
-      await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
-      await bcrypt.hash("adminpassword", BCRYPT_WORK_FACTOR),
-    ]
+     VALUES ('u1', ?, 'Mr.', 'U1F', 'U1L', 'u1@email.com', false),
+            ('u2', ?, 'Ms.', 'U2F', 'U2L', 'u2@email.com', false),
+            ('admin', ?, 'Dr.', 'Admin', 'User', 'admin@email.com', true)`,
+    [password1, password2, adminPassword]
   );
 
   // Insert test periods
-  await db.query(`
+  await db.raw(`
     INSERT INTO periods (user_username, school_year, title, number)
     VALUES ('u1', '2023-2024', 'Math Period 1', 1),
            ('u1', '2023-2024', 'Math Period 2', 2)
   `);
 
   // Insert test classroom
-  await db.query(`
+  await db.raw(`
     INSERT INTO classrooms(
       user_username,
       seat_alphabetical,
@@ -72,15 +71,15 @@ async function commonBeforeAll() {
 }
 
 async function commonBeforeEach() {
-  await db.query("BEGIN");
+  await db.raw("BEGIN");
 }
 
 async function commonAfterEach() {
-  await db.query("ROLLBACK");
+  await db.raw("ROLLBACK");
 }
 
 async function commonAfterAll() {
-  await db.end();
+  await db.destroy();
 }
 
 module.exports = {

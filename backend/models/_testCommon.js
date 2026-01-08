@@ -5,32 +5,31 @@ const { BCRYPT_WORK_FACTOR } = require("../config");
 
 async function commonBeforeAll() {
   // Delete in correct order due to foreign key constraints
-  await db.query("DELETE FROM seating_charts");
-  await db.query("DELETE FROM students");
-  await db.query("DELETE FROM classrooms");
-  await db.query("DELETE FROM periods");
-  await db.query("DELETE FROM users");
+  await db.raw("DELETE FROM seating_charts");
+  await db.raw("DELETE FROM students");
+  await db.raw("DELETE FROM classrooms");
+  await db.raw("DELETE FROM periods");
+  await db.raw("DELETE FROM users");
 
   // Insert test users
-  await db.query(
+  const password1 = await bcrypt.hash("password1", BCRYPT_WORK_FACTOR);
+  const password2 = await bcrypt.hash("password2", BCRYPT_WORK_FACTOR);
+  await db.raw(
     `INSERT INTO users(username, password, title, first_name, last_name, email, is_admin)
-     VALUES ('u1', $1, 'Mr.', 'U1F', 'U1L', 'u1@email.com', false),
-            ('u2', $2, 'Ms.', 'U2F', 'U2L', 'u2@email.com', false)`,
-    [
-      await bcrypt.hash("password1", BCRYPT_WORK_FACTOR),
-      await bcrypt.hash("password2", BCRYPT_WORK_FACTOR),
-    ]
+     VALUES ('u1', ?, 'Mr.', 'U1F', 'U1L', 'u1@email.com', false),
+            ('u2', ?, 'Ms.', 'U2F', 'U2L', 'u2@email.com', false)`,
+    [password1, password2]
   );
 
   // Insert test periods
-  await db.query(`
+  await db.raw(`
     INSERT INTO periods (user_username, school_year, title, number)
     VALUES ('u1', '2023-2024', 'Math Period 1', 1),
            ('u1', '2023-2024', 'Math Period 2', 2)
   `);
 
   // Insert test classroom
-  await db.query(`
+  await db.raw(`
     INSERT INTO classrooms(
       user_username,
       seat_alphabetical,
@@ -58,7 +57,7 @@ async function commonBeforeAll() {
   `);
 
   // Insert test students
-  await db.query(`
+  await db.raw(`
     INSERT INTO students (period_id, name, grade, gender, is_ESE, has_504, is_ELL, is_EBD)
     SELECT period_id, 'Test Student 1', 10, 'M', false, false, false, false
     FROM periods WHERE number = 1 AND user_username = 'u1'
@@ -66,15 +65,15 @@ async function commonBeforeAll() {
 }
 
 async function commonBeforeEach() {
-  await db.query("BEGIN");
+  await db.raw("BEGIN");
 }
 
 async function commonAfterEach() {
-  await db.query("ROLLBACK");
+  await db.raw("ROLLBACK");
 }
 
 async function commonAfterAll() {
-  await db.end();
+  await db.destroy();
 }
 
 module.exports = {

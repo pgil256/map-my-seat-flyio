@@ -4,11 +4,11 @@ const request = require("supertest");
 const app = require("./app");
 
 describe("App", () => {
-  describe("404 Handler", () => {
-    test("returns 404 for nonexistent route", async () => {
+  describe("SPA Catch-all", () => {
+    test("returns 200 for unknown routes (serves SPA)", async () => {
       const response = await request(app).get("/nonexistent-route-12345");
-      expect(response.statusCode).toBe(404);
-      expect(response.body).toHaveProperty("error");
+      // SPA catch-all serves index.html with 200
+      expect(response.statusCode).toBe(200);
     });
   });
 
