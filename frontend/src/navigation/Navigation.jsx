@@ -8,7 +8,8 @@ import {
   Container,
   Breadcrumb,
   BreadcrumbItem,
-  BreadcrumbLink
+  BreadcrumbLink,
+  Link as ChakraLink
 } from "@chakra-ui/react";
 
 const Navigation = ({ logout }) => {
@@ -41,9 +42,9 @@ const Navigation = ({ logout }) => {
               </Breadcrumb>
             </Box>
             <Box display={{ base: "block", md: "none" }} ml="auto">
-              <BreadcrumbLink as={Link} to="/" fontSize="lg" fontWeight="bold">
+              <ChakraLink as={Link} to="/" fontSize="lg" fontWeight="bold" _hover={{ textDecoration: 'none' }}>
                 Map My Seat
-              </BreadcrumbLink>
+              </ChakraLink>
             </Box>
             <MobileNav currentUser={currentUser} logout={logout} />
           </Flex>
@@ -74,9 +75,9 @@ const Navigation = ({ logout }) => {
               </Breadcrumb>
             </Box>
             <Box display={{ base: "block", md: "none" }} ml="auto">
-              <BreadcrumbLink as={Link} to="/" fontSize="lg" fontWeight="bold">
+              <ChakraLink as={Link} to="/" fontSize="lg" fontWeight="bold" _hover={{ textDecoration: 'none' }}>
                 Map My Seat
-              </BreadcrumbLink>
+              </ChakraLink>
             </Box>
             <MobileNav currentUser={currentUser} logout={logout} />
           </Flex>
