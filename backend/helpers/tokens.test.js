@@ -1,4 +1,4 @@
-const { createToken } = require('./createToken');
+const { createToken } = require('./tokens');
 const jwt = require('jsonwebtoken');
 const { SECRET_KEY } = require('../config');
 
