@@ -18,12 +18,20 @@ const router = new express.Router();
 
 // router.use("/:classroomId/seating-charts", seatingChartRouter);
 
-//Route for retrieving classroom via username
+//Route for retrieving all classrooms for a user
+router.get("/:username/all", adminOrCorrectUser, async function (req, res, next) {
+  try {
+    const classrooms = await Classroom.getClassrooms(req.params.username);
+    return res.json({ classrooms });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+//Route for retrieving classroom via username (legacy - returns first classroom)
 router.get("/:username", adminOrCorrectUser, async function (req, res, next) {
   try {
-    console.log(req.params.username)
     const classroom = await Classroom.getClassroom(req.params.username);
-    console.log(classroom);
     return res.status(200).json({ classroom });
   } catch (err) {
     return next(err);
@@ -33,8 +41,9 @@ router.get("/:username", adminOrCorrectUser, async function (req, res, next) {
 //Route for creating new classroom
 router.post("/:username", adminOrCorrectUser, async function (req, res, next) {
   try {
-    const classroom = await Classroom.createClassroom(req.params.username);
-    return res.json({ classroom });
+    const { name } = req.body;
+    const classroom = await Classroom.createClassroom(req.params.username, name);
+    return res.status(201).json({ classroom });
   } catch (err) {
     return next(err);
   }
@@ -145,6 +154,24 @@ router.patch(
         req.body
       );
       return res.json({ seatingChart });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+//Route for duplicating a seating chart
+router.post(
+  "/:username/:classroomId/seating-charts/:seatingChartId/duplicate",
+  adminOrCorrectUser,
+  async function (req, res, next) {
+    try {
+      const { label } = req.body;
+      const seatingChart = await SeatingChart.duplicateSeatingChart(
+        req.params.seatingChartId,
+        label
+      );
+      return res.status(201).json({ seatingChart });
     } catch (err) {
       return next(err);
     }
