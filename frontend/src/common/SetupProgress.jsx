@@ -14,12 +14,12 @@ function SetupProgress({ hasPeriods, hasStudents, hasClassroom, username }) {
     {
       label: "Create Period",
       done: hasPeriods,
-      link: `/periods/${username}`,
+      link: "/periods",
     },
     {
       label: "Add Students",
       done: hasStudents,
-      link: hasPeriods ? `/periods/${username}` : null,
+      link: hasPeriods ? "/periods" : null,
     },
     {
       label: "Setup Classroom",

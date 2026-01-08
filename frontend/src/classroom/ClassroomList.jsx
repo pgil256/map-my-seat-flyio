@@ -32,6 +32,17 @@ function ClassroomList() {
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const getDeskCount = (seatingConfig) => {
+    if (!seatingConfig) return 0;
+    try {
+      const config = JSON.parse(seatingConfig);
+      if (!Array.isArray(config)) return 0;
+      return config.flat().filter(c => c === "desk").length;
+    } catch {
+      return 0;
+    }
+  };
+
   const [classrooms, setClassrooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newClassroomName, setNewClassroomName] = useState("");
@@ -102,8 +113,8 @@ function ClassroomList() {
                 <VStack align="start" spacing={3}>
                   <Heading size="md">{classroom.name}</Heading>
                   <Text color="gray.500" fontSize="sm">
-                    {classroom.seatingConfig
-                      ? `${JSON.parse(classroom.seatingConfig).flat().filter(c => c === "desk").length} desks`
+                    {getDeskCount(classroom.seatingConfig) > 0
+                      ? `${getDeskCount(classroom.seatingConfig)} desks`
                       : "No layout configured"}
                   </Text>
                   <HStack spacing={2} w="full">

@@ -22,7 +22,7 @@ const Navigation = ({ logout }) => {
           <Flex justify="space-between" align="center">
             <Box display={{ base: "none", md: "block" }}>
               <Breadcrumb spacing="8px" separator="|" fontSize="lg">
-                {['/', `/periods/${currentUser.username}`, `/classrooms/${currentUser.username}`, `/profile/${currentUser.username}`].map((path, index) => (
+                {['/', '/periods', `/classrooms/${currentUser.username}`, '/profile'].map((path, index) => (
                   <BreadcrumbItem key={path}>
                     <BreadcrumbLink
                       as={Link}

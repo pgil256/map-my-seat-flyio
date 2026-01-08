@@ -57,13 +57,13 @@ function MobileNav({ currentUser, logout }) {
 
               {currentUser ? (
                 <>
-                  <NavLink to={`/periods/${currentUser.username}`}>
+                  <NavLink to="/periods">
                     Set Up Classes
                   </NavLink>
                   <NavLink to={`/classrooms/${currentUser.username}`}>
                     Create Classroom
                   </NavLink>
-                  <NavLink to={`/profile/${currentUser.username}`}>
+                  <NavLink to="/profile">
                     Profile
                   </NavLink>
                   <Button
