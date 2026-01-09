@@ -4,6 +4,7 @@ import UserContext from "../auth/UserContext";
 import SeatingApi from "../api.js";
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import "./SeatingChart.css";
 import {
   Table,
   Tbody,
@@ -14,7 +15,38 @@ import {
   Heading,
   Center,
   Button,
+  HStack,
 } from "@chakra-ui/react";
+
+// Component to show accommodation badges for students
+function AccommodationIndicators({ student }) {
+  const indicators = [];
+
+  if (student.isESE) indicators.push({ label: "ESE", color: "purple.400" });
+  if (student.has504) indicators.push({ label: "504", color: "blue.400" });
+  if (student.isELL) indicators.push({ label: "ELL", color: "green.400" });
+  if (student.isEBD) indicators.push({ label: "EBD", color: "orange.400" });
+
+  if (indicators.length === 0) return null;
+
+  return (
+    <HStack spacing={0.5} mt={0.5} justify="center" flexWrap="wrap">
+      {indicators.map(({ label, color }) => (
+        <Box
+          key={label}
+          bg={color}
+          color="white"
+          fontSize="6px"
+          px={0.5}
+          borderRadius="sm"
+          lineHeight="1.2"
+        >
+          {label}
+        </Box>
+      ))}
+    </HStack>
+  );
+}
 
 const SeatingChart = () => {
   const { number: num } = useParams();
@@ -135,19 +167,20 @@ const SeatingChart = () => {
         case "teacher-desk":
           return {
             width: "50px",
-            height: "30px",
+            height: "40px",
             overflow: "auto"
           };
       }
       return {
         width: "50px",
-        height: "30px",
+        height: "40px",
       };
     };
 
     return (
       <Container
-      ref={containerRef}
+        ref={containerRef}
+        className="seating-chart-container"
         maxW="100vw"
         maxH="80vh"
         border="2px solid teal"
@@ -162,10 +195,12 @@ const SeatingChart = () => {
             {matrix.map((row, rowIndex) => (
               <Tr key={rowIndex}>
                 {row.map((cell, colIndex) => {
-                  let content;
+                  let content = null;
+                  let studentInDesk = null;
 
                   if (cell === "desk" && studentIndex < sortedStudents.length) {
-                    content = sortedStudents[studentIndex].name;
+                    studentInDesk = sortedStudents[studentIndex];
+                    content = studentInDesk.name;
                     studentIndex++;
                   } else if (cell === "teacher-desk") {
                     content = `${currentUser.title} ${currentUser.lastName}`;
@@ -203,11 +238,14 @@ const SeatingChart = () => {
                       boxSizing="border-box"
                       textAlign="center"
                       verticalAlign="middle"
-                      lineHeight="30px"
-                      p={0} 
+                      lineHeight="1.2"
+                      p={0.5}
                       m={0}
                     >
-                      {content}
+                      <Box>
+                        {content}
+                        {studentInDesk && <AccommodationIndicators student={studentInDesk} />}
+                      </Box>
                     </Td>
                   );
                 })}
@@ -298,11 +336,14 @@ const SeatingChart = () => {
   return (
     <>
 <Container maxW='100%' width='100vw' p={0}>
-  <Center w='100%'>
+  <Center w='100%' className="no-print">
     <Button m={3} colorScheme={'blue'} onClick={handleSpreadButtonClick}>
       Spread Students
     </Button>
     <Button onClick={exportToPDF}>Export to PDF</Button>
+    <Button ml={3} colorScheme={'gray'} onClick={() => window.print()}>
+      Print
+    </Button>
   </Center>
 
   <Center>

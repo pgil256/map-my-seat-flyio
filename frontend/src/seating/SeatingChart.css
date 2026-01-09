@@ -1,0 +1,38 @@
+@media print {
+  nav,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  .seating-chart-container {
+    width: 100%;
+    max-width: none;
+    page-break-inside: avoid;
+  }
+
+  .seating-chart-container table {
+    border-collapse: collapse;
+  }
+
+  .seating-chart-container td {
+    border: 1px solid #333 !important;
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .seating-chart-container td.desk {
+    background: #e0e0e0 !important;
+  }
+
+  .seating-chart-container td.teacher-desk {
+    background: #bdbdbd !important;
+  }
+}
