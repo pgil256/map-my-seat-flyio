@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useRef, useMemo } from "react";
 import { demoUser, demoPeriods, demoClassroom, demoSeatingChart } from "./demoData";
 
 const DemoContext = createContext();
@@ -11,6 +11,10 @@ export function DemoProvider({ children }) {
     classroom: demoClassroom,
     seatingCharts: [demoSeatingChart],
   });
+
+  // Use ref to always get current demoData in API methods
+  const demoDataRef = useRef(demoData);
+  demoDataRef.current = demoData;
 
   const startDemo = useCallback(() => {
     setIsDemo(true);
@@ -28,21 +32,25 @@ export function DemoProvider({ children }) {
   }, []);
 
   // Demo API methods that work with local state
-  const demoApi = {
-    getCurrentUser: () => Promise.resolve(demoData.user),
+  // Use demoDataRef.current for reads to always get fresh data
+  const demoApi = useMemo(() => ({
+    getCurrentUser: () => Promise.resolve(demoDataRef.current.user),
 
-    getPeriods: () => Promise.resolve(demoData.periods),
+    getPeriods: () => Promise.resolve([...demoDataRef.current.periods]),
 
     getPeriod: (username, periodId) => {
-      const period = demoData.periods.find(p => p.periodId === periodId);
-      return Promise.resolve(period || null);
+      // periodId may come as string from URL params
+      const id = typeof periodId === 'string' ? parseInt(periodId, 10) : periodId;
+      const period = demoDataRef.current.periods.find(p => p.periodId === id);
+      return Promise.resolve(period ? { ...period } : null);
     },
 
     createPeriod: (username, data) => {
       const newPeriod = {
         periodId: Date.now(),
-        periodNumber: data.periodNumber,
-        periodName: data.periodName || `Period ${data.periodNumber}`,
+        number: data.number,
+        title: data.title || `Period ${data.number}`,
+        schoolYear: data.schoolYear || "2025-2026",
         userUsername: "demo_user",
         students: [],
       };
@@ -54,24 +62,27 @@ export function DemoProvider({ children }) {
     },
 
     updatePeriod: (username, periodId, data) => {
+      const id = typeof periodId === 'string' ? parseInt(periodId, 10) : periodId;
       setDemoData(prev => ({
         ...prev,
         periods: prev.periods.map(p =>
-          p.periodId === periodId ? { ...p, ...data } : p
+          p.periodId === id ? { ...p, ...data } : p
         ),
       }));
-      return Promise.resolve({ periodId, ...data });
+      return Promise.resolve({ periodId: id, ...data });
     },
 
     deletePeriod: (username, periodId) => {
+      const id = typeof periodId === 'string' ? parseInt(periodId, 10) : periodId;
       setDemoData(prev => ({
         ...prev,
-        periods: prev.periods.filter(p => p.periodId !== periodId),
+        periods: prev.periods.filter(p => p.periodId !== id),
       }));
-      return Promise.resolve(periodId);
+      return Promise.resolve(id);
     },
 
     createStudent: (username, periodId, data) => {
+      const pId = typeof periodId === 'string' ? parseInt(periodId, 10) : periodId;
       const newStudent = {
         studentId: Date.now(),
         ...data,
@@ -79,7 +90,7 @@ export function DemoProvider({ children }) {
       setDemoData(prev => ({
         ...prev,
         periods: prev.periods.map(p =>
-          p.periodId === periodId
+          p.periodId === pId
             ? { ...p, students: [...(p.students || []), newStudent] }
             : p
         ),
@@ -88,37 +99,41 @@ export function DemoProvider({ children }) {
     },
 
     updateStudent: (username, periodId, studentId, data) => {
+      const pId = typeof periodId === 'string' ? parseInt(periodId, 10) : periodId;
+      const sId = typeof studentId === 'string' ? parseInt(studentId, 10) : studentId;
       setDemoData(prev => ({
         ...prev,
         periods: prev.periods.map(p =>
-          p.periodId === periodId
+          p.periodId === pId
             ? {
                 ...p,
                 students: p.students.map(s =>
-                  s.studentId === studentId ? { ...s, ...data } : s
+                  s.studentId === sId ? { ...s, ...data } : s
                 )
               }
             : p
         ),
       }));
-      return Promise.resolve({ studentId, ...data });
+      return Promise.resolve({ studentId: sId, ...data });
     },
 
     deleteStudent: (username, periodId, studentId) => {
+      const pId = typeof periodId === 'string' ? parseInt(periodId, 10) : periodId;
+      const sId = typeof studentId === 'string' ? parseInt(studentId, 10) : studentId;
       setDemoData(prev => ({
         ...prev,
         periods: prev.periods.map(p =>
-          p.periodId === periodId
-            ? { ...p, students: p.students.filter(s => s.studentId !== studentId) }
+          p.periodId === pId
+            ? { ...p, students: p.students.filter(s => s.studentId !== sId) }
             : p
         ),
       }));
-      return Promise.resolve(studentId);
+      return Promise.resolve(sId);
     },
 
-    getClassroom: () => Promise.resolve(demoData.classroom),
+    getClassroom: (username, classroomId) => Promise.resolve(demoDataRef.current.classroom ? { ...demoDataRef.current.classroom } : null),
 
-    getClassrooms: () => Promise.resolve([demoData.classroom]),
+    getClassrooms: () => Promise.resolve(demoDataRef.current.classroom ? [{ ...demoDataRef.current.classroom }] : []),
 
     createClassroom: () => {
       const newClassroom = {
@@ -172,11 +187,12 @@ export function DemoProvider({ children }) {
       return Promise.resolve(true);
     },
 
-    getSeatingCharts: () => Promise.resolve(demoData.seatingCharts),
+    getSeatingCharts: (username, classroomId) => Promise.resolve([...demoDataRef.current.seatingCharts]),
 
     getSeatingChart: (username, classroomId, seatingChartId) => {
-      const chart = demoData.seatingCharts.find(c => c.seatingChartId === seatingChartId);
-      return Promise.resolve(chart || null);
+      const id = typeof seatingChartId === 'string' ? parseInt(seatingChartId, 10) : seatingChartId;
+      const chart = demoDataRef.current.seatingCharts.find(c => c.seatingChartId === id);
+      return Promise.resolve(chart ? { ...chart } : null);
     },
 
     createSeatingChart: (username, classroomId, data) => {
@@ -194,19 +210,21 @@ export function DemoProvider({ children }) {
     },
 
     updateSeatingChart: (username, classroomId, seatingChartId, data) => {
+      const id = typeof seatingChartId === 'string' ? parseInt(seatingChartId, 10) : seatingChartId;
       setDemoData(prev => ({
         ...prev,
         seatingCharts: prev.seatingCharts.map(c =>
-          c.seatingChartId === seatingChartId ? { ...c, ...data } : c
+          c.seatingChartId === id ? { ...c, ...data } : c
         ),
       }));
-      return Promise.resolve({ seatingChartId, ...data });
+      return Promise.resolve({ seatingChartId: id, ...data });
     },
 
     deleteSeatingChart: (username, classroomId, seatingChartId) => {
+      const id = typeof seatingChartId === 'string' ? parseInt(seatingChartId, 10) : seatingChartId;
       setDemoData(prev => ({
         ...prev,
-        seatingCharts: prev.seatingCharts.filter(c => c.seatingChartId !== seatingChartId),
+        seatingCharts: prev.seatingCharts.filter(c => c.seatingChartId !== id),
       }));
       return Promise.resolve(1);
     },
@@ -214,7 +232,7 @@ export function DemoProvider({ children }) {
     getConstraints: () => Promise.resolve([]),
     createConstraint: () => Promise.resolve({ constraintId: Date.now() }),
     deleteConstraint: () => Promise.resolve(),
-  };
+  }), []);
 
   return (
     <DemoContext.Provider value={{ isDemo, startDemo, exitDemo, demoApi, demoData }}>

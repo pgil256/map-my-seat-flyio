@@ -54,7 +54,7 @@ const PeriodForm = () => {
       }
     }
     getPeriodsOnMount();
-  }, [username]);
+  }, [username, api]);
 
   const updatePeriod = async (e, period) => {
     e.preventDefault();

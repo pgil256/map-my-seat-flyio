@@ -75,7 +75,7 @@ export default function LandingPage() {
 
   const handleTryDemo = () => {
     startDemo();
-    navigate("/classes");
+    navigate("/periods");
   };
 
   return (

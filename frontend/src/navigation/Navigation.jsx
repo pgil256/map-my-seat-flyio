@@ -23,8 +23,8 @@ const Navigation = ({ logout }) => {
 
   const loggedInNav = () => {
     return (
-      <Container maxW="container.xl" px={0}>
-        <Box bg={bgColor} w="100%" p={4} color="white">
+      <Box bg={bgColor} w="100%" p={4} color="white">
+        <Container maxW="container.xl" px={0}>
           <Flex justify="space-between" align="center">
             <Box display={{ base: "none", md: "block" }}>
               <Breadcrumb spacing="8px" separator="|" fontSize="lg">
@@ -64,15 +64,15 @@ const Navigation = ({ logout }) => {
             />
             <MobileNav currentUser={currentUser} logout={logout} />
           </Flex>
-        </Box>
-      </Container>
+        </Container>
+      </Box>
     );
   };
 
   const loggedOutNav = () => {
     return (
-      <Container maxW="container.xl" px={0}>
-        <Box bg={bgColor} w="100%" p={4} color="white">
+      <Box bg={bgColor} w="100%" p={4} color="white">
+        <Container maxW="container.xl" px={0}>
           <Flex justify="space-between" align="center">
             <Box display={{ base: "none", md: "block" }}>
               <Breadcrumb fontWeight="medium" fontSize="lg" spacing="8px" separator="|">
@@ -107,8 +107,8 @@ const Navigation = ({ logout }) => {
             />
             <MobileNav currentUser={currentUser} logout={logout} />
           </Flex>
-        </Box>
-      </Container>
+        </Container>
+      </Box>
     );
   };
 

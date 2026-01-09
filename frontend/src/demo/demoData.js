@@ -9,8 +9,9 @@ export const demoUser = {
 export const demoPeriods = [
   {
     periodId: 1,
-    periodNumber: 1,
-    periodName: "Morning Math",
+    number: 1,
+    title: "Morning Math",
+    schoolYear: "2025-2026",
     userUsername: "demo_user",
     students: [
       { studentId: 1, name: "Emma Johnson", grade: "9", gender: "female", isESE: false, has504: false, isELL: false, isEBD: false },
@@ -29,8 +30,9 @@ export const demoPeriods = [
   },
   {
     periodId: 2,
-    periodNumber: 2,
-    periodName: "Science Lab",
+    number: 2,
+    title: "Science Lab",
+    schoolYear: "2025-2026",
     userUsername: "demo_user",
     students: [
       { studentId: 13, name: "Charlotte Martin", grade: "10", gender: "female", isESE: false, has504: false, isELL: false, isEBD: false },
@@ -45,8 +47,9 @@ export const demoPeriods = [
   },
   {
     periodId: 3,
-    periodNumber: 3,
-    periodName: "English Literature",
+    number: 3,
+    title: "English Literature",
+    schoolYear: "2025-2026",
     userUsername: "demo_user",
     students: [
       { studentId: 21, name: "Abigail Hall", grade: "11", gender: "female", isESE: false, has504: false, isELL: false, isEBD: false },

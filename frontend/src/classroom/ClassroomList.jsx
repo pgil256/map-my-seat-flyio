@@ -60,7 +60,7 @@ function ClassroomList() {
       }
     }
     fetchClassrooms();
-  }, [currentUser.username]);
+  }, [currentUser.username, api]);
 
   const handleCreateClassroom = async () => {
     try {
