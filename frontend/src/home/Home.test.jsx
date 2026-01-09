@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import UserContext from "../auth/UserContext";
+import { DemoProvider } from "../demo/DemoContext";
 import Home from "./Home";
 
 // Mock the API
@@ -17,11 +18,13 @@ vi.mock("../api", () => ({
 const renderWithProviders = (currentUser = null) => {
   return render(
     <ChakraProvider>
-      <UserContext.Provider value={{ currentUser }}>
-        <MemoryRouter>
-          <Home />
-        </MemoryRouter>
-      </UserContext.Provider>
+      <DemoProvider>
+        <UserContext.Provider value={{ currentUser }}>
+          <MemoryRouter>
+            <Home />
+          </MemoryRouter>
+        </UserContext.Provider>
+      </DemoProvider>
     </ChakraProvider>
   );
 };
@@ -31,9 +34,10 @@ describe("Home", () => {
     vi.clearAllMocks();
   });
 
-  it("renders the welcome message when user is not logged in", () => {
+  it("renders the landing page when user is not logged in", () => {
     renderWithProviders(null);
-    expect(screen.getByText("Welcome to Map My Seat")).toBeInTheDocument();
+    expect(screen.getByText(/Seating charts/)).toBeInTheDocument();
+    expect(screen.getByText(/made easy/)).toBeInTheDocument();
   });
 
   it(
@@ -61,9 +65,10 @@ describe("Home", () => {
     });
   });
 
-  it("shows login and signup buttons when not logged in", () => {
+  it("shows CTA buttons on landing page when not logged in", () => {
     renderWithProviders(null);
-    expect(screen.getByRole("button", { name: /get started/i })).toBeInTheDocument();
+    // Landing page has multiple "Get Started" buttons and "Log In" button
+    expect(screen.getAllByRole("button", { name: /get started/i }).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: /log in/i })).toBeInTheDocument();
   });
 
