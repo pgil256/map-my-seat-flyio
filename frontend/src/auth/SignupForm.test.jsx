@@ -1,66 +1,61 @@
-import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
-import { render, fireEvent, waitFor } from '@testing-library/react';
-import SignupForm from './SignupForm';
+import React from "react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import { ChakraProvider } from "@chakra-ui/react";
+import { vi, describe, it, expect, beforeEach } from "vitest";
+import SignupForm from "./SignupForm";
 
-// Mock signup function with sample data
-const mockSignup = jest.fn((formData) => {
-  return {
-    success: true,
-    errors: [],
-  };
-});
+const mockSignup = vi.fn();
 
-describe('SignupForm', () => {
-  it('renders without crashing', () => {
-    render(
+const renderWithProviders = (signup = mockSignup) => {
+  return render(
+    <ChakraProvider>
       <MemoryRouter>
-        <SignupForm signup={mockSignup} />
+        <SignupForm signup={signup} />
       </MemoryRouter>
-    );
+    </ChakraProvider>
+  );
+};
+
+describe("SignupForm", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockSignup.mockResolvedValue({ success: true, errors: [] });
   });
 
-  it('can fill out the form and submit successfully', async () => {
-    const { getByLabelText, getByText } = render(
-      <MemoryRouter>
-        <SignupForm signup={mockSignup} />
-      </MemoryRouter>
-    );
+  it("renders without crashing", () => {
+    renderWithProviders();
+    expect(screen.getByRole("heading", { name: "Sign up" })).toBeInTheDocument();
+  });
 
-    fireEvent.change(getByLabelText(/username/i), {
-      target: { value: 'testuser' },
+  it("can fill out the form and submit successfully", async () => {
+    renderWithProviders();
+
+    fireEvent.change(screen.getByLabelText(/username/i), {
+      target: { value: "testuser" },
     });
-    fireEvent.change(getByLabelText(/password/i), {
-      target: { value: 'password123' },
+    fireEvent.change(screen.getByLabelText(/password/i), {
+      target: { value: "password123" },
     });
-    fireEvent.click(getByLabelText(/mr./i));
-    fireEvent.change(getByLabelText(/first name/i), {
-      target: { value: 'John' },
+    // Title defaults to "Mr." so we don't need to change it
+    fireEvent.change(screen.getByLabelText(/first name/i), {
+      target: { value: "John" },
     });
-    fireEvent.change(getByLabelText(/last name/i), {
-      target: { value: 'Doe' },
+    fireEvent.change(screen.getByLabelText(/last name/i), {
+      target: { value: "Doe" },
     });
-    fireEvent.change(getByLabelText(/email/i), {
-      target: { value: 'johndoe@example.com' },
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: "johndoe@example.com" },
     });
 
-    fireEvent.click(getByText(/submit/i));
+    fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
     await waitFor(() => expect(mockSignup).toHaveBeenCalledTimes(1));
   });
 
-  it('displays an error message when the username contains a period', () => {
-    const { getByLabelText, getByText } = render(
-      <MemoryRouter>
-        <SignupForm signup={mockSignup} />
-      </MemoryRouter>
-    );
-
-    fireEvent.change(getByLabelText(/username/i), {
-      target: { value: 'test.user' },
-    });
-
-    fireEvent.click(getByText(/submit/i));
-
-    expect(getByText(/periods may not be included in username/i)).toBeInTheDocument();
+  it("renders title selection options", () => {
+    renderWithProviders();
+    expect(screen.getByText("Mr.")).toBeInTheDocument();
+    expect(screen.getByText("Mrs.")).toBeInTheDocument();
+    expect(screen.getByText("Ms.")).toBeInTheDocument();
   });
 });

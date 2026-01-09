@@ -1,107 +1,100 @@
-describe("ClassroomForm", () => {
-  let wrapper;
+import React from "react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import { ChakraProvider } from "@chakra-ui/react";
+import { vi, describe, it, expect, beforeEach } from "vitest";
+import UserContext from "../auth/UserContext";
+import PeriodForm from "./PeriodForm";
+
+// Mock the API
+vi.mock("../api", () => ({
+  default: {
+    getPeriods: vi.fn(),
+    createPeriod: vi.fn(),
+    updatePeriod: vi.fn(),
+    deletePeriod: vi.fn(),
+  },
+}));
+
+import SeatingApi from "../api";
+
+const mockPeriods = [
+  { periodId: 1, number: 1, title: "Math", schoolYear: "2024-2025", students: [] },
+  { periodId: 2, number: 2, title: "Science", schoolYear: "2024-2025", students: [] },
+];
+
+const renderWithProviders = () => {
   const currentUser = { username: "testuser" };
-  const useClassroomSpy = jest.spyOn(SeatingApi, "getClassroom");
-  const createClassroomSpy = jest.spyOn(SeatingApi, "createClassroom");
-  const updateClassroomSpy = jest.spyOn(SeatingApi, "updateClassroom");
+  return render(
+    <ChakraProvider>
+      <UserContext.Provider value={{ currentUser }}>
+        <MemoryRouter>
+          <PeriodForm />
+        </MemoryRouter>
+      </UserContext.Provider>
+    </ChakraProvider>
+  );
+};
 
+describe("PeriodForm", () => {
   beforeEach(() => {
-    //Reset all mock implementation and state
-    jest.clearAllMocks();
-    currentUser.username = "testuser";
-    useContext.mockReturnValue({ currentUser });
-    wrapper = shallow(<ClassroomForm />);
+    vi.clearAllMocks();
   });
 
-  it("should render a loading spinner initially when infoLoading is true", () => {   
-    wrapper.setState({ infoLoading: true });    
-    expect(wrapper.exists(LoadingSpinner)).toBeTruthy();
-  });
+  it("renders the heading", async () => {
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    renderWithProviders();
 
-  it("should render the classroom form when infoLoading is false and classroom exists", async () => {
-    useClassroomSpy.mockResolvedValue({
-      classroomId: "testid",
-      seatAlphabetical: true,
-      seatRandomize: false,
-      seatHighLow: false,
-      seatMaleFemale: false,
-      eseIsPriority: false,
-      ellIsPriority: false,
-      fiveZeroFourIsPriority: true,
-      ebdIsPriority: true,
-    });
-
-    await Promise.resolve();
-    expect(wrapper.exists("form")).toBeTruthy();
-    expect(wrapper.exists(MakeAlert)).toBeFalsy();
-    expect(wrapper.exists(ClassroomRedirect)).toBeTruthy();
-    expect(wrapper.exists(Classroom)).toBeTruthy();
-  });
-
-  it("should render an MakeAlert when saveConfirmed is truthy", async () => {
-    useClassroomSpy.mockResolvedValue({
-      classroomId: "testid",
-      seatAlphabetical: true,
-      seatRandomize: false,
-      seatHighLow: false,
-      seatMaleFemale: false,
-      eseIsPriority: false,
-      ellIsPriority: false,
-      fiveZeroFourIsPriority: true,
-      ebdIsPriority: true,
-    });
-
-    await Promise.resolve();
-    wrapper.setState({ saveConfirmed: ["Changes saved successfully"] });
-    
-    expect(wrapper.exists(MakeAlert)).toBeTruthy();
-    expect(wrapper.find(MakeAlert).prop("messages")).toEqual(["Changes saved successfully"]);
-  });
-
-  it("should render an error message if SeatingApi.createOrGetClassroom() fails", async () => {
-    createClassroomSpy.mockRejectedValue(new Error("Unable to create classroom"));
-
-    await Promise.resolve();
-
-    expect(wrapper.exists(MakeAlert)).toBeTruthy();
-    expect(wrapper.find(MakeAlert).prop("messages")).toEqual(["Error while retrieving or creating classroom: Unable to create classroom"]);
-  });
-
-  it("should update form data state when handleChange is called on an input", () => {    
-    const event = { target: { name: "eseIsPriority", type: "checkbox", checked: true, value: undefined } };
-    wrapper.instance().handleChange(event);    
-    expect(wrapper.state("formData").eseIsPriority).toBe(true);
-  });
-
-  it("should call SeatingApi.updateClassroom() with the correct arguments on form submission", async () => {
-    useClassroomSpy.mockResolvedValue({
-      classroomId: "testid",
-      seatAlphabetical: true,
-      seatRandomize: false,
-      seatHighLow: false,
-      seatMaleFemale: false,
-      eseIsPriority: false,
-      ellIsPriority: false,
-      fiveZeroFourIsPriority: true,
-      ebdIsPriority: true,
-    });
-
-    await Promise.resolve();
-    const preventDefaultSpy = jest.spyOn(Event.prototype, "preventDefault");
-    wrapper.find("form").simulate("submit", new Event(""));
-   
-    expect(preventDefaultSpy).toHaveBeenCalled();
-    expect(updateClassroomSpy).toHaveBeenCalledWith(currentUser.username, "testid", {
-      seatAlphabetical: true,
-      seatRandomize: false,
-      seatHighLow: false,
-      seatMaleFemale: false,
-      eseIsPriority: false,
-      ellIsPriority: false,
-      fiveZeroFourIsPriority: true,
-      ebdIsPriority: true,
-      seatingConfig: null,
+    await waitFor(() => {
+      expect(screen.getByText("Enter Class Periods")).toBeInTheDocument();
     });
   });
 
+  it("renders the new period form", async () => {
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByText("New Period")).toBeInTheDocument();
+    });
+  });
+
+  it("renders period cards for existing periods", async () => {
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByText("Period 1")).toBeInTheDocument();
+      expect(screen.getByText("Period 2")).toBeInTheDocument();
+    });
+  });
+
+  it("displays period titles", async () => {
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByText("Math")).toBeInTheDocument();
+      expect(screen.getByText("Science")).toBeInTheDocument();
+    });
+  });
+
+  it("renders Create Period button", async () => {
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /create period/i })).toBeInTheDocument();
+    });
+  });
+
+  it("renders Edit Period buttons for each period", async () => {
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    renderWithProviders();
+
+    await waitFor(() => {
+      const editButtons = screen.getAllByRole("button", { name: /edit period/i });
+      expect(editButtons.length).toBe(2);
+    });
+  });
 });

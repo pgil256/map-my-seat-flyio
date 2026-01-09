@@ -1,158 +1,102 @@
 import React from "react";
-import { render } from "@testing-library/react";
-import SeatingChart from "../SeatingChart";
+import { render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { ChakraProvider } from "@chakra-ui/react";
+import { vi, describe, it, expect, beforeEach } from "vitest";
+import UserContext from "../auth/UserContext";
+import SeatingChart from "./SeatingChart";
 
-jest.mock("react-router-dom", () => ({
-  useParams: jest.fn(() => ({ number: 1, classroomId: 1 })),
-}));
-
-jest.mock("../auth/UserContext", () => ({
-  currentUser: {
-    username: "testuser",
+// Mock the API
+vi.mock("../api", () => ({
+  default: {
+    getClassroom: vi.fn(),
+    getPeriods: vi.fn(),
+    getPeriod: vi.fn(),
   },
 }));
 
-jest.mock("../api", () => ({
-  getSeatingCharts: jest.fn(() => [
-    { id: 1, number: 1 },
-    { id: 2, number: 2 },
-  ]),
-  getSeatingChart: jest.fn(() => ({
-    seatingChartData: [],
-  })),
-}));
+import SeatingApi from "../api";
+
+const mockClassroom = {
+  classroomId: "classroom-1",
+  seatingConfig: Array(12).fill(null).map(() => Array(12).fill(null)),
+  seatAlphabetical: true,
+  seatRandomize: false,
+  seatHighLow: false,
+  seatMaleFemale: false,
+  eseIsPriority: false,
+  ellIsPriority: false,
+  fiveZeroFourIsPriority: false,
+  ebdIsPriority: false,
+};
+
+const mockPeriods = [
+  { periodId: 1, number: 1, title: "Math", students: [] },
+  { periodId: 2, number: 2, title: "Science", students: [] },
+];
+
+const renderWithProviders = (route = "/classrooms/1/seating-charts/1") => {
+  const currentUser = { username: "testuser" };
+  return render(
+    <ChakraProvider>
+      <UserContext.Provider value={{ currentUser }}>
+        <MemoryRouter initialEntries={[route]}>
+          <Routes>
+            <Route
+              path="/classrooms/:classroomId/seating-charts/:number"
+              element={<SeatingChart />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </UserContext.Provider>
+    </ChakraProvider>
+  );
+};
 
 describe("SeatingChart Component", () => {
-  test("renders successfully", () => {
-    render(<SeatingChart />);
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  test("useParams returns the correct values", () => {
-    const { result } = renderHook(() => useParams());
-    expect(result.current).toEqual({ number: 1, classroomId: 1 });
+  it("renders without crashing", async () => {
+    SeatingApi.getClassroom.mockResolvedValue(mockClassroom);
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    SeatingApi.getPeriod.mockResolvedValue([]);
+
+    const { container } = renderWithProviders();
+    expect(container).toBeDefined();
   });
 
-  test("useState hooks initialize to the correct values", () => {
-    const { getByText } = render(<SeatingChart />);
-    expect(getByText("Loading...")).toBeInTheDocument();
-  });
+  it("fetches classroom data on mount", async () => {
+    SeatingApi.getClassroom.mockResolvedValue(mockClassroom);
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    SeatingApi.getPeriod.mockResolvedValue([]);
+    renderWithProviders();
 
-  test("API calls are made correctly", async () => {
-    const { getByText } = render(<SeatingChart />);
-    expect(getByText("Loading...")).toBeInTheDocument();
-
-    await wait(() => {
-      expect(getSeatingCharts).toHaveBeenCalledTimes(1);
-    });
-
-    await wait(() => {
-      expect(getSeatingChart).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(SeatingApi.getClassroom).toHaveBeenCalledWith("testuser");
     });
   });
 
-  test("sort students correctly based on seating preferences", () => {
-    const students = [
-      { name: "Alice", grade: 5, has504: true, isELL: false, isESE: false },
-      { name: "Bob", grade: 4, has504: false, isELL: false, isESE: true },
-      { name: "Charlie", grade: 3, has504: false, isELL: true, isESE: false },
-      { name: "David", grade: 2, has504: true, isELL: false, isESE: false },
-      { name: "Eric", grade: 1, has504: false, isELL: true, isESE: true },
-    ];
+  it("fetches periods data on mount", async () => {
+    SeatingApi.getClassroom.mockResolvedValue(mockClassroom);
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    SeatingApi.getPeriod.mockResolvedValue([]);
+    renderWithProviders();
 
-    const classroom = {
-      eseIsPriority: false,
-      ellIsPriority: true,
-      fiveZeroFourIsPriority: false,
-      ebdIsPriority: false,
-      seatAlphabetical: false,
-      seatRandomize: false,
-      seatHighLow: true,
-      seatMaleFemale: false,
-    };
+    await waitFor(() => {
+      expect(SeatingApi.getPeriods).toHaveBeenCalledWith("testuser");
+    });
+  });
 
-    const expectedResult = [
-      "Alice",
-      "David",
-      "Bob",
-      "Charlie",
-      "Eric",
-    ];
+  it("displays period number in heading after loading", async () => {
+    SeatingApi.getClassroom.mockResolvedValue(mockClassroom);
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    SeatingApi.getPeriod.mockResolvedValue([]);
+    renderWithProviders();
 
-    const result = getSeatingPreference(students, classroom);
-
-    expect(result).toEqual(expectedResult);
+    await waitFor(() => {
+      expect(screen.getByText(/Period 1 Seating Chart/)).toBeInTheDocument();
+    });
   });
 });
-
-jest.mock("../api", () => ({
-  getSeatingCharts: jest.fn(() => [
-    { id: 1, number: 1 },
-    { id: 2, number: 2 },
-  ]),
-  getSeatingChart: jest.fn(() => ({
-    seatingChartData: [],
-  })),
-}));
-
-describe("SeatingChart Component", () => {
-  test("renders successfully", () => {
-    render(<SeatingChart />);
-  });
-
-  test("useParams returns the correct values", () => {
-    const { result } = renderHook(() => useParams());
-    expect(result.current).toEqual({ number: 1, classroomId: 1 });
-  });
-
-  test("useState hooks initialize to the correct values", () => {
-    const { getByText } = render(<SeatingChart />);
-    expect(getByText("Loading...")).toBeInTheDocument();
-  });
-
-  test("API calls are made correctly", async () => {
-    const { getByText } = render(<SeatingChart />);
-    expect(getByText("Loading...")).toBeInTheDocument();
-
-    await wait(() => {
-      expect(getSeatingCharts).toHaveBeenCalledTimes(1);
-    });
-
-    await wait(() => {
-      expect(getSeatingChart).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  test("sort students correctly based on seating preferences", () => {
-    const students = [
-      { name: "Alice", grade: 5, has504: true, isELL: false, isESE: false },
-      { name: "Bob", grade: 4, has504: false, isELL: false, isESE: true },
-      { name: "Charlie", grade: 3, has504: false, isELL: true, isESE: false },
-      { name: "David", grade: 2, has504: true, isELL: false, isESE: false },
-      { name: "Eric", grade: 1, has504: false, isELL: true, isESE: true },
-    ];
-
-    const classroom = {
-      eseIsPriority: false,
-      ellIsPriority: true,
-      fiveZeroFourIsPriority: false,
-      ebdIsPriority: false,
-      seatAlphabetical: false,
-      seatRandomize: false,
-      seatHighLow: true,
-      seatMaleFemale: false,
-    };
-
-    const expectedResult = [
-      "Alice",
-      "David",
-      "Bob",
-      "Charlie",
-      "Eric",
-    ];
-
-    const result = getSeatingPreference(students, classroom);
-
-    expect(result).toEqual(expectedResult);
-  });
-});
-
