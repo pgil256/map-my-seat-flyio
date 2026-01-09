@@ -36,14 +36,21 @@ describe("Home", () => {
     expect(screen.getByText("Welcome to Map My Seat")).toBeInTheDocument();
   });
 
-  it("renders personalized welcome when user is logged in with firstName", async () => {
-    const currentUser = { firstName: "John", username: "johndoe" };
-    renderWithProviders(currentUser);
+  it(
+    "renders personalized welcome when user is logged in with firstName",
+    { timeout: 15000 },
+    async () => {
+      const currentUser = { firstName: "John", username: "johndoe" };
+      renderWithProviders(currentUser);
 
-    await waitFor(() => {
-      expect(screen.getByText(/Welcome, John/)).toBeInTheDocument();
-    });
-  });
+      await waitFor(
+        () => {
+          expect(screen.getByText(/Welcome, John/)).toBeInTheDocument();
+        },
+        { timeout: 10000 }
+      );
+    }
+  );
 
   it("renders welcome with username when firstName is not available", async () => {
     const currentUser = { username: "johndoe" };

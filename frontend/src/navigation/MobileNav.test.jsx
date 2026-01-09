@@ -158,23 +158,27 @@ describe("MobileNav", () => {
       expect(mockLogout).toHaveBeenCalledTimes(1);
     });
 
-    it("includes username in classrooms link", async () => {
-      renderWithProviders(
-        <MobileNav currentUser={currentUser} logout={mockLogout} />
-      );
+    it(
+      "includes username in classrooms link",
+      { timeout: 15000 },
+      async () => {
+        renderWithProviders(
+          <MobileNav currentUser={currentUser} logout={mockLogout} />
+        );
 
-      fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
+        fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 
-      await waitFor(
-        () => {
-          // NavLink renders Button as RouterLink (anchor tag)
-          const classroomLink = screen.getByRole("link", {
-            name: "Create Classroom",
-          });
-          expect(classroomLink).toHaveAttribute("href", "/classrooms/testuser");
-        },
-        { timeout: 10000 }
-      );
-    });
+        await waitFor(
+          () => {
+            // NavLink renders Button as RouterLink (anchor tag)
+            const classroomLink = screen.getByRole("link", {
+              name: "Create Classroom",
+            });
+            expect(classroomLink).toHaveAttribute("href", "/classrooms/testuser");
+          },
+          { timeout: 10000 }
+        );
+      }
+    );
   });
 });

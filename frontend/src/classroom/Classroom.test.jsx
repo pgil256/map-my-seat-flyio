@@ -36,17 +36,27 @@ describe("Classroom", () => {
 
   it("renders Teacher Desk and Student Desk buttons", () => {
     renderWithProviders();
-    expect(screen.getByText(/Teacher Desk/i)).toBeInTheDocument();
-    expect(screen.getByText(/Student Desk/i)).toBeInTheDocument();
+    // Get buttons specifically by role
+    const teacherDeskButton = screen.getByRole("button", { name: /Teacher Desk/i });
+    const studentDeskButton = screen.getByRole("button", { name: /Student Desk/i });
+    expect(teacherDeskButton).toBeInTheDocument();
+    expect(studentDeskButton).toBeInTheDocument();
+  });
+
+  it("renders desk count display", () => {
+    renderWithProviders();
+    expect(screen.getByText(/Student Desks:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Teacher Desk:/i)).toBeInTheDocument();
   });
 
   it("calls updateSeatingConfig when interacting with the grid", () => {
     renderWithProviders();
 
     // First select teacher desk by clicking the button
-    fireEvent.click(screen.getByText(/Teacher Desk/i));
+    const teacherDeskButton = screen.getByRole("button", { name: /Teacher Desk/i });
+    fireEvent.click(teacherDeskButton);
 
     // The component should be interactive now
-    expect(screen.getByText(/Teacher Desk/i)).toBeInTheDocument();
+    expect(teacherDeskButton).toBeInTheDocument();
   });
 });

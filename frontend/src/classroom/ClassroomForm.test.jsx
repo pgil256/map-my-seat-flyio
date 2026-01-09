@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import UserContext from "../auth/UserContext";
+import { ToastProvider } from "../common/ToastContext";
 import ClassroomForm from "./ClassroomForm";
 
 // Mock the API
@@ -35,11 +36,13 @@ const renderWithProviders = () => {
   const currentUser = { username: "testuser" };
   return render(
     <ChakraProvider>
-      <UserContext.Provider value={{ currentUser }}>
-        <MemoryRouter>
-          <ClassroomForm />
-        </MemoryRouter>
-      </UserContext.Provider>
+      <ToastProvider>
+        <UserContext.Provider value={{ currentUser }}>
+          <MemoryRouter>
+            <ClassroomForm />
+          </MemoryRouter>
+        </UserContext.Provider>
+      </ToastProvider>
     </ChakraProvider>
   );
 };

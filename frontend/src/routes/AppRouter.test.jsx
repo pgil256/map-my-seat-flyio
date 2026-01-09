@@ -6,6 +6,7 @@ import { vi } from "vitest";
 
 import AppRouter from "./AppRouter";
 import UserContext from "../auth/UserContext";
+import { ToastProvider } from "../common/ToastContext";
 
 // Mock the API to prevent actual network calls
 vi.mock("../api", () => ({
@@ -36,11 +37,13 @@ const mockUser = { username: "testuser", isAdmin: false };
 const renderWithProviders = (route) => {
   return render(
     <ChakraProvider>
-      <UserContext.Provider value={{ currentUser: mockUser }}>
-        <MemoryRouter initialEntries={[route]}>
-          <AppRouter />
-        </MemoryRouter>
-      </UserContext.Provider>
+      <ToastProvider>
+        <UserContext.Provider value={{ currentUser: mockUser }}>
+          <MemoryRouter initialEntries={[route]}>
+            <AppRouter />
+          </MemoryRouter>
+        </UserContext.Provider>
+      </ToastProvider>
     </ChakraProvider>
   );
 };
