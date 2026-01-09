@@ -74,7 +74,7 @@ async function commonAfterEach() {
 }
 
 async function commonAfterAll() {
-  await db.destroy();
+  // db.destroy() is handled by jest.globalTeardown.js
 }
 
 module.exports = {
