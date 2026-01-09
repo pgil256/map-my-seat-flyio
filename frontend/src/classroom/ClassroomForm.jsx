@@ -72,7 +72,10 @@ const ClassroomForm = () => {
 
       setClassroom(classroom);
       setClassroomId(classroom.classroomId);
-      setSeatingConfig(classroom.seatingConfig);
+      // Parse seatingConfig if it's a JSON string
+      const config = classroom.seatingConfig;
+      const parsedConfig = typeof config === 'string' ? JSON.parse(config) : config;
+      setSeatingConfig(parsedConfig);
       setFormDataFromModel(classroom);
 
       setInfoLoading(false);
