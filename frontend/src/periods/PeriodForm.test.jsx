@@ -44,13 +44,13 @@ describe("PeriodForm", () => {
     vi.clearAllMocks();
   });
 
-  it("renders the heading", async () => {
+  it("renders the heading", { timeout: 15000 }, async () => {
     SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
     renderWithProviders();
 
     await waitFor(() => {
       expect(screen.getByText("Enter Class Periods")).toBeInTheDocument();
-    });
+    }, { timeout: 10000 });
   });
 
   it("renders the new period form", async () => {

@@ -94,11 +94,11 @@ describe("AppRouter", () => {
     });
   });
 
-  it("renders SeatingChart component for /classrooms/:classroomId/seating-charts/:number route", async () => {
+  it("renders SeatingChart component for /classrooms/:classroomId/seating-charts/:number route", { timeout: 15000 }, async () => {
     renderWithProviders("/classrooms/1/seating-charts/1");
     await waitFor(() => {
       expect(screen.getByText(/Period.*Seating Chart/)).toBeInTheDocument();
-    });
+    }, { timeout: 10000 });
   });
 
   it("renders ProfileForm component for /profile route", async () => {

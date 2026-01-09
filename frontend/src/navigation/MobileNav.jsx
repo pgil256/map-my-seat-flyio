@@ -9,13 +9,20 @@ import {
   VStack,
   Button,
   useDisclosure,
+  useColorMode,
+  useColorModeValue,
   Box,
+  Divider,
+  HStack,
+  Text,
 } from "@chakra-ui/react";
-import { HamburgerIcon } from "@chakra-ui/icons";
+import { HamburgerIcon, MoonIcon, SunIcon } from "@chakra-ui/icons";
 import { Link as RouterLink } from "react-router-dom";
 
 function MobileNav({ currentUser, logout }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { colorMode, toggleColorMode } = useColorMode();
+  const hoverBg = useColorModeValue("teal.500", "teal.700");
 
   const handleLogout = () => {
     logout();
@@ -43,7 +50,7 @@ function MobileNav({ currentUser, logout }) {
         onClick={onOpen}
         variant="ghost"
         color="white"
-        _hover={{ bg: "teal.500" }}
+        _hover={{ bg: hoverBg }}
       />
 
       <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
@@ -82,6 +89,17 @@ function MobileNav({ currentUser, logout }) {
                   <NavLink to="/signup">Sign Up</NavLink>
                 </>
               )}
+              <Divider my={4} />
+              <HStack justify="space-between" px={4}>
+                <Text>Dark Mode</Text>
+                <IconButton
+                  aria-label="Toggle dark mode"
+                  icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                  onClick={toggleColorMode}
+                  variant="ghost"
+                  size="sm"
+                />
+              </HStack>
             </VStack>
           </DrawerBody>
         </DrawerContent>

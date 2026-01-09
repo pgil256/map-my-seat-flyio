@@ -9,16 +9,22 @@ import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
-  Link as ChakraLink
+  Link as ChakraLink,
+  IconButton,
+  useColorMode,
+  useColorModeValue,
 } from "@chakra-ui/react";
+import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 const Navigation = ({ logout }) => {
   const { currentUser } = useContext(UserContext);
+  const { colorMode, toggleColorMode } = useColorMode();
+  const bgColor = useColorModeValue("teal.400", "teal.600");
 
   const loggedInNav = () => {
     return (
       <Container maxW="container.xl" px={0}>
-        <Box bg="teal.400" w="100%" p={4} color="white">
+        <Box bg={bgColor} w="100%" p={4} color="white">
           <Flex justify="space-between" align="center">
             <Box display={{ base: "none", md: "block" }}>
               <Breadcrumb spacing="8px" separator="|" fontSize="lg">
@@ -46,6 +52,16 @@ const Navigation = ({ logout }) => {
                 Map My Seat
               </ChakraLink>
             </Box>
+            <IconButton
+              aria-label="Toggle dark mode"
+              icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+              onClick={toggleColorMode}
+              variant="ghost"
+              color="white"
+              _hover={{ bg: "whiteAlpha.200" }}
+              ml={2}
+              display={{ base: "none", md: "flex" }}
+            />
             <MobileNav currentUser={currentUser} logout={logout} />
           </Flex>
         </Box>
@@ -56,7 +72,7 @@ const Navigation = ({ logout }) => {
   const loggedOutNav = () => {
     return (
       <Container maxW="container.xl" px={0}>
-        <Box bg="teal.400" w="100%" p={4} color="white">
+        <Box bg={bgColor} w="100%" p={4} color="white">
           <Flex justify="space-between" align="center">
             <Box display={{ base: "none", md: "block" }}>
               <Breadcrumb fontWeight="medium" fontSize="lg" spacing="8px" separator="|">
@@ -79,6 +95,16 @@ const Navigation = ({ logout }) => {
                 Map My Seat
               </ChakraLink>
             </Box>
+            <IconButton
+              aria-label="Toggle dark mode"
+              icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+              onClick={toggleColorMode}
+              variant="ghost"
+              color="white"
+              _hover={{ bg: "whiteAlpha.200" }}
+              ml={2}
+              display={{ base: "none", md: "flex" }}
+            />
             <MobileNav currentUser={currentUser} logout={logout} />
           </Flex>
         </Box>
