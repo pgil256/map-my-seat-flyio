@@ -5,6 +5,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import StudentForm from "./StudentForm";
 import UserContext from "../auth/UserContext";
+import { DemoProvider } from "../demo/DemoContext";
 
 // Mock the API
 vi.mock("../api", () => ({
@@ -21,13 +22,15 @@ const mockUser = { username: "testuser", isAdmin: false };
 const renderWithProviders = (periodId = "1") => {
   return render(
     <ChakraProvider>
-      <UserContext.Provider value={{ currentUser: mockUser }}>
-        <MemoryRouter initialEntries={[`/periods/${periodId}`]}>
-          <Routes>
-            <Route path="/periods/:periodId" element={<StudentForm />} />
-          </Routes>
-        </MemoryRouter>
-      </UserContext.Provider>
+      <DemoProvider>
+        <UserContext.Provider value={{ currentUser: mockUser }}>
+          <MemoryRouter initialEntries={[`/periods/${periodId}`]}>
+            <Routes>
+              <Route path="/periods/:periodId" element={<StudentForm />} />
+            </Routes>
+          </MemoryRouter>
+        </UserContext.Provider>
+      </DemoProvider>
     </ChakraProvider>
   );
 };

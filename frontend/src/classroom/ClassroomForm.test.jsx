@@ -5,6 +5,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import UserContext from "../auth/UserContext";
 import { ToastProvider } from "../common/ToastContext";
+import { DemoProvider } from "../demo/DemoContext";
 import ClassroomForm from "./ClassroomForm";
 
 // Mock the API
@@ -37,11 +38,13 @@ const renderWithProviders = () => {
   return render(
     <ChakraProvider>
       <ToastProvider>
-        <UserContext.Provider value={{ currentUser }}>
-          <MemoryRouter>
-            <ClassroomForm />
-          </MemoryRouter>
-        </UserContext.Provider>
+        <DemoProvider>
+          <UserContext.Provider value={{ currentUser }}>
+            <MemoryRouter>
+              <ClassroomForm />
+            </MemoryRouter>
+          </UserContext.Provider>
+        </DemoProvider>
       </ToastProvider>
     </ChakraProvider>
   );

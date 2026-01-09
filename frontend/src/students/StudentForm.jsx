@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import SeatingApi from "../api.js";
+import useApi from "../hooks/useApi";
 import LoadingSpinner from "../common/LoadingSpinner";
 import UserContext from "../auth/UserContext";
 import MakeAlert from "../common/MakeAlert";
@@ -32,6 +32,7 @@ import {
 //Allows for student crud operations
 const StudentForm = () => {
   const { currentUser } = useContext(UserContext);
+  const { api } = useApi();
   const username = currentUser.username;
   const { periodId } = useParams();
   const [infoLoading, setInfoLoading] = useState(true);
@@ -72,22 +73,19 @@ const StudentForm = () => {
     async function getStudentsOnMount() {
       if (infoLoading) {
         try {
-          let students = await SeatingApi.getPeriod(username, periodId);
-          setStudents(students);
+          let result = await api.getPeriod(username, periodId);
+          setStudents(result?.students || []);
           setNewStudent({});
         } catch (error) {
-          if (!students) {
-            console.error(
-              `Students from period with id of ${periodId} could not be retrieved`
-            );
-            return;
-          }
+          console.error(
+            `Students from period with id of ${periodId} could not be retrieved`
+          );
         }
       }
       setInfoLoading(false);
     }
     getStudentsOnMount();
-  }, []);
+  }, [api, username, periodId, infoLoading]);
 
   //Update each student who had any attributes changed
   async function updateStudent(e) {
@@ -106,7 +104,7 @@ const StudentForm = () => {
     };
 
     try {
-      const updatedStudent = await SeatingApi.updateStudent(
+      const updatedStudent = await api.updateStudent(
         username,
         periodId,
         studentId,
@@ -142,7 +140,7 @@ const StudentForm = () => {
     let studentId = parseInt(selectedStudent.studentId);
 
     try {
-      await SeatingApi.deleteStudent(username, periodId, studentId);
+      await api.deleteStudent(username, periodId, studentId);
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       setStudents((s) => s.filter((s) => s.studentId !== studentId));
@@ -169,7 +167,7 @@ const StudentForm = () => {
     };
 
     try {
-      let addedStudent = await SeatingApi.createStudent(
+      let addedStudent = await api.createStudent(
         username,
         periodId,
         data
@@ -240,7 +238,7 @@ const StudentForm = () => {
       };
 
       try {
-        let addedStudent = await SeatingApi.createStudent(
+        let addedStudent = await api.createStudent(
           username,
           periodId,
           data

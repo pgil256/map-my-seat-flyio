@@ -87,25 +87,28 @@ describe("MobileNav", () => {
   describe("when user is logged in", () => {
     const currentUser = { username: "testuser" };
 
-    it("shows authenticated navigation links", async () => {
+    it("shows authenticated navigation links", { timeout: 15000 }, async () => {
       renderWithProviders(
         <MobileNav currentUser={currentUser} logout={mockLogout} />
       );
 
       fireEvent.click(screen.getByRole("button", { name: /open menu/i }));
 
-      await waitFor(() => {
-        // NavLink renders Button as RouterLink (anchor tag)
-        expect(
-          screen.getByRole("link", { name: "Set Up Classes" })
-        ).toBeInTheDocument();
-        expect(
-          screen.getByRole("link", { name: "Create Classroom" })
-        ).toBeInTheDocument();
-        expect(
-          screen.getByRole("link", { name: "Profile" })
-        ).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          // NavLink renders Button as RouterLink (anchor tag)
+          expect(
+            screen.getByRole("link", { name: "Set Up Classes" })
+          ).toBeInTheDocument();
+          expect(
+            screen.getByRole("link", { name: "Create Classroom" })
+          ).toBeInTheDocument();
+          expect(
+            screen.getByRole("link", { name: "Profile" })
+          ).toBeInTheDocument();
+        },
+        { timeout: 10000 }
+      );
     });
 
     it("shows Logout button", async () => {

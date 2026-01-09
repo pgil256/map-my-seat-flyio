@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import SeatingApi from "../api";
+import useApi from "../hooks/useApi";
 import UserContext from "../auth/UserContext";
 import EmptyState from "../common/EmptyState";
 import LoadingSpinner from "../common/LoadingSpinner";
@@ -29,6 +29,7 @@ import { AddIcon, DeleteIcon } from "@chakra-ui/icons";
 
 function ClassroomList() {
   const { currentUser } = useContext(UserContext);
+  const { api } = useApi();
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -50,7 +51,7 @@ function ClassroomList() {
   useEffect(() => {
     async function fetchClassrooms() {
       try {
-        const data = await SeatingApi.getClassrooms(currentUser.username);
+        const data = await api.getClassrooms(currentUser.username);
         setClassrooms(data);
       } catch (err) {
         console.error("Failed to fetch classrooms:", err);
@@ -63,7 +64,7 @@ function ClassroomList() {
 
   const handleCreateClassroom = async () => {
     try {
-      const classroom = await SeatingApi.createClassroomWithName(
+      const classroom = await api.createClassroomWithName(
         currentUser.username,
         newClassroomName || "My Classroom"
       );
@@ -80,7 +81,7 @@ function ClassroomList() {
       return;
     }
     try {
-      await SeatingApi.deleteClassroom(currentUser.username, classroomId);
+      await api.deleteClassroom(currentUser.username, classroomId);
       setClassrooms(classrooms.filter(c => c.classroomId !== classroomId));
     } catch (err) {
       console.error("Failed to delete classroom:", err);

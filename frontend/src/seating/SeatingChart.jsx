@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useRef } from "react";
 import { useParams } from "react-router-dom";
 import UserContext from "../auth/UserContext";
-import SeatingApi from "../api.js";
+import useApi from "../hooks/useApi";
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import "./SeatingChart.css";
@@ -53,6 +53,7 @@ const SeatingChart = () => {
   const number = parseInt(num);
   const containerRef = useRef(null);
   const { currentUser } = useContext(UserContext);
+  const { api } = useApi();
   const username = currentUser.username;
   const [classroom, setClassroom] = useState({});
   const [students, setStudents] = useState([]);
@@ -295,18 +296,18 @@ const SeatingChart = () => {
 
   const getClassroomData = async () => {
     try {
-      let classroomData = await SeatingApi.getClassroom(username);
+      let classroomData = await api.getClassroom(username);
       if (classroomData) {
         setClassroom(classroomData);
         setMatrix(classroomData.seatingConfig);
       } else {
         console.error("Classroom data is undefined.");
       }
-      let periods = await SeatingApi.getPeriods(username);
+      let periods = await api.getPeriods(username);
       const currentPeriod = periods.find((p) => p.number === number);
 
       if (currentPeriod && currentPeriod.periodId) {
-        let studentsData = await SeatingApi.getPeriod(
+        let studentsData = await api.getPeriod(
           username,
           currentPeriod.periodId
         );

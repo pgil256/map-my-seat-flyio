@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import UserContext from "../auth/UserContext";
+import { DemoProvider } from "../demo/DemoContext";
 import ClassroomRedirect from "./ClassroomRedirect";
 
 // Mock useNavigate
@@ -35,11 +36,13 @@ const renderWithProviders = (classroomId = "classroom-123") => {
   const currentUser = { username: "testuser" };
   return render(
     <ChakraProvider>
-      <UserContext.Provider value={{ currentUser }}>
-        <MemoryRouter>
-          <ClassroomRedirect classroomId={classroomId} />
-        </MemoryRouter>
-      </UserContext.Provider>
+      <DemoProvider>
+        <UserContext.Provider value={{ currentUser }}>
+          <MemoryRouter>
+            <ClassroomRedirect classroomId={classroomId} />
+          </MemoryRouter>
+        </UserContext.Provider>
+      </DemoProvider>
     </ChakraProvider>
   );
 };

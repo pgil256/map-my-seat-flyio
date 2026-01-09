@@ -3,6 +3,7 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { ChakraProvider } from "@chakra-ui/react";
 import StudentConstraints from "./StudentConstraints";
 import UserContext from "../auth/UserContext";
+import { DemoProvider } from "../demo/DemoContext";
 import SeatingApi from "../api";
 
 // Mock the API
@@ -34,9 +35,11 @@ const mockConstraints = [
 const renderWithProviders = (ui, { currentUser = { username: "testuser" } } = {}) => {
   return render(
     <ChakraProvider>
-      <UserContext.Provider value={{ currentUser }}>
-        {ui}
-      </UserContext.Provider>
+      <DemoProvider>
+        <UserContext.Provider value={{ currentUser }}>
+          {ui}
+        </UserContext.Provider>
+      </DemoProvider>
     </ChakraProvider>
   );
 };

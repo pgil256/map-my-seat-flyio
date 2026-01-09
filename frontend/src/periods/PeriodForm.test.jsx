@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import UserContext from "../auth/UserContext";
+import { DemoProvider } from "../demo/DemoContext";
 import PeriodForm from "./PeriodForm";
 
 // Mock the API
@@ -27,11 +28,13 @@ const renderWithProviders = () => {
   const currentUser = { username: "testuser" };
   return render(
     <ChakraProvider>
-      <UserContext.Provider value={{ currentUser }}>
-        <MemoryRouter>
-          <PeriodForm />
-        </MemoryRouter>
-      </UserContext.Provider>
+      <DemoProvider>
+        <UserContext.Provider value={{ currentUser }}>
+          <MemoryRouter>
+            <PeriodForm />
+          </MemoryRouter>
+        </UserContext.Provider>
+      </DemoProvider>
     </ChakraProvider>
   );
 };

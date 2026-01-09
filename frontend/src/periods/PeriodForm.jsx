@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import SeatingApi from "../api.js";
+import useApi from "../hooks/useApi";
 import UserContext from "../auth/UserContext";
 import MakeAlert from "../common/MakeAlert";
 import EmptyState from "../common/EmptyState";
@@ -26,6 +26,7 @@ import {
 //Allows user to add new periods and add to aforementioned list
 const PeriodForm = () => {
   const { currentUser } = useContext(UserContext);
+  const { api } = useApi();
   const username = currentUser.username;
   const navigate = useNavigate();
 
@@ -46,7 +47,7 @@ const PeriodForm = () => {
   useEffect(() => {
     async function getPeriodsOnMount() {
       try {
-        let periods = await SeatingApi.getPeriods(username);
+        let periods = await api.getPeriods(username);
         setPeriods(periods);
       } catch (err) {
         console.error("Periods could not be retrieved", err.message);
@@ -66,7 +67,7 @@ const PeriodForm = () => {
     };
 
     try {
-      const updatedPeriod = await SeatingApi.updatePeriod(
+      const updatedPeriod = await api.updatePeriod(
         username,
         periodId,
         data
@@ -91,7 +92,7 @@ const PeriodForm = () => {
   const deletePeriod = async (e, period) => {
     e.preventDefault();
     try {
-      await SeatingApi.deletePeriod(username, period.periodId);
+      await api.deletePeriod(username, period.periodId);
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       setPeriods((p) => p.filter((p) => p.periodId !== period.periodId));
@@ -115,11 +116,11 @@ const PeriodForm = () => {
       return setFormErrors("Period number must be greater than one");
     }
     try {
-      const addedPeriod = await SeatingApi.createPeriod(username, data);
+      const addedPeriod = await api.createPeriod(username, data);
       await new Promise((resolve) => setTimeout(resolve, 0));
       if (addedPeriod) {
         try {
-          let fetchedPeriods = await SeatingApi.getPeriods(username);
+          let fetchedPeriods = await api.getPeriods(username);
           setPeriods(fetchedPeriods);
         } catch (err) {
           console.error("Periods could not be retrieved", err.message);

@@ -4,6 +4,7 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import UserContext from "../auth/UserContext";
+import { DemoProvider } from "../demo/DemoContext";
 import SeatingChart from "./SeatingChart";
 
 // Mock the API
@@ -39,16 +40,18 @@ const renderWithProviders = (route = "/classrooms/1/seating-charts/1") => {
   const currentUser = { username: "testuser" };
   return render(
     <ChakraProvider>
-      <UserContext.Provider value={{ currentUser }}>
-        <MemoryRouter initialEntries={[route]}>
-          <Routes>
-            <Route
-              path="/classrooms/:classroomId/seating-charts/:number"
-              element={<SeatingChart />}
-            />
-          </Routes>
-        </MemoryRouter>
-      </UserContext.Provider>
+      <DemoProvider>
+        <UserContext.Provider value={{ currentUser }}>
+          <MemoryRouter initialEntries={[route]}>
+            <Routes>
+              <Route
+                path="/classrooms/:classroomId/seating-charts/:number"
+                element={<SeatingChart />}
+              />
+            </Routes>
+          </MemoryRouter>
+        </UserContext.Provider>
+      </DemoProvider>
     </ChakraProvider>
   );
 };

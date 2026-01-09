@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import SeatingApi from "../api.js";
+import useApi from "../hooks/useApi";
 import UserContext from "../auth/UserContext";
 import {
   Box,
@@ -17,6 +17,7 @@ import {
 //Profile form
 const ProfileForm = () => {
   const { currentUser, setCurrentUser } = useContext(UserContext);
+  const { api } = useApi();
   const username = currentUser.username;
   const [formData, setFormData] = useState({
     firstName: currentUser.firstName,
@@ -33,7 +34,7 @@ const ProfileForm = () => {
     };
 
     try {
-      const updatedUser = await SeatingApi.saveUserProfile(
+      const updatedUser = await api.saveUserProfile(
         username,
         profileData
       );

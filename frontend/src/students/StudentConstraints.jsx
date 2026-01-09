@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import SeatingApi from "../api";
+import useApi from "../hooks/useApi";
 import UserContext from "../auth/UserContext";
 import {
   Box,
@@ -19,6 +19,7 @@ import { DeleteIcon } from "@chakra-ui/icons";
 
 function StudentConstraints({ periodId, students }) {
   const { currentUser } = useContext(UserContext);
+  const { api } = useApi();
   const toast = useToast();
 
   const [constraints, setConstraints] = useState([]);
@@ -29,7 +30,7 @@ function StudentConstraints({ periodId, students }) {
   useEffect(() => {
     async function fetchConstraints() {
       try {
-        const data = await SeatingApi.getConstraints(currentUser.username, periodId);
+        const data = await api.getConstraints(currentUser.username, periodId);
         setConstraints(data);
       } catch (err) {
         console.error("Failed to fetch constraints:", err);
@@ -49,7 +50,7 @@ function StudentConstraints({ periodId, students }) {
     }
 
     try {
-      const constraint = await SeatingApi.createConstraint(
+      const constraint = await api.createConstraint(
         currentUser.username,
         periodId,
         {
@@ -76,7 +77,7 @@ function StudentConstraints({ periodId, students }) {
 
   const handleDeleteConstraint = async (constraintId) => {
     try {
-      await SeatingApi.deleteConstraint(currentUser.username, periodId, constraintId);
+      await api.deleteConstraint(currentUser.username, periodId, constraintId);
       setConstraints(constraints.filter(c => c.constraintId !== constraintId));
       toast({ title: "Constraint removed", status: "success" });
     } catch (err) {

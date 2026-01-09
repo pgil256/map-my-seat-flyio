@@ -9,12 +9,15 @@ import { jwtDecode } from "jwt-decode";
 import LoadingSpinner from "./common/LoadingSpinner";
 import { ToastProvider, useAppToast } from "./common/ToastContext";
 import ErrorBoundary from "./common/ErrorBoundary";
+import { DemoProvider, useDemo } from "./demo/DemoContext";
+import DemoBanner from "./demo/DemoBanner";
 export const TOKEN_STORAGE_ID = "seating-token";
 
 function AppContent({ token, setToken }) {
   const [infoLoaded, setInfoLoaded] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const toast = useAppToast();
+  const { isDemo, demoData, exitDemo } = useDemo();
 
   console.debug(
     "App",
@@ -23,12 +26,21 @@ function AppContent({ token, setToken }) {
     "currentUser=",
     currentUser,
     "token=",
-    token
+    token,
+    "isDemo=",
+    isDemo
   );
 
   useEffect(
     function loadUserInfo() {
       async function getCurrentUser() {
+        // In demo mode, use demo user
+        if (isDemo) {
+          setCurrentUser(demoData.user);
+          setInfoLoaded(true);
+          return;
+        }
+
         if (token) {
           try {
             let { username } = jwtDecode(token);
@@ -49,14 +61,17 @@ function AppContent({ token, setToken }) {
       setInfoLoaded(false);
       getCurrentUser();
     },
-    [token, setToken, toast]
+    [token, setToken, toast, isDemo, demoData.user]
   );
 
   const logout = useCallback(() => {
+    if (isDemo) {
+      exitDemo();
+    }
     setCurrentUser(null);
     setToken(null);
     toast.info("You have been logged out");
-  }, [setToken, toast]);
+  }, [setToken, toast, isDemo, exitDemo]);
 
   async function signup(signupData) {
     try {
@@ -90,6 +105,7 @@ function AppContent({ token, setToken }) {
 
   return (
     <UserContext.Provider value={{ currentUser, setCurrentUser }}>
+      <DemoBanner />
       <div id="main">
         <Navigation logout={logout} />
         <AppRouter login={login} signup={signup} />
@@ -105,7 +121,9 @@ function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <ToastProvider>
-          <AppContent token={token} setToken={setToken} />
+          <DemoProvider>
+            <AppContent token={token} setToken={setToken} />
+          </DemoProvider>
         </ToastProvider>
       </BrowserRouter>
     </ErrorBoundary>

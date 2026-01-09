@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import SeatingApi from "../api";
+import useApi from "../hooks/useApi";
 import UserContext from "../auth/UserContext";
 import {
   Box,
@@ -19,6 +19,7 @@ import { CopyIcon, DeleteIcon, ViewIcon } from "@chakra-ui/icons";
 
 function SeatingChartHistory({ classroomId, periodId, onSelectChart }) {
   const { currentUser } = useContext(UserContext);
+  const { api } = useApi();
   const toast = useToast();
 
   const [charts, setCharts] = useState([]);
@@ -27,7 +28,7 @@ function SeatingChartHistory({ classroomId, periodId, onSelectChart }) {
   useEffect(() => {
     async function fetchCharts() {
       try {
-        const data = await SeatingApi.getSeatingCharts(
+        const data = await api.getSeatingCharts(
           currentUser.username,
           classroomId
         );
@@ -47,7 +48,7 @@ function SeatingChartHistory({ classroomId, periodId, onSelectChart }) {
 
   const handleDuplicate = async (chart) => {
     try {
-      const newChart = await SeatingApi.duplicateSeatingChart(
+      const newChart = await api.duplicateSeatingChart(
         currentUser.username,
         classroomId,
         chart.seatingChartId,
@@ -64,7 +65,7 @@ function SeatingChartHistory({ classroomId, periodId, onSelectChart }) {
     if (!window.confirm("Delete this seating chart?")) return;
 
     try {
-      await SeatingApi.deleteSeatingChart(
+      await api.deleteSeatingChart(
         currentUser.username,
         classroomId,
         seatingChartId

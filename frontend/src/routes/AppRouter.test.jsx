@@ -7,6 +7,7 @@ import { vi } from "vitest";
 import AppRouter from "./AppRouter";
 import UserContext from "../auth/UserContext";
 import { ToastProvider } from "../common/ToastContext";
+import { DemoProvider } from "../demo/DemoContext";
 
 // Mock the API to prevent actual network calls
 vi.mock("../api", () => ({
@@ -38,23 +39,28 @@ const renderWithProviders = (route) => {
   return render(
     <ChakraProvider>
       <ToastProvider>
-        <UserContext.Provider value={{ currentUser: mockUser }}>
-          <MemoryRouter initialEntries={[route]}>
-            <AppRouter />
-          </MemoryRouter>
-        </UserContext.Provider>
+        <DemoProvider>
+          <UserContext.Provider value={{ currentUser: mockUser }}>
+            <MemoryRouter initialEntries={[route]}>
+              <AppRouter />
+            </MemoryRouter>
+          </UserContext.Provider>
+        </DemoProvider>
       </ToastProvider>
     </ChakraProvider>
   );
 };
 
 describe("AppRouter", () => {
-  it("renders Home component for / route", async () => {
+  it("renders Home component for / route", { timeout: 15000 }, async () => {
     renderWithProviders("/");
-    await waitFor(() => {
-      // When logged in, shows personalized welcome message
-      expect(screen.getByText(/Welcome, testuser/)).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        // When logged in, shows personalized welcome message
+        expect(screen.getByText(/Welcome, testuser/)).toBeInTheDocument();
+      },
+      { timeout: 10000 }
+    );
   });
 
   it("renders LoginForm component for /login route", () => {

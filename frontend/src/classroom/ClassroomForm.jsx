@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useCallback } from "react";
 import Classroom from "./Classroom.jsx";
 import ClassroomRedirect from "./ClassroomRedirect.jsx";
-import SeatingApi from "../api.js";
+import useApi from "../hooks/useApi";
 import UserContext from "../auth/UserContext";
 import MakeAlert from "../common/MakeAlert";
 import useAutosave from "../hooks/useAutosave";
@@ -26,6 +26,7 @@ import {
 
 const ClassroomForm = () => {
   const { currentUser } = useContext(UserContext);
+  const { api } = useApi();
   const username = currentUser.username;
   const toast = useAppToast();
 
@@ -47,14 +48,14 @@ const ClassroomForm = () => {
     if (!classroomId) return;
 
     try {
-      await SeatingApi.updateClassroom(username, classroomId, {
+      await api.updateClassroom(username, classroomId, {
         seatingConfig: JSON.stringify(config),
       });
       toast.info("Layout auto-saved");
     } catch (err) {
       console.error("Autosave failed:", err);
     }
-  }, [classroomId, username, toast]);
+  }, [classroomId, username, toast, api]);
 
   useAutosave(seatingConfig, handleAutosave, 2000, !!classroomId && !infoLoading);
 
@@ -62,10 +63,10 @@ const ClassroomForm = () => {
     try {
       let classroom;
       try {
-        classroom = await SeatingApi.getClassroom(username);
+        classroom = await api.getClassroom(username);
       } catch {
         if (!classroom) {
-          classroom = await SeatingApi.createClassroom(username);
+          classroom = await api.createClassroom(username);
         }
       }
 
@@ -81,7 +82,7 @@ const ClassroomForm = () => {
         err.message
       );
     }
-  }, [username]);
+  }, [username, api]);
 
   const setFormDataFromModel = (formModel) => {
     setFormData({
@@ -113,7 +114,7 @@ const ClassroomForm = () => {
     };
 
     try {
-      const updatedClassroom = await SeatingApi.updateClassroom(
+      const updatedClassroom = await api.updateClassroom(
         username,
         classroomId,
         data
