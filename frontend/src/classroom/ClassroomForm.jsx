@@ -4,6 +4,8 @@ import ClassroomRedirect from "./ClassroomRedirect.jsx";
 import SeatingApi from "../api.js";
 import UserContext from "../auth/UserContext";
 import MakeAlert from "../common/MakeAlert";
+import useAutosave from "../hooks/useAutosave";
+import { useAppToast } from "../common/ToastContext";
 import {
   Center,
   Box,
@@ -25,6 +27,7 @@ import {
 const ClassroomForm = () => {
   const { currentUser } = useContext(UserContext);
   const username = currentUser.username;
+  const toast = useAppToast();
 
   const [classroom, setClassroom] = useState({});
   const [classroomId, setClassroomId] = useState("");
@@ -38,6 +41,22 @@ const ClassroomForm = () => {
       setSeatingConfig(seatingConfig);
     }
   };
+
+  // Autosave classroom layout when seatingConfig changes
+  const handleAutosave = useCallback(async (config) => {
+    if (!classroomId) return;
+
+    try {
+      await SeatingApi.updateClassroom(username, classroomId, {
+        seatingConfig: JSON.stringify(config),
+      });
+      toast.info("Layout auto-saved");
+    } catch (err) {
+      console.error("Autosave failed:", err);
+    }
+  }, [classroomId, username, toast]);
+
+  useAutosave(seatingConfig, handleAutosave, 2000, !!classroomId && !infoLoading);
 
   const getClassroomOnMount = useCallback(async () => {
     try {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Center, Box, Table, Tbody, Tr, Td, Button } from "@chakra-ui/react";
+import { Center, Box, Table, Tbody, Tr, Td, Button, HStack, Text } from "@chakra-ui/react";
 
 //Creates the dynamic table for the classroom
 //Uses state to apply css classes at various divs in in the table matrix
@@ -10,6 +10,10 @@ const Classroom = (props) => {
 
   const [tableMatrix, setTableMatrix] = useState(currentSeatingConfig);
   const [selected, setSelected] = useState("");
+
+  // Calculate desk counts
+  const deskCount = tableMatrix.flat().filter(cell => cell === "desk").length;
+  const teacherDeskCount = tableMatrix.flat().filter(cell => cell === "teacher-desk").length;
 
   const handleClick = (rowIndex, colIndex) => {
     const newTableMatrix = [...tableMatrix];
@@ -48,6 +52,16 @@ const Classroom = (props) => {
             Student Desk
           </Button>
         </Box>
+      </Center>
+      <Center>
+        <HStack spacing={4} mb={4} fontSize="sm" color="gray.600">
+          <Text>
+            Student Desks: <strong>{deskCount}</strong>
+          </Text>
+          <Text>
+            Teacher Desk: <strong>{teacherDeskCount}</strong>
+          </Text>
+        </HStack>
       </Center>
       <Table h="375px" w="925px" colorScheme="teal">
         <Tbody>

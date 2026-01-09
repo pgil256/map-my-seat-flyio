@@ -1,10 +1,11 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import SeatingApi from "../api.js";
 import LoadingSpinner from "../common/LoadingSpinner";
 import UserContext from "../auth/UserContext";
 import MakeAlert from "../common/MakeAlert";
 import EmptyState from "../common/EmptyState";
+import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import Papa from "papaparse";
 
 
@@ -41,6 +42,30 @@ const StudentForm = () => {
   const [newStudent, setNewStudent] = useState({});
   const [csvData, setCsvData] = useState(null);
   const [allCardsExpanded, setAllCardsExpanded] = useState(false); // Now a boolean
+
+  // Reset form function for keyboard shortcut
+  const resetForm = useCallback(() => {
+    setSelectedStudent({});
+    setNewStudent({
+      name: "",
+      grade: "",
+      gender: "",
+      isESE: false,
+      has504: false,
+      isELL: false,
+      isEBD: false,
+    });
+    setFormErrors([]);
+    setSaveConfirmed(false);
+  }, []);
+
+  // Escape key to cancel editing
+  useKeyboardShortcuts([
+    {
+      key: "Escape",
+      handler: resetForm,
+    },
+  ], [resetForm]);
 
   //On page render, retrieve all students associated with this period
   useEffect(() => {
