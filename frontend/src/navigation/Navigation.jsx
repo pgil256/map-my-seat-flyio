@@ -6,63 +6,100 @@ import {
   Box,
   Flex,
   Container,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
+  HStack,
   Link as ChakraLink,
   IconButton,
   useColorMode,
   useColorModeValue,
+  Text,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
 const Navigation = ({ logout }) => {
   const { currentUser } = useContext(UserContext);
   const { colorMode, toggleColorMode } = useColorMode();
-  const bgColor = useColorModeValue("teal.400", "teal.600");
+  const bgColor = useColorModeValue("white", "brand.800");
+  const borderColor = useColorModeValue("brand.200", "brand.700");
+  const textColor = useColorModeValue("brand.600", "brand.200");
+  const activeColor = useColorModeValue("brand.800", "brand.100");
+  const hoverBg = useColorModeValue("brand.50", "brand.700");
+
+  const NavLink = ({ to, children, onClick }) => (
+    <ChakraLink
+      as={Link}
+      to={to}
+      onClick={onClick}
+      px={3}
+      py={2}
+      fontSize="sm"
+      fontWeight="medium"
+      color={textColor}
+      borderRadius="base"
+      _hover={{
+        bg: hoverBg,
+        color: activeColor,
+        textDecoration: "none",
+      }}
+    >
+      {children}
+    </ChakraLink>
+  );
 
   const loggedInNav = () => {
     return (
-      <Box bg={bgColor} w="100%" p={4} color="white">
-        <Container maxW="container.xl" px={0}>
+      <Box
+        bg={bgColor}
+        w="100%"
+        borderBottom="1px"
+        borderColor={borderColor}
+        position="sticky"
+        top={0}
+        zIndex={10}
+      >
+        <Container maxW="container.xl" py={3}>
           <Flex justify="space-between" align="center">
-            <Box display={{ base: "none", md: "block" }}>
-              <Breadcrumb spacing="8px" separator="|" fontSize="lg">
-                {['/', '/periods', `/classrooms/${currentUser.username}`, '/profile'].map((path, index) => (
-                  <BreadcrumbItem key={path}>
-                    <BreadcrumbLink
-                      as={Link}
-                      to={path}
-                      _hover={{ textDecoration: 'underline' }}
-                      _active={{ color: "teal.600" }}
-                    >
-                      {['Home', 'Set Up Classes', 'Create Classroom', 'Profile'][index]}
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                ))}
-                <BreadcrumbItem>
-                  <BreadcrumbLink as={Link} to="/" onClick={logout}>
-                    Logout
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-              </Breadcrumb>
-            </Box>
-            <Box display={{ base: "block", md: "none" }} ml="auto">
-              <ChakraLink as={Link} to="/" fontSize="lg" fontWeight="bold" _hover={{ textDecoration: 'none' }}>
+            <HStack spacing={1} display={{ base: "none", md: "flex" }}>
+              <ChakraLink
+                as={Link}
+                to="/"
+                fontWeight="semibold"
+                fontSize="md"
+                color={activeColor}
+                mr={4}
+                _hover={{ textDecoration: "none" }}
+              >
+                Map My Seat
+              </ChakraLink>
+              <NavLink to="/">Home</NavLink>
+              <NavLink to="/periods">Classes</NavLink>
+              <NavLink to={`/classrooms/${currentUser.username}`}>Classrooms</NavLink>
+              <NavLink to="/profile">Profile</NavLink>
+              <NavLink to="/" onClick={logout}>Logout</NavLink>
+            </HStack>
+
+            <Box display={{ base: "block", md: "none" }}>
+              <ChakraLink
+                as={Link}
+                to="/"
+                fontWeight="semibold"
+                color={activeColor}
+                _hover={{ textDecoration: 'none' }}
+              >
                 Map My Seat
               </ChakraLink>
             </Box>
-            <IconButton
-              aria-label="Toggle dark mode"
-              icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-              onClick={toggleColorMode}
-              variant="ghost"
-              color="white"
-              _hover={{ bg: "whiteAlpha.200" }}
-              ml={2}
-              display={{ base: "none", md: "flex" }}
-            />
-            <MobileNav currentUser={currentUser} logout={logout} />
+
+            <HStack spacing={2}>
+              <IconButton
+                aria-label="Toggle dark mode"
+                icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                onClick={toggleColorMode}
+                variant="ghost"
+                size="sm"
+                display={{ base: "none", md: "flex" }}
+              />
+              <MobileNav currentUser={currentUser} logout={logout} />
+            </HStack>
           </Flex>
         </Container>
       </Box>
@@ -71,41 +108,57 @@ const Navigation = ({ logout }) => {
 
   const loggedOutNav = () => {
     return (
-      <Box bg={bgColor} w="100%" p={4} color="white">
-        <Container maxW="container.xl" px={0}>
+      <Box
+        bg={bgColor}
+        w="100%"
+        borderBottom="1px"
+        borderColor={borderColor}
+        position="sticky"
+        top={0}
+        zIndex={10}
+      >
+        <Container maxW="container.xl" py={3}>
           <Flex justify="space-between" align="center">
-            <Box display={{ base: "none", md: "block" }}>
-              <Breadcrumb fontWeight="medium" fontSize="lg" spacing="8px" separator="|">
-                {['/', '/login', '/signup'].map((path, index) => (
-                  <BreadcrumbItem key={path}>
-                    <BreadcrumbLink
-                      as={Link}
-                      to={path}
-                      _hover={{ textDecoration: 'underline' }}
-                      _active={{ color: "teal.600" }}
-                    >
-                      {['Home', 'Log In', 'Sign Up'][index]}
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                ))}
-              </Breadcrumb>
-            </Box>
-            <Box display={{ base: "block", md: "none" }} ml="auto">
-              <ChakraLink as={Link} to="/" fontSize="lg" fontWeight="bold" _hover={{ textDecoration: 'none' }}>
+            <HStack spacing={1} display={{ base: "none", md: "flex" }}>
+              <ChakraLink
+                as={Link}
+                to="/"
+                fontWeight="semibold"
+                fontSize="md"
+                color={activeColor}
+                mr={4}
+                _hover={{ textDecoration: "none" }}
+              >
+                Map My Seat
+              </ChakraLink>
+              <NavLink to="/">Home</NavLink>
+              <NavLink to="/login">Log In</NavLink>
+              <NavLink to="/signup">Sign Up</NavLink>
+            </HStack>
+
+            <Box display={{ base: "block", md: "none" }}>
+              <ChakraLink
+                as={Link}
+                to="/"
+                fontWeight="semibold"
+                color={activeColor}
+                _hover={{ textDecoration: 'none' }}
+              >
                 Map My Seat
               </ChakraLink>
             </Box>
-            <IconButton
-              aria-label="Toggle dark mode"
-              icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
-              onClick={toggleColorMode}
-              variant="ghost"
-              color="white"
-              _hover={{ bg: "whiteAlpha.200" }}
-              ml={2}
-              display={{ base: "none", md: "flex" }}
-            />
-            <MobileNav currentUser={currentUser} logout={logout} />
+
+            <HStack spacing={2}>
+              <IconButton
+                aria-label="Toggle dark mode"
+                icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
+                onClick={toggleColorMode}
+                variant="ghost"
+                size="sm"
+                display={{ base: "none", md: "flex" }}
+              />
+              <MobileNav currentUser={currentUser} logout={logout} />
+            </HStack>
           </Flex>
         </Container>
       </Box>

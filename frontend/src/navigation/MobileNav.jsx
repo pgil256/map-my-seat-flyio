@@ -22,7 +22,10 @@ import { Link as RouterLink } from "react-router-dom";
 function MobileNav({ currentUser, logout }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
-  const hoverBg = useColorModeValue("teal.500", "teal.700");
+  const iconColor = useColorModeValue("brand.600", "brand.200");
+  const hoverBg = useColorModeValue("brand.50", "brand.700");
+  const drawerBg = useColorModeValue("white", "brand.800");
+  const borderColor = useColorModeValue("brand.200", "brand.700");
 
   const handleLogout = () => {
     logout();
@@ -37,6 +40,7 @@ function MobileNav({ currentUser, logout }) {
       w="full"
       justifyContent="flex-start"
       onClick={onClose}
+      _hover={{ bg: hoverBg }}
     >
       {children}
     </Button>
@@ -49,36 +53,35 @@ function MobileNav({ currentUser, logout }) {
         icon={<HamburgerIcon />}
         onClick={onOpen}
         variant="ghost"
-        color="white"
+        color={iconColor}
         _hover={{ bg: hoverBg }}
       />
 
       <Drawer isOpen={isOpen} placement="right" onClose={onClose}>
         <DrawerOverlay />
-        <DrawerContent>
+        <DrawerContent bg={drawerBg}>
           <DrawerCloseButton />
-          <DrawerHeader borderBottomWidth="1px">Menu</DrawerHeader>
+          <DrawerHeader borderBottomWidth="1px" borderColor={borderColor}>
+            Menu
+          </DrawerHeader>
           <DrawerBody>
             <VStack spacing={2} align="stretch" mt={4}>
               <NavLink to="/">Home</NavLink>
 
               {currentUser ? (
                 <>
-                  <NavLink to="/periods">
-                    Set Up Classes
-                  </NavLink>
+                  <NavLink to="/periods">Classes</NavLink>
                   <NavLink to={`/classrooms/${currentUser.username}`}>
-                    Create Classroom
+                    Classrooms
                   </NavLink>
-                  <NavLink to="/profile">
-                    Profile
-                  </NavLink>
+                  <NavLink to="/profile">Profile</NavLink>
                   <Button
                     variant="ghost"
                     w="full"
                     justifyContent="flex-start"
                     onClick={handleLogout}
                     color="red.500"
+                    _hover={{ bg: "red.50" }}
                   >
                     Logout
                   </Button>
@@ -89,7 +92,7 @@ function MobileNav({ currentUser, logout }) {
                   <NavLink to="/signup">Sign Up</NavLink>
                 </>
               )}
-              <Divider my={4} />
+              <Divider my={4} borderColor={borderColor} />
               <HStack justify="space-between" px={4}>
                 <Text>Dark Mode</Text>
                 <IconButton
@@ -98,6 +101,7 @@ function MobileNav({ currentUser, logout }) {
                   onClick={toggleColorMode}
                   variant="ghost"
                   size="sm"
+                  _hover={{ bg: hoverBg }}
                 />
               </HStack>
             </VStack>

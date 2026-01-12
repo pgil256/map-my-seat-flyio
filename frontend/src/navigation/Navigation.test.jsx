@@ -30,8 +30,8 @@ describe("Navigation component", () => {
     renderWithProviders(currentUser);
 
     expect(screen.getByText("Home")).toBeInTheDocument();
-    expect(screen.getByText("Set Up Classes")).toBeInTheDocument();
-    expect(screen.getByText("Create Classroom")).toBeInTheDocument();
+    expect(screen.getByText("Classes")).toBeInTheDocument();
+    expect(screen.getByText("Classrooms")).toBeInTheDocument();
     expect(screen.getByText("Profile")).toBeInTheDocument();
     expect(screen.getByText("Logout")).toBeInTheDocument();
   });
