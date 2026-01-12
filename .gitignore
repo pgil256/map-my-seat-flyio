@@ -52,6 +52,9 @@ tmp/
 temp/
 .cache/
 
+# Git worktrees
+.worktrees/
+
 # Debug
 debug.log
 
