@@ -11,35 +11,42 @@ import {
   Box,
   Tr,
   Td,
-  Container,
   Heading,
   Center,
   Button,
   HStack,
+  Card,
+  CardBody,
+  Flex,
+  Text,
+  useColorModeValue,
 } from "@chakra-ui/react";
 
-// Component to show accommodation badges for students
+// Component to show accommodation badges for students using theme colors
 function AccommodationIndicators({ student }) {
   const indicators = [];
 
-  if (student.isESE) indicators.push({ label: "ESE", color: "purple.400" });
-  if (student.has504) indicators.push({ label: "504", color: "blue.400" });
-  if (student.isELL) indicators.push({ label: "ELL", color: "green.400" });
-  if (student.isEBD) indicators.push({ label: "EBD", color: "orange.400" });
+  if (student.isESE) indicators.push({ label: "ESE", bg: "accommodation.ese.bg", color: "accommodation.ese.text" });
+  if (student.has504) indicators.push({ label: "504", bg: "accommodation.plan504.bg", color: "accommodation.plan504.text" });
+  if (student.isELL) indicators.push({ label: "ELL", bg: "accommodation.ell.bg", color: "accommodation.ell.text" });
+  if (student.isEBD) indicators.push({ label: "EBD", bg: "accommodation.ebd.bg", color: "accommodation.ebd.text" });
 
   if (indicators.length === 0) return null;
 
   return (
     <HStack spacing={0.5} mt={0.5} justify="center" flexWrap="wrap">
-      {indicators.map(({ label, color }) => (
+      {indicators.map(({ label, bg, color }) => (
         <Box
           key={label}
-          bg={color}
-          color="white"
+          className="accommodation-badge"
+          bg={bg}
+          color={color}
           fontSize="6px"
-          px={0.5}
-          borderRadius="sm"
+          px={1}
+          py={0.5}
+          borderRadius="full"
           lineHeight="1.2"
+          fontWeight="medium"
         >
           {label}
         </Box>
@@ -61,6 +68,15 @@ const SeatingChart = () => {
   const [matrix, setMatrix] = useState(
     [...Array(12).keys()].map(() => [...Array(12).keys()])
   );
+
+  // Color mode values
+  const emptyBg = useColorModeValue("brand.50", "brand.800");
+  const emptyBorder = useColorModeValue("brand.300", "brand.600");
+  const deskBg = useColorModeValue("white", "brand.800");
+  const deskBorder = useColorModeValue("brand.300", "brand.500");
+  const teacherDeskBg = useColorModeValue("brand.200", "brand.600");
+  const textColor = useColorModeValue("brand.800", "brand.100");
+  const subtitleColor = useColorModeValue("brand.600", "brand.300");
 
   const sortAndPrioritizeStudents = (students, classroom) => {
     let modifiedStudentsList = [...students];
@@ -155,95 +171,109 @@ const SeatingChart = () => {
   const generateTableContent = (matrix, sortedStudents) => {
     let studentIndex = 0;
 
-    const computeFontSize = (content) => {
-      if (content.length < 10) return ".9rem";
-      if (content.length < 15) return "0.9rem";
-      if (content.length < 20) return "0.9rem";
-      return "0.5em";
-    };
-
     const computeCellSize = (cellType) => {
       switch (cellType) {
         case "desk":
         case "teacher-desk":
           return {
-            width: "50px",
-            height: "40px",
-            overflow: "auto"
+            width: "60px",
+            height: "50px",
+            overflow: "hidden"
           };
       }
       return {
-        width: "50px",
-        height: "40px",
+        width: "60px",
+        height: "50px",
       };
     };
 
+    // Get current date for title bar
+    const currentDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
     return (
-      <Container
+      <Box
         ref={containerRef}
         className="seating-chart-container"
-        maxW="100vw"
+        maxW="100%"
         maxH="80vh"
-        border="2px solid teal"
-        m="2"
-        p="2"
       >
-        <Center mb="4">
-          <Heading>Period {number} Seating Chart</Heading>
-        </Center>
-        <Table colorScheme="teal">
+        {/* Title bar */}
+        <Flex justify="space-between" align="center" mb={4}>
+          <Box>
+            <Heading size="lg" color={textColor}>Period {number} Seating Chart</Heading>
+            <Text fontSize="sm" color={subtitleColor}>
+              {classroom.name || "Classroom"} | Generated: {currentDate}
+            </Text>
+          </Box>
+        </Flex>
+        <Table>
           <Tbody>
             {matrix.map((row, rowIndex) => (
               <Tr key={rowIndex}>
                 {row.map((cell, colIndex) => {
                   let content = null;
                   let studentInDesk = null;
+                  const isDesk = cell === "desk";
+                  const isTeacherDesk = cell === "teacher-desk";
+                  const isEmpty = !isDesk && !isTeacherDesk;
 
-                  if (cell === "desk" && studentIndex < sortedStudents.length) {
+                  if (isDesk && studentIndex < sortedStudents.length) {
                     studentInDesk = sortedStudents[studentIndex];
                     content = studentInDesk.name;
                     studentIndex++;
-                  } else if (cell === "teacher-desk") {
+                  } else if (isTeacherDesk) {
                     content = `${currentUser.title} ${currentUser.lastName}`;
                   }
 
-                  const fontSize = computeFontSize(content || "");
                   const cellSize = computeCellSize(cell);
 
                   return (
                     <Td
                       key={colIndex}
                       className={`${
-                        cell === "desk"
+                        isDesk
                           ? "desk"
-                          : cell === "teacher-desk"
+                          : isTeacherDesk
                           ? "teacher-desk"
                           : ""
                       }`}
                       bg={
-                        cell === "desk"
-                          ? "gray.300"
-                          : cell === "teacher-desk"
-                          ? "gray.400"
-                          : ""
+                        isDesk
+                          ? deskBg
+                          : isTeacherDesk
+                          ? teacherDeskBg
+                          : emptyBg
                       }
-                      borderWidth="1px"
-                      borderColor="gray.200"
-                      cursor="pointer"
+                      borderWidth={isEmpty ? "1px" : "1px"}
+                      borderStyle={isEmpty ? "dashed" : "solid"}
+                      borderColor={
+                        isDesk
+                          ? deskBorder
+                          : isTeacherDesk
+                          ? deskBorder
+                          : emptyBorder
+                      }
                       width={cellSize.width}
                       height={cellSize.height}
                       whiteSpace="nowrap"
-                      overflow="auto"
+                      overflow="hidden"
                       textOverflow="ellipsis"
-                      fontSize={fontSize}
+                      fontSize="13px"
+                      fontWeight="medium"
                       boxSizing="border-box"
                       textAlign="center"
                       verticalAlign="middle"
                       lineHeight="1.2"
-                      p={0.5}
+                      p={1}
                       m={0}
+                      transition="box-shadow 0.15s ease"
+                      _hover={isDesk || isTeacherDesk ? { boxShadow: "sm" } : {}}
                     >
-                      <Box>
+                      <Box color={textColor}>
                         {content}
                         {studentInDesk && <AccommodationIndicators student={studentInDesk} />}
                       </Box>
@@ -254,7 +284,7 @@ const SeatingChart = () => {
             ))}
           </Tbody>
         </Table>
-      </Container>
+      </Box>
     );
   };
 
@@ -335,25 +365,32 @@ const SeatingChart = () => {
   }, [classroom, students]);
 
   return (
-    <>
-<Container maxW='100%' width='100vw' p={0}>
-  <Center w='100%' className="no-print">
-    <Button m={3} colorScheme={'blue'} onClick={handleSpreadButtonClick}>
-      Spread Students
-    </Button>
-    <Button onClick={exportToPDF}>Export to PDF</Button>
-    <Button ml={3} colorScheme={'gray'} onClick={() => window.print()}>
-      Print
-    </Button>
-  </Center>
+    <Box maxW="100%" width="100vw" p={4}>
+      <Card p={6}>
+        <CardBody>
+          {/* Action buttons - top right */}
+          <Flex justify="flex-end" mb={4} className="no-print">
+            <HStack spacing={3}>
+              <Button variant="outline" size="sm" onClick={handleSpreadButtonClick}>
+                Spread Students
+              </Button>
+              <Button variant="outline" size="sm" onClick={exportToPDF}>
+                Export to PDF
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => window.print()}>
+                Print
+              </Button>
+            </HStack>
+          </Flex>
 
-  <Center>
-    <Box mr='3' ml='3'>
-      {generateTableContent(matrix, sortedStudents, username)}
+          <Center>
+            <Box>
+              {generateTableContent(matrix, sortedStudents, username)}
+            </Box>
+          </Center>
+        </CardBody>
+      </Card>
     </Box>
-  </Center>
-</Container>
-</>
   );
 };
 
