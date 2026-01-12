@@ -4,21 +4,24 @@ import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { describe, it, expect } from "vitest";
 import UserContext from "../auth/UserContext";
+import { DemoProvider } from "../demo/DemoContext";
 import PrivateRoute from "./PrivateRoutes";
 
 const renderWithProviders = (currentUser, initialRoute = "/protected") => {
   return render(
     <ChakraProvider>
-      <UserContext.Provider value={{ currentUser }}>
-        <MemoryRouter initialEntries={[initialRoute]}>
-          <Routes>
-            <Route element={<PrivateRoute />}>
-              <Route path="/protected" element={<div data-testid="protected">Protected Content</div>} />
-            </Route>
-            <Route path="/login" element={<div data-testid="login">Login Page</div>} />
-          </Routes>
-        </MemoryRouter>
-      </UserContext.Provider>
+      <DemoProvider>
+        <UserContext.Provider value={{ currentUser }}>
+          <MemoryRouter initialEntries={[initialRoute]}>
+            <Routes>
+              <Route element={<PrivateRoute />}>
+                <Route path="/protected" element={<div data-testid="protected">Protected Content</div>} />
+              </Route>
+              <Route path="/login" element={<div data-testid="login">Login Page</div>} />
+            </Routes>
+          </MemoryRouter>
+        </UserContext.Provider>
+      </DemoProvider>
     </ChakraProvider>
   );
 };
