@@ -8,13 +8,13 @@ import EmptyState from "../common/EmptyState";
 import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import Papa from "papaparse";
 
-
 import {
   Box,
   Flex,
   Heading,
   Center,
-  Stack,
+  VStack,
+  HStack,
   SimpleGrid,
   Text,
   Button,
@@ -23,11 +23,38 @@ import {
   Card,
   CardBody,
   Input,
-  Spacer,
-  RadioGroup,
   Radio,
   Checkbox,
+  Badge,
+  useColorModeValue,
 } from "@chakra-ui/react";
+
+// Accommodation badge component using theme colors
+const AccommodationBadge = ({ type, active }) => {
+  const colors = {
+    ESE: { bg: "accommodation.ese.bg", text: "accommodation.ese.text" },
+    "504": { bg: "accommodation.plan504.bg", text: "accommodation.plan504.text" },
+    ELL: { bg: "accommodation.ell.bg", text: "accommodation.ell.text" },
+    EBD: { bg: "accommodation.ebd.bg", text: "accommodation.ebd.text" },
+  };
+
+  if (!active) return null;
+
+  return (
+    <Badge
+      bg={colors[type].bg}
+      color={colors[type].text}
+      px={2}
+      py={0.5}
+      borderRadius="full"
+      fontSize="xs"
+      fontWeight="medium"
+      textTransform="uppercase"
+    >
+      {type}
+    </Badge>
+  );
+};
 
 //Allows for student crud operations
 const StudentForm = () => {
@@ -42,7 +69,12 @@ const StudentForm = () => {
   const [saveConfirmed, setSaveConfirmed] = useState(false);
   const [newStudent, setNewStudent] = useState({});
   const [csvData, setCsvData] = useState(null);
-  const [allCardsExpanded, setAllCardsExpanded] = useState(false); // Now a boolean
+  const [allCardsExpanded, setAllCardsExpanded] = useState(false);
+
+  const headingColor = useColorModeValue("brand.800", "brand.100");
+  const textColor = useColorModeValue("brand.600", "brand.300");
+  const cardBg = useColorModeValue("white", "brand.800");
+  const borderColor = useColorModeValue("brand.200", "brand.700");
 
   // Reset form function for keyboard shortcut
   const resetForm = useCallback(() => {
@@ -120,7 +152,6 @@ const StudentForm = () => {
           const newStudents = [...prevStudents];
           newStudents[index] = updatedStudent;
           setSelectedStudent({});
-          // setIsEditMode(false);
           return newStudents;
         }
         return prevStudents;
@@ -254,7 +285,7 @@ const StudentForm = () => {
   };
 
   const handleCardClick = () => {
-    setAllCardsExpanded(!allCardsExpanded); // toggle the boolean value
+    setAllCardsExpanded(!allCardsExpanded);
   };
 
   if (infoLoading) {
@@ -262,233 +293,231 @@ const StudentForm = () => {
   }
 
   return (
-    <>
-      <Flex>
-        <Flex flexDirection="column" w="35%">
-          <Card vh="90%" mt={2}>
-            <CardBody mt={1} p={0}>
-              <Center>
-                <Heading mb={2} p={2} size="lg" noOfLines={1}>
-                  Add New Student
-                </Heading>
-              </Center>
-              <Center>
-                <Stack spacing={0}>
-                  <Flex alignItems="center">
-                    <FormLabel htmlFor="newStudentName">Name:</FormLabel>
+    <Flex gap={4} p={2}>
+      <Flex flexDirection="column" w="35%">
+        <Card p={6}>
+          <CardBody p={0}>
+            <VStack spacing={4}>
+              <Heading size="lg" color={headingColor}>
+                Add New Student
+              </Heading>
+              <VStack spacing={4} w="full">
+                <Flex alignItems="center" w="full">
+                  <FormLabel htmlFor="newStudentName" flex="25%" mb={0}>Name:</FormLabel>
+                  <Input
+                    flex="75%"
+                    type="text"
+                    name="name"
+                    value={newStudent.name}
+                    onChange={(e) =>
+                      setNewStudent({ ...newStudent, name: e.target.value })
+                    }
+                  />
+                </Flex>
+                <Flex alignItems="center" w="full">
+                  <FormLabel htmlFor="grade" flex="25%" mb={0}>Grade:</FormLabel>
+                  <Input
+                    flex="35%"
+                    type="number"
+                    name="grade"
+                    value={newStudent.grade}
+                    min={0}
+                    max={100}
+                    onChange={(e) =>
+                      setNewStudent({ ...newStudent, grade: e.target.value })
+                    }
+                  />
+                  <HStack spacing={4} ml={4}>
+                    <HStack>
+                      <FormLabel htmlFor="M" mb={0}>M</FormLabel>
+                      <Radio
+                        type="radio"
+                        name="gender"
+                        value="M"
+                        checked={newStudent.gender === "M"}
+                        onChange={(e) =>
+                          setNewStudent({
+                            ...newStudent,
+                            gender: e.target.value,
+                          })
+                        }
+                      />
+                    </HStack>
+                    <HStack>
+                      <FormLabel htmlFor="F" mb={0}>F</FormLabel>
+                      <Radio
+                        type="radio"
+                        name="gender"
+                        value="F"
+                        checked={newStudent.gender === "F"}
+                        onChange={(e) =>
+                          setNewStudent({
+                            ...newStudent,
+                            gender: e.target.value,
+                          })
+                        }
+                      />
+                    </HStack>
+                  </HStack>
+                </Flex>
+
+                <HStack spacing={4} w="full" justify="center">
+                  <HStack>
+                    <FormLabel htmlFor="ESE" mb={0}>ESE</FormLabel>
+                    <Checkbox
+                      type="checkbox"
+                      name="isESE"
+                      isChecked={newStudent.isESE}
+                      onChange={(e) =>
+                        setNewStudent({
+                          ...newStudent,
+                          isESE: e.target.checked,
+                        })
+                      }
+                    />
+                  </HStack>
+                  <HStack>
+                    <FormLabel htmlFor="504" mb={0}>504</FormLabel>
+                    <Checkbox
+                      type="checkbox"
+                      name="has504"
+                      isChecked={newStudent.has504}
+                      onChange={(e) =>
+                        setNewStudent({
+                          ...newStudent,
+                          has504: e.target.checked,
+                        })
+                      }
+                    />
+                  </HStack>
+                  <HStack>
+                    <FormLabel htmlFor="ELL" mb={0}>ELL</FormLabel>
+                    <Checkbox
+                      type="checkbox"
+                      name="isELL"
+                      isChecked={newStudent.isELL}
+                      onChange={(e) =>
+                        setNewStudent({
+                          ...newStudent,
+                          isELL: e.target.checked,
+                        })
+                      }
+                    />
+                  </HStack>
+                  <HStack>
+                    <FormLabel htmlFor="EBD" mb={0}>EBD</FormLabel>
+                    <Checkbox
+                      type="checkbox"
+                      name="isEBD"
+                      isChecked={newStudent.isEBD}
+                      onChange={(e) =>
+                        setNewStudent({
+                          ...newStudent,
+                          isEBD: e.target.checked,
+                        })
+                      }
+                    />
+                  </HStack>
+                </HStack>
+                <Button
+                  variant="solid"
+                  onClick={createStudent}
+                >
+                  Add Student
+                </Button>
+
+                {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
+                {saveConfirmed.length ? (
+                  <MakeAlert messages={saveConfirmed} />
+                ) : null}
+              </VStack>
+            </VStack>
+          </CardBody>
+          <CardBody p={0} mt={6}>
+            <VStack spacing={4}>
+              <Heading size="lg" color={headingColor}>
+                Update Student
+              </Heading>
+              <form style={{ width: "100%" }}>
+                <VStack spacing={4} w="full">
+                  <Flex alignItems="center" w="full">
+                    <FormLabel htmlFor="name" flex="25%" mb={0}>Name:</FormLabel>
                     <Input
-                      mb={1}
+                      flex="75%"
                       type="text"
                       name="name"
-                      value={newStudent.name}
+                      value={selectedStudent ? selectedStudent.name : ""}
                       onChange={(e) =>
-                        setNewStudent({ ...newStudent, name: e.target.value })
+                        setSelectedStudent({
+                          ...selectedStudent,
+                          name: e.target.value,
+                        })
                       }
                     />
                   </Flex>
-                  <Flex alignItems="center">
-                    <FormLabel htmlFor="grade">Grade:</FormLabel>
+
+                  <Flex alignItems="center" w="full">
+                    <FormLabel htmlFor="grade" flex="25%" mb={0}>Grade:</FormLabel>
                     <Input
+                      flex="35%"
                       type="number"
                       name="grade"
-                      value={newStudent.grade}
+                      value={selectedStudent ? selectedStudent.grade : ""}
                       min={0}
                       max={100}
                       onChange={(e) =>
-                        setNewStudent({ ...newStudent, grade: e.target.value })
+                        setSelectedStudent({
+                          ...selectedStudent,
+                          grade: parseInt(e.target.value),
+                        })
                       }
                     />
-                    <Center>
-                      <Stack direction="row" m={2}>
-                        <FormLabel htmlFor="M">Male</FormLabel>
+                    <HStack spacing={4} ml={4}>
+                      <HStack>
+                        <FormLabel htmlFor="M" mb={0}>M</FormLabel>
                         <Radio
                           type="radio"
                           name="gender"
                           value="M"
-                          checked={newStudent.gender === "M"}
-                          onChange={(e) =>
-                            setNewStudent({
-                              ...newStudent,
-                              gender: e.target.value,
-                            })
+                          isChecked={
+                            selectedStudent && selectedStudent.gender === "M"
+                          }
+                          onChange={() =>
+                            setSelectedStudent(
+                              selectedStudent
+                                ? { ...selectedStudent, gender: "M" }
+                                : null
+                            )
                           }
                         />
-
-                        <FormLabel htmlFor="F">Female:</FormLabel>
+                      </HStack>
+                      <HStack>
+                        <FormLabel htmlFor="F" mb={0}>F</FormLabel>
                         <Radio
                           type="radio"
                           name="gender"
                           value="F"
-                          checked={newStudent.gender === "F"}
-                          onChange={(e) =>
-                            setNewStudent({
-                              ...newStudent,
-                              gender: e.target.value,
-                            })
+                          isChecked={
+                            selectedStudent && selectedStudent.gender === "F"
                           }
-                        />
-                      </Stack>
-                    </Center>
-                  </Flex>
-
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <Stack direction="row" m={2}>
-                      <FormLabel htmlFor="ESE">ESE</FormLabel>
-                      <Checkbox
-                        type="checkbox"
-                        name="isESE"
-                        checked={newStudent.isESE}
-                        onChange={(e) =>
-                          setNewStudent({
-                            ...newStudent,
-                            isESE: e.target.checked,
-                          })
-                        }
-                      />
-                      <FormLabel htmlFor="504">504</FormLabel>
-                      <Checkbox
-                        type="checkbox"
-                        name="has504"
-                        checked={newStudent.has504}
-                        onChange={(e) =>
-                          setNewStudent({
-                            ...newStudent,
-                            has504: e.target.checked,
-                          })
-                        }
-                      />
-
-                      <FormLabel htmlFor="ELL">ELL</FormLabel>
-                      <Checkbox
-                        type="checkbox"
-                        name="isELL"
-                        checked={newStudent.isELL}
-                        onChange={(e) =>
-                          setNewStudent({
-                            ...newStudent,
-                            isELL: e.target.checked,
-                          })
-                        }
-                      />
-
-                      <FormLabel htmlFor="EBD">EBD</FormLabel>
-                      <Checkbox
-                        type="checkbox"
-                        name="isEBD"
-                        checked={newStudent.isEBD}
-                        onChange={(e) =>
-                          setNewStudent({
-                            ...newStudent,
-                            isEBD: e.target.checked,
-                          })
-                        }
-                      />
-                    </Stack>
-                  </Box>
-                  <Center>
-                    <Button
-                      w="50%"
-                      m={2}
-                      colorScheme="blue"
-                      onClick={createStudent}
-                    >
-                      Add Student
-                    </Button>
-                  </Center>
-
-                  {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
-                  {saveConfirmed.length ? (
-                    <MakeAlert messages={saveConfirmed} />
-                  ) : null}
-                </Stack>
-              </Center>
-            </CardBody>
-            <CardBody flexShrink={0}>
-              <Center>
-                <Heading mb={2} p={0} size="lg" noOfLines={1}>
-                  Update Student
-                </Heading>
-              </Center>
-              <Center>
-                <Stack spacing={2} m={0}>
-                  <form>
-                    <Flex alignItems="center">
-                      <FormLabel htmlFor="name">Name:</FormLabel>
-                      <Input
-                        type="text"
-                        name="name"
-                        value={selectedStudent ? selectedStudent.name : ""}
-                        onChange={(e) =>
-                          setSelectedStudent({
-                            ...selectedStudent,
-                            name: e.target.value,
-                          })
-                        }
-                      />
-                    </Flex>
-
-                    <Flex alignItems="center">
-                      <FormLabel htmlFor="grade">Grade:</FormLabel>
-                      <Input
-                        type="number"
-                        name="grade"
-                        value={selectedStudent ? selectedStudent.grade : ""}
-                        min={0}
-                        max={100}
-                        onChange={(e) =>
-                          setSelectedStudent({
-                            ...selectedStudent,
-                            grade: parseInt(e.target.value),
-                          })
-                        }
-                      />
-                      <RadioGroup>
-                        <Stack direction="row" m={2}>
-                          <FormLabel htmlFor="M">Male</FormLabel>
-                          <Radio
-                            type="radio"
-                            name="gender"
-                            value="M"
-                            checked={
-                              selectedStudent && selectedStudent.gender === "M"
-                            }
-                            onChange={() =>
-                              setSelectedStudent(
-                                selectedStudent
-                                  ? { ...selectedStudent, gender: "M" }
-                                  : null
-                              )
-                            }
-                          />
-
-                          <FormLabel htmlFor="F">Female:</FormLabel>
-                          <Radio
-                            type="radio"
-                            name="gender"
-                            value="F"
-                            checked={
-                              selectedStudent && selectedStudent.gender === "F"
-                            }
-                            onChange={() =>
+                          onChange={() =>
+                            setSelectedStudent(
                               selectedStudent
                                 ? { ...selectedStudent, gender: "F" }
                                 : null
-                            }
-                          />
-                        </Stack>
-                      </RadioGroup>
-                    </Flex>
-                    <Stack direction="row" m={2}>
-                      <FormLabel htmlFor="ESE">ESE</FormLabel>
+                            )
+                          }
+                        />
+                      </HStack>
+                    </HStack>
+                  </Flex>
+                  <HStack spacing={4} w="full" justify="center">
+                    <HStack>
+                      <FormLabel htmlFor="ESE" mb={0}>ESE</FormLabel>
                       <Checkbox
                         type="checkbox"
                         name="isESE"
-                        value="true"
-                        checked={
+                        isChecked={
                           selectedStudent ? selectedStudent.isESE : false
                         }
                         onChange={() =>
@@ -498,13 +527,13 @@ const StudentForm = () => {
                           })
                         }
                       />
-
-                      <FormLabel htmlFor="504">504</FormLabel>
+                    </HStack>
+                    <HStack>
+                      <FormLabel htmlFor="504" mb={0}>504</FormLabel>
                       <Checkbox
                         type="checkbox"
                         name="has504"
-                        value="true"
-                        checked={
+                        isChecked={
                           selectedStudent ? selectedStudent.has504 : false
                         }
                         onChange={() =>
@@ -514,13 +543,13 @@ const StudentForm = () => {
                           })
                         }
                       />
-
-                      <FormLabel htmlFor="ELL">ELL</FormLabel>
+                    </HStack>
+                    <HStack>
+                      <FormLabel htmlFor="ELL" mb={0}>ELL</FormLabel>
                       <Checkbox
                         type="checkbox"
                         name="isELL"
-                        value="true"
-                        checked={
+                        isChecked={
                           selectedStudent ? selectedStudent.isELL : false
                         }
                         onChange={() =>
@@ -530,13 +559,13 @@ const StudentForm = () => {
                           })
                         }
                       />
-
-                      <FormLabel htmlFor="EBD">EBD</FormLabel>
+                    </HStack>
+                    <HStack>
+                      <FormLabel htmlFor="EBD" mb={0}>EBD</FormLabel>
                       <Checkbox
                         type="checkbox"
                         name="isEBD"
-                        value="true"
-                        checked={
+                        isChecked={
                           selectedStudent ? selectedStudent.isEBD : false
                         }
                         onChange={() =>
@@ -546,10 +575,11 @@ const StudentForm = () => {
                           })
                         }
                       />
-                    </Stack>
+                    </HStack>
+                  </HStack>
+                  <HStack spacing={4}>
                     <Button
-                      m={2}
-                      colorScheme="blue"
+                      variant="solid"
                       type="button"
                       name="updateStudent"
                       onClick={(e) => updateStudent(e)}
@@ -558,147 +588,124 @@ const StudentForm = () => {
                     </Button>
 
                     <Button
-                      m={2}
-                      colorScheme="blue"
+                      variant="outline"
                       type="button"
                       name="deleteStudent"
                       onClick={(e) => deleteStudent(e)}
                     >
                       Delete Student
                     </Button>
+                  </HStack>
 
-                    {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
-                    {saveConfirmed.length ? (
-                      <MakeAlert messages={saveConfirmed} />
-                    ) : null}
-                  </form>
-                </Stack>
-              </Center>
-            </CardBody>
-          </Card>
-        </Flex>
-        <Card w="63%" m={1} p={1} id="studentContainer">
-          <Center>
-            <Box m={1} p={1} flex="1">
-              <Center>
-                <Heading>Add Student Rosters</Heading>
-              </Center>
-              <Text mt={2} fontSize="md">
-                Use this page to enter students for this particular seciton. Add
-                Students using the "Add Students" form, or by importing CSV
-                files. Student info can be viewed and modified by clicking on
-                their name and making changes in the "Edit Changes" form.
-              </Text>
-              <Flex direction="row" width="full" mt={5}>
-                <Spacer />
-                <Button mr={40} onClick={() => handleCardClick()}>
-                  Expand Student List
-                </Button>
-                <Input
-                  w="240px"
-                  h="32px"
-                  type="file"
-                  onChange={handleCSVChange}
-                  accept=".csv"
-                />
-                <Stack>
-                  <Button colorScheme="blue" ml={4} onClick={handleCSVSubmit}>
-                    Submit CSV file
-                  </Button>
-                  {saveConfirmed && (
-                    <Box>
-                      <p>Students added successfully!</p>
-                    </Box>
-                  )}
-                </Stack>
-              </Flex>
-            </Box>
-          </Center>
-          <CardBody>
-            {students && students.length === 0 ? (
-              <EmptyState
-                title="No students yet"
-                description="Add students individually using the form, or upload a CSV file with your class roster."
-                actionLabel="Add First Student"
-                onAction={() => document.querySelector('input[name="name"]')?.focus()}
-              />
-            ) : (
-              <Box overflowY={"auto"} maxHeight="280px">
-                <SimpleGrid columns={5} spacing={2}>
-                  {students.map((student) => (
-                    <React.Fragment key={student.studentId}>
-                      <Flex py={5} position="relative">
-                        <Box
-                          maxW={"510px"}
-                          w={"full"}
-                          bg={"white"}
-                          boxShadow={"2xl"}
-                          rounded={"lg"}
-                          p={5}
-                          textAlign={"center"}
-                        >
-                          <Heading
-                            fontSize={"2xl"}
-                            fontFamily={"body"}
-                            style={{ cursor: "pointer" }}
-                          >
-                            {student.name}
-                          </Heading>
-                          <Collapse in={allCardsExpanded}>
-                            <>
-                              <Center>
-                                <Stack
-                                  fontWeight={600}
-                                  fontSize={"sm"}
-                                  color={"gray.500"}
-                                  m={1}
-                                  mt={2}
-                                  w="350px"
-                                >
-                                  <SimpleGrid spacing={1} columns={2}>
-                                    <Text>Grade: {student.grade}</Text>
-                                    <Text>M/F: {student.gender}</Text>
-                                    <Text>
-                                      ESE: {student.isESE ? "Yes" : "No"}
-                                    </Text>
-                                    <Text>
-                                      504: {student.has504 ? "Yes" : "No"}
-                                    </Text>
-                                    <Text>
-                                      ELL: {student.isELL ? "Yes" : "No"}
-                                    </Text>
-                                    <Text>
-                                      EBD: {student.isEBD ? "Yes" : "No"}
-                                    </Text>
-                                  </SimpleGrid>
-                                </Stack>
-                              </Center>
-                              <Stack mt={4} direction={"row"} spacing={4}>
-                                <Button
-                                  onClick={() => setSelectedStudent(student)}
-                                  flex={1}
-                                  fontSize={"sm"}
-                                  rounded={"full"}
-                                  _focus={{
-                                    bg: "gray.200",
-                                  }}
-                                >
-                                  Edit Student
-                                </Button>
-                              </Stack>
-                            </>
-                          </Collapse>
-                        </Box>
-                      </Flex>
-                    </React.Fragment>
-                  ))}
-                </SimpleGrid>
-              </Box>
-            )}
+                  {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
+                  {saveConfirmed.length ? (
+                    <MakeAlert messages={saveConfirmed} />
+                  ) : null}
+                </VStack>
+              </form>
+            </VStack>
           </CardBody>
         </Card>
       </Flex>
-    </>
+      <Card w="63%" p={6} id="studentContainer">
+        <VStack spacing={4}>
+          <Heading size="lg" color={headingColor}>
+            Add Student Rosters
+          </Heading>
+          <Text color={textColor} textAlign="center">
+            Use this page to enter students for this particular section. Add
+            Students using the "Add Students" form, or by importing CSV
+            files. Student info can be viewed and modified by clicking on
+            their name and making changes in the "Edit Changes" form.
+          </Text>
+          <Flex direction="row" width="full" mt={4} justifyContent="flex-end" gap={4}>
+            <Button variant="outline" onClick={() => handleCardClick()}>
+              Expand Student List
+            </Button>
+            <Input
+              w="240px"
+              h="40px"
+              type="file"
+              onChange={handleCSVChange}
+              accept=".csv"
+              pt={1}
+            />
+            <VStack align="start">
+              <Button variant="solid" onClick={handleCSVSubmit}>
+                Submit CSV file
+              </Button>
+              {saveConfirmed && (
+                <Text fontSize="sm" color="success.500">
+                  Students added successfully!
+                </Text>
+              )}
+            </VStack>
+          </Flex>
+        </VStack>
+        <CardBody>
+          {students && students.length === 0 ? (
+            <EmptyState
+              title="No students yet"
+              description="Add students individually using the form, or upload a CSV file with your class roster."
+              actionLabel="Add First Student"
+              onAction={() => document.querySelector('input[name="name"]')?.focus()}
+            />
+          ) : (
+            <Box overflowY="auto" maxHeight="280px">
+              <SimpleGrid columns={5} spacing={2}>
+                {students.map((student) => (
+                  <React.Fragment key={student.studentId}>
+                    <Flex py={4} position="relative">
+                      <Box
+                        maxW="510px"
+                        w="full"
+                        bg={cardBg}
+                        borderWidth="1px"
+                        borderColor={borderColor}
+                        borderRadius="md"
+                        p={4}
+                        textAlign="center"
+                      >
+                        <Heading
+                          size="sm"
+                          color={headingColor}
+                          style={{ cursor: "pointer" }}
+                          onClick={() => setSelectedStudent(student)}
+                        >
+                          {student.name}
+                        </Heading>
+                        <Collapse in={allCardsExpanded}>
+                          <VStack mt={2} spacing={2}>
+                            <SimpleGrid columns={2} spacing={1} w="full">
+                              <Text fontSize="sm" color={textColor}>Grade: {student.grade}</Text>
+                              <Text fontSize="sm" color={textColor}>M/F: {student.gender}</Text>
+                            </SimpleGrid>
+                            <HStack spacing={1} wrap="wrap" justify="center">
+                              <AccommodationBadge type="ESE" active={student.isESE} />
+                              <AccommodationBadge type="504" active={student.has504} />
+                              <AccommodationBadge type="ELL" active={student.isELL} />
+                              <AccommodationBadge type="EBD" active={student.isEBD} />
+                            </HStack>
+                            <Button
+                              onClick={() => setSelectedStudent(student)}
+                              variant="outline"
+                              size="sm"
+                              w="full"
+                            >
+                              Edit Student
+                            </Button>
+                          </VStack>
+                        </Collapse>
+                      </Box>
+                    </Flex>
+                  </React.Fragment>
+                ))}
+              </SimpleGrid>
+            </Box>
+          )}
+        </CardBody>
+      </Card>
+    </Flex>
   );
 };
 
