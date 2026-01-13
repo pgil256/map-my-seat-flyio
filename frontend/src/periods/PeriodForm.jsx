@@ -85,7 +85,7 @@ const PeriodForm = () => {
       setFormErrors([]);
       setSaveConfirmed(true);
     } catch (err) {
-      setFormErrors(err);
+      setFormErrors([err.message || "Failed to update period"]);
     }
   };
 
@@ -99,7 +99,7 @@ const PeriodForm = () => {
       setFormErrors([]);
       setSaveConfirmed(true);
     } catch (err) {
-      setFormErrors(err);
+      setFormErrors([err.message || "Failed to delete period"]);
     }
   };
 
@@ -113,7 +113,7 @@ const PeriodForm = () => {
       number: parseInt(number),
     };
     if (data.number <= 0) {
-      return setFormErrors("Period number must be greater than one");
+      return setFormErrors(["Period number must be greater than zero"]);
     }
     try {
       const addedPeriod = await api.createPeriod(username, data);
@@ -130,7 +130,7 @@ const PeriodForm = () => {
       setFormErrors([]);
       setSaveConfirmed(true);
     } catch (err) {
-      setFormErrors(err);
+      setFormErrors([err.message || "Failed to create period"]);
     }
   };
 

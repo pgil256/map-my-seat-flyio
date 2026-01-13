@@ -125,12 +125,11 @@ const StudentForm = () => {
         }
         return prevStudents;
       });
+      setFormErrors([]);
+      setSaveConfirmed(true);
     } catch (err) {
-      setFormErrors(err);
+      setFormErrors([err.message || "Failed to update student"]);
     }
-
-    setFormErrors([]);
-    setSaveConfirmed(true);
   }
 
   //Delete existing student
@@ -186,12 +185,11 @@ const StudentForm = () => {
           isEBD: false,
         });
       }
+      setFormErrors([]);
+      setSaveConfirmed(true);
     } catch (err) {
-      return setFormErrors(err);
+      setFormErrors([err.message || "Failed to create student"]);
     }
-
-    setFormErrors([]);
-    setSaveConfirmed(true);
   }
 
   const handleCSVChange = (e) => {
@@ -247,7 +245,7 @@ const StudentForm = () => {
           setStudents((prev) => [...prev, addedStudent]);
         }
       } catch (err) {
-        return setFormErrors([...formErrors, err]);
+        return setFormErrors([...formErrors, err.message || "Failed to import student"]);
       }
     }
     setSaveConfirmed(true);
@@ -401,8 +399,8 @@ const StudentForm = () => {
                   </Center>
 
                   {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
-                  {saveConfirmed.length ? (
-                    <MakeAlert messages={saveConfirmed} />
+                  {saveConfirmed ? (
+                    <MakeAlert messages={["Changes saved successfully"]} />
                   ) : null}
                 </Stack>
               </Center>
@@ -568,8 +566,8 @@ const StudentForm = () => {
                     </Button>
 
                     {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
-                    {saveConfirmed.length ? (
-                      <MakeAlert messages={saveConfirmed} />
+                    {saveConfirmed ? (
+                      <MakeAlert messages={["Changes saved successfully"]} />
                     ) : null}
                   </form>
                 </Stack>

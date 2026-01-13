@@ -8,7 +8,7 @@ export function DemoProvider({ children }) {
   const [demoData, setDemoData] = useState({
     user: demoUser,
     periods: demoPeriods,
-    classroom: demoClassroom,
+    classrooms: [demoClassroom],
     seatingCharts: [demoSeatingChart],
   });
 
@@ -22,7 +22,7 @@ export function DemoProvider({ children }) {
     setDemoData({
       user: demoUser,
       periods: [...demoPeriods],
-      classroom: { ...demoClassroom },
+      classrooms: [{ ...demoClassroom }],
       seatingCharts: [{ ...demoSeatingChart }],
     });
   }, []);
@@ -131,9 +131,18 @@ export function DemoProvider({ children }) {
       return Promise.resolve(sId);
     },
 
-    getClassroom: (username, classroomId) => Promise.resolve(demoDataRef.current.classroom ? { ...demoDataRef.current.classroom } : null),
+    getClassroom: (username, classroomId) => {
+      const id = typeof classroomId === 'string' ? parseInt(classroomId, 10) : classroomId;
+      const classrooms = demoDataRef.current.classrooms;
+      // If no classroomId provided, return first classroom
+      if (!classroomId) {
+        return Promise.resolve(classrooms.length > 0 ? { ...classrooms[0] } : null);
+      }
+      const classroom = classrooms.find(c => c.classroomId === id);
+      return Promise.resolve(classroom ? { ...classroom } : null);
+    },
 
-    getClassrooms: () => Promise.resolve(demoDataRef.current.classroom ? [{ ...demoDataRef.current.classroom }] : []),
+    getClassrooms: () => Promise.resolve([...demoDataRef.current.classrooms]),
 
     createClassroom: () => {
       const newClassroom = {
@@ -148,7 +157,7 @@ export function DemoProvider({ children }) {
       };
       setDemoData(prev => ({
         ...prev,
-        classroom: newClassroom,
+        classrooms: [...prev.classrooms, newClassroom],
       }));
       return Promise.resolve(newClassroom);
     },
@@ -166,23 +175,32 @@ export function DemoProvider({ children }) {
       };
       setDemoData(prev => ({
         ...prev,
-        classroom: newClassroom,
+        classrooms: [...prev.classrooms, newClassroom],
       }));
       return Promise.resolve(newClassroom);
     },
 
     updateClassroom: (username, classroomId, data) => {
-      setDemoData(prev => ({
-        ...prev,
-        classroom: { ...prev.classroom, ...data },
-      }));
-      return Promise.resolve({ ...demoData.classroom, ...data });
+      const id = typeof classroomId === 'string' ? parseInt(classroomId, 10) : classroomId;
+      let updatedClassroom;
+      setDemoData(prev => {
+        const newClassrooms = prev.classrooms.map(c => {
+          if (c.classroomId === id) {
+            updatedClassroom = { ...c, ...data };
+            return updatedClassroom;
+          }
+          return c;
+        });
+        return { ...prev, classrooms: newClassrooms };
+      });
+      return Promise.resolve(updatedClassroom);
     },
 
-    deleteClassroom: () => {
+    deleteClassroom: (username, classroomId) => {
+      const id = typeof classroomId === 'string' ? parseInt(classroomId, 10) : classroomId;
       setDemoData(prev => ({
         ...prev,
-        classroom: null,
+        classrooms: prev.classrooms.filter(c => c.classroomId !== id),
       }));
       return Promise.resolve(true);
     },
@@ -196,9 +214,14 @@ export function DemoProvider({ children }) {
     },
 
     createSeatingChart: (username, classroomId, data) => {
+      const currentCharts = demoDataRef.current.seatingCharts;
+      const maxNumber = currentCharts.length > 0
+        ? Math.max(...currentCharts.map(c => c.number || 0))
+        : 0;
       const newChart = {
         seatingChartId: Date.now(),
         classroomId,
+        number: maxNumber + 1,
         ...data,
         createdAt: new Date().toISOString(),
       };
@@ -227,6 +250,24 @@ export function DemoProvider({ children }) {
         seatingCharts: prev.seatingCharts.filter(c => c.seatingChartId !== id),
       }));
       return Promise.resolve(1);
+    },
+
+    duplicateSeatingChart: (username, classroomId, seatingChartId, label) => {
+      const id = typeof seatingChartId === 'string' ? parseInt(seatingChartId, 10) : seatingChartId;
+      const original = demoDataRef.current.seatingCharts.find(c => c.seatingChartId === id);
+      if (!original) return Promise.resolve(null);
+
+      const newChart = {
+        ...original,
+        seatingChartId: Date.now(),
+        label: label || `Copy of ${original.label || 'Chart'}`,
+        createdAt: new Date().toISOString(),
+      };
+      setDemoData(prev => ({
+        ...prev,
+        seatingCharts: [newChart, ...prev.seatingCharts],
+      }));
+      return Promise.resolve(newChart);
     },
 
     getConstraints: () => Promise.resolve([]),

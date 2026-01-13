@@ -63,3 +63,11 @@ debug.log
 # yarn.lock
 # pnpm-lock.yaml
 .vercel
+
+# Auto Claude generated files
+.auto-claude/
+.auto-claude-security.json
+.auto-claude-status
+.claude_settings.json
+.security-key
+logs/security/
