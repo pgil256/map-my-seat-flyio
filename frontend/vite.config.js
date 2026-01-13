@@ -7,6 +7,12 @@ import reactRefresh from "@vitejs/plugin-react-refresh";
 import { resolve } from "path";
 
 export default defineConfig({
+  test: {
+    globals: true,
+    environment: "jsdom",
+    setupFiles: "./src/setupTests.js",
+    css: true,
+  },
   // build: {
   //   // lib: {
   //   //   // Could also be a dictionary or array of multiple entry points

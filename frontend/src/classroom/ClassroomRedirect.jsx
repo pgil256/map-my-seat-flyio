@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import UserContext from "../auth/UserContext";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../common/LoadingSpinner.jsx";
-import SeatingApi from "../api.js";
+import useApi from "../hooks/useApi";
 import { Center, Heading, Button } from "@chakra-ui/react";
 
 //Renders button based on the periods for the current user
@@ -12,12 +12,13 @@ const ClassroomRedirect = (props) => {
   const [periods, setPeriods] = useState([]);
   const [infoLoading, setInfoLoading] = useState(true);
   const { currentUser } = useContext(UserContext);
+  const { api } = useApi();
   const navigate = useNavigate();
   const username = currentUser.username;
 
   const getPeriodsOnMount = async (isMounted) => {
     try {
-      const periods = await SeatingApi.getPeriods(username);
+      const periods = await api.getPeriods(username);
       if (isMounted) {
         setPeriods(periods);
         setInfoLoading(false);

@@ -5,6 +5,7 @@ const { BCRYPT_WORK_FACTOR } = require("../config");
 
 async function commonBeforeAll() {
   // Delete in correct order due to foreign key constraints
+  await db.raw("DELETE FROM student_constraints");
   await db.raw("DELETE FROM seating_charts");
   await db.raw("DELETE FROM students");
   await db.raw("DELETE FROM classrooms");
@@ -33,13 +34,13 @@ async function commonBeforeAll() {
     INSERT INTO classrooms(
       user_username,
       seat_alphabetical,
-      randomize,
+      seat_randomize,
       seat_high_low,
       seat_male_female,
-      ESE_is_priority,
-      ELL_is_priority,
+      ese_is_priority,
+      ell_is_priority,
       fivezerofour_is_priority,
-      EBD_is_priority,
+      ebd_is_priority,
       seating_config
     )
     VALUES(
@@ -73,7 +74,7 @@ async function commonAfterEach() {
 }
 
 async function commonAfterAll() {
-  await db.destroy();
+  // db.destroy() is handled by jest.globalTeardown.js
 }
 
 module.exports = {

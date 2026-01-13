@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Center, Box, Table, Tbody, Tr, Td, Button } from "@chakra-ui/react";
+import { Center, Box, Table, Tbody, Tr, Td, Button, HStack, Text, useColorModeValue } from "@chakra-ui/react";
 
 //Creates the dynamic table for the classroom
 //Uses state to apply css classes at various divs in in the table matrix
@@ -10,6 +10,19 @@ const Classroom = (props) => {
 
   const [tableMatrix, setTableMatrix] = useState(currentSeatingConfig);
   const [selected, setSelected] = useState("");
+
+  // Color mode values for grid cells
+  const emptyBg = useColorModeValue("brand.50", "brand.800");
+  const deskBg = useColorModeValue("brand.100", "brand.700");
+  const deskBorder = useColorModeValue("brand.300", "brand.500");
+  const teacherDeskBg = useColorModeValue("brand.200", "brand.600");
+  const hoverBg = useColorModeValue("brand.100", "brand.700");
+  const borderColor = useColorModeValue("brand.200", "brand.600");
+  const textColor = useColorModeValue("brand.600", "brand.300");
+
+  // Calculate desk counts
+  const deskCount = tableMatrix.flat().filter(cell => cell === "desk").length;
+  const teacherDeskCount = tableMatrix.flat().filter(cell => cell === "teacher-desk").length;
 
   const handleClick = (rowIndex, colIndex) => {
     const newTableMatrix = [...tableMatrix];
@@ -29,12 +42,12 @@ const Classroom = (props) => {
   return (
     <Box>
       <Center>
-        <Box mb={2}>
+        <HStack mb={4} spacing={4}>
           <Button
             width="200px"
             size="sm"
             onClick={() => setSelected("teacher-desk")}
-            colorScheme={selected === "teacher-desk" ? "red" : "gray"}
+            variant={selected === "teacher-desk" ? "solid" : "outline"}
           >
             Teacher Desk
           </Button>
@@ -42,14 +55,23 @@ const Classroom = (props) => {
             width="200px"
             size="sm"
             onClick={() => setSelected("desk")}
-            colorScheme={selected === "desk" ? "blue" : "gray"}
-            ml={4}
+            variant={selected === "desk" ? "solid" : "outline"}
           >
             Student Desk
           </Button>
-        </Box>
+        </HStack>
       </Center>
-      <Table h="375px" w="925px" colorScheme="teal">
+      <Center>
+        <HStack spacing={4} mb={4} fontSize="sm" color={textColor}>
+          <Text>
+            Student Desks: <strong>{deskCount}</strong>
+          </Text>
+          <Text>
+            Teacher Desk: <strong>{teacherDeskCount}</strong>
+          </Text>
+        </HStack>
+      </Center>
+      <Table h="375px" w="925px">
         <Tbody>
           {tableMatrix.map((row, rowIndex) => (
             <Tr key={rowIndex}>
@@ -60,19 +82,18 @@ const Classroom = (props) => {
                   onClick={() => handleClick(rowIndex, colIndex)}
                   bg={
                     cell === "desk"
-                      ? "blue.500"
+                      ? deskBg
                       : cell === "teacher-desk"
-                      ? "red.500"
-                      : ""
+                      ? teacherDeskBg
+                      : emptyBg
                   }
                   borderWidth="1px"
-                  borderColor="gray.200"
+                  borderColor={cell === "desk" ? deskBorder : borderColor}
                   p={2}
-                  _hover={{ bg: "green.200" }}
+                  _hover={{ bg: hoverBg, boxShadow: "sm" }}
                   cursor="pointer"
-                  transition="background-color 0.3s ease"
+                  transition="all 0.15s ease"
                   borderRadius="md"
-                  boxShadow="md"
                 ></Td>
               ))}
             </Tr>

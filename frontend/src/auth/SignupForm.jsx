@@ -13,7 +13,10 @@ import {
   FormLabel,
   FormControl,
   FormErrorMessage,
-  Stack,
+  VStack,
+  HStack,
+  Card,
+  CardBody,
   useColorModeValue,
 } from "@chakra-ui/react";
 
@@ -21,6 +24,9 @@ const SignupForm = ({ signup }) => {
   const navigate = useNavigate();
   const [formErrors, setFormErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const headingColor = useColorModeValue("brand.800", "brand.100");
+  const bgColor = useColorModeValue("brand.50", "brand.900");
 
   const validationRules = {
     username: [
@@ -82,138 +88,140 @@ const SignupForm = ({ signup }) => {
 
   return (
     <Flex
-      width={"100vw"}
-      height={"70vh"}
-      alignContent={"center"}
-      justifyContent={"center"}
-      bg={useColorModeValue("gray.50", "gray.800")}
+      width="100vw"
+      minH="100vh"
+      alignItems="center"
+      justifyContent="center"
+      bg={bgColor}
+      py={8}
     >
-      <Stack spacing={12} mx={"auto"} maxW={"5xl"} maxH={"5xl"} py={4} px={4}>
-        <Stack align={"center"}>
-          <Heading fontSize={"4xl"}>Sign up for Map my Seat</Heading>
-        </Stack>
-        <Box
-          rounded={"lg"}
-          bg={useColorModeValue("white", "gray.700")}
-          boxShadow={"lg"}
-          p={10}
-        >
-          <Center>
-            <Stack spacing={5}>
+      <Box mx="auto" maxW="4xl" py={4} px={4}>
+        <VStack spacing={6}>
+          <Heading size="lg" color={headingColor}>
+            Sign up for Map my Seat
+          </Heading>
+          <Card p={6}>
+            <CardBody>
               <form onSubmit={handleSubmit}>
-                <Box textAlign="center">
-                  <Heading>Sign up</Heading>
-                </Box>
-                <Box style={{ display: "flex", flexDirection: "row" }}>
-                  <Box mr={"4"} mt="4" mb="4">
-                    <FormControl isInvalid={!!errors.username} mb={3}>
-                      <FormLabel htmlFor="username">Username</FormLabel>
-                      <Input
-                        id="username"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                      <FormErrorMessage>{errors.username}</FormErrorMessage>
-                    </FormControl>
-                    <FormControl isInvalid={!!errors.password} mb={3}>
-                      <FormLabel htmlFor="password">Password</FormLabel>
-                      <Input
-                        id="password"
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                      <FormErrorMessage>{errors.password}</FormErrorMessage>
-                    </FormControl>
-                    <FormControl isInvalid={!!errors.email} mb={3}>
-                      <FormLabel htmlFor="email">Email</FormLabel>
-                      <Input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                      <FormErrorMessage>{errors.email}</FormErrorMessage>
-                    </FormControl>
+                <VStack spacing={4}>
+                  <Box textAlign="center" w="full">
+                    <Heading size="lg" color={headingColor}>
+                      Sign up
+                    </Heading>
                   </Box>
-                  <Box mt="4" mb="4">
-                    <FormLabel htmlFor="title">Title:</FormLabel>
-                    <Stack direction="row" mb={3}>
-                      <Radio
-                        name="title"
-                        value="Mr."
-                        onChange={handleTitleChange}
-                        isChecked={formData.title === "Mr."}
-                      />
-                      <FormLabel htmlFor="Mr">Mr.</FormLabel>
-                      <Radio
-                        name="title"
-                        value="Mrs."
-                        onChange={handleTitleChange}
-                        isChecked={formData.title === "Mrs."}
-                      />
-                      <FormLabel htmlFor="Mrs.">Mrs.</FormLabel>
-                      <Radio
-                        name="title"
-                        value="Ms."
-                        onChange={handleTitleChange}
-                        isChecked={formData.title === "Ms."}
-                      />
-                      <FormLabel htmlFor="Ms.">Ms.</FormLabel>
-                    </Stack>
-                    <FormControl isInvalid={!!errors.firstName} mb={3}>
-                      <FormLabel htmlFor="firstName">First name</FormLabel>
-                      <Input
-                        id="firstName"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                      <FormErrorMessage>{errors.firstName}</FormErrorMessage>
-                    </FormControl>
-                    <FormControl isInvalid={!!errors.lastName} mb={3}>
-                      <FormLabel htmlFor="lastName">Last name</FormLabel>
-                      <Input
-                        id="lastName"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                      <FormErrorMessage>{errors.lastName}</FormErrorMessage>
-                    </FormControl>
-                  </Box>
-                </Box>
+                  <Flex direction={{ base: "column", md: "row" }} gap={6}>
+                    <VStack spacing={4} flex="1">
+                      <FormControl isInvalid={!!errors.username}>
+                        <FormLabel htmlFor="username">Username</FormLabel>
+                        <Input
+                          id="username"
+                          name="username"
+                          value={formData.username}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <FormErrorMessage>{errors.username}</FormErrorMessage>
+                      </FormControl>
+                      <FormControl isInvalid={!!errors.password}>
+                        <FormLabel htmlFor="password">Password</FormLabel>
+                        <Input
+                          id="password"
+                          type="password"
+                          name="password"
+                          value={formData.password}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <FormErrorMessage>{errors.password}</FormErrorMessage>
+                      </FormControl>
+                      <FormControl isInvalid={!!errors.email}>
+                        <FormLabel htmlFor="email">Email</FormLabel>
+                        <Input
+                          id="email"
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <FormErrorMessage>{errors.email}</FormErrorMessage>
+                      </FormControl>
+                    </VStack>
+                    <VStack spacing={4} flex="1">
+                      <FormControl>
+                        <FormLabel htmlFor="title">Title</FormLabel>
+                        <HStack spacing={4}>
+                          <HStack>
+                            <Radio
+                              name="title"
+                              value="Mr."
+                              onChange={handleTitleChange}
+                              isChecked={formData.title === "Mr."}
+                            />
+                            <FormLabel htmlFor="Mr" mb={0}>Mr.</FormLabel>
+                          </HStack>
+                          <HStack>
+                            <Radio
+                              name="title"
+                              value="Mrs."
+                              onChange={handleTitleChange}
+                              isChecked={formData.title === "Mrs."}
+                            />
+                            <FormLabel htmlFor="Mrs." mb={0}>Mrs.</FormLabel>
+                          </HStack>
+                          <HStack>
+                            <Radio
+                              name="title"
+                              value="Ms."
+                              onChange={handleTitleChange}
+                              isChecked={formData.title === "Ms."}
+                            />
+                            <FormLabel htmlFor="Ms." mb={0}>Ms.</FormLabel>
+                          </HStack>
+                        </HStack>
+                      </FormControl>
+                      <FormControl isInvalid={!!errors.firstName}>
+                        <FormLabel htmlFor="firstName">First name</FormLabel>
+                        <Input
+                          id="firstName"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <FormErrorMessage>{errors.firstName}</FormErrorMessage>
+                      </FormControl>
+                      <FormControl isInvalid={!!errors.lastName}>
+                        <FormLabel htmlFor="lastName">Last name</FormLabel>
+                        <Input
+                          id="lastName"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                        <FormErrorMessage>{errors.lastName}</FormErrorMessage>
+                      </FormControl>
+                    </VStack>
+                  </Flex>
 
-                <Center>
-                  <Button
-                    type="submit"
-                    colorScheme={"blue"}
-                    bg={"blue.400"}
-                    rounded={"full"}
-                    px={6}
-                    isLoading={isSubmitting}
-                    loadingText="Signing up..."
-                    _hover={{
-                      bg: "green.500",
-                    }}
-                  >
-                    Sign up
-                  </Button>
-                </Center>
-                {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
+                  <Center w="full" mt={2}>
+                    <Button
+                      type="submit"
+                      variant="solid"
+                      isLoading={isSubmitting}
+                      loadingText="Signing up..."
+                    >
+                      Sign up
+                    </Button>
+                  </Center>
+                  {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
+                </VStack>
               </form>
-            </Stack>
-          </Center>
-        </Box>
-      </Stack>
+            </CardBody>
+          </Card>
+        </VStack>
+      </Box>
     </Flex>
   );
 };

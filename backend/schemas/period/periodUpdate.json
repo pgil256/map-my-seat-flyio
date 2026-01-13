@@ -4,12 +4,9 @@
     "type": "object",
     "default": {},
     "title": "Root Schema",
-    "required": [
-        "periodId",
-        "schoolYear",
-        "title",
-        "number"
-    ],
+    "required": [],
+    "minProperties": 1,
+    "additionalProperties": false,
     "properties": {
         "periodId": {
             "type": "integer",

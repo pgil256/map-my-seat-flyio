@@ -1,0 +1,45 @@
+@media print {
+  nav,
+  button,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+  }
+
+  .seating-chart-container {
+    width: 100%;
+    max-width: none;
+    page-break-inside: avoid;
+  }
+
+  .seating-chart-container table {
+    border-collapse: collapse;
+  }
+
+  .seating-chart-container td {
+    border: 2px solid #1e293b !important;
+    background: white !important;
+    color: #1e293b !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .seating-chart-container td.desk {
+    background: #f1f5f9 !important;
+  }
+
+  .seating-chart-container td.teacher-desk {
+    background: #e2e8f0 !important;
+  }
+
+  .accommodation-badge {
+    background: none !important;
+    color: #1e293b !important;
+    font-size: 10px;
+  }
+}

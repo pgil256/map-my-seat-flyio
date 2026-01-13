@@ -23,15 +23,15 @@ const router = new express.Router();
 //Route for creating new period
 router.post("/:username", adminOrCorrectUser, async function (req, res, next) {
   try {
-    console.log(req.body);
-    const validator = jsonschema.validate(req.body, periodNewSchema);
+    // Add username from URL params to request body for validation and model
+    const periodData = { ...req.body, username: req.params.username };
+    const validator = jsonschema.validate(periodData, periodNewSchema);
     if (!validator.valid) {
       const errs = validator.errors.map((e) => e.stack);
-      console.log(errs);
       throw new BadRequestError(errs);
     }
 
-    const period = await Period.createPeriod(req.body);
+    const period = await Period.createPeriod(periodData);
     return res.status(201).json({ period });
   } catch (err) {
     return next(err);
@@ -41,7 +41,6 @@ router.post("/:username", adminOrCorrectUser, async function (req, res, next) {
 //Route for retrieving all periods via username
 router.get("/:username", adminOrCorrectUser, async function (req, res, next) {
   try {
-    console.log(req.params.username);
     const periods = await Period.getPeriods(req.params.username);
     return res.json({ periods });
   } catch (err) {

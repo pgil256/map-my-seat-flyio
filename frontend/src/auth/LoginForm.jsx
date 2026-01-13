@@ -9,7 +9,9 @@ import {
   FormLabel,
   FormControl,
   FormErrorMessage,
-  Stack,
+  VStack,
+  Card,
+  CardBody,
   useColorModeValue,
 } from "@chakra-ui/react";
 
@@ -21,6 +23,9 @@ const LoginForm = ({ login }) => {
   const navigate = useNavigate();
   const [formErrors, setFormErrors] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const headingColor = useColorModeValue("brand.800", "brand.100");
+  const bgColor = useColorModeValue("brand.50", "brand.900");
 
   const validationRules = {
     username: [validators.required("Username is required")],
@@ -54,73 +59,68 @@ const LoginForm = ({ login }) => {
 
   return (
     <Flex
-      width={"100vw"}
-      height={"100vh"}
-      alignContent={"center"}
-      justifyContent={"center"}
-      bg={useColorModeValue("gray.50", "gray.800")}
+      width="100vw"
+      height="100vh"
+      alignItems="center"
+      justifyContent="center"
+      bg={bgColor}
     >
-      <Stack spacing={6} mx={"auto"} maxW={"lg"} py={12} px={6}>
-        <Stack align={"center"}>
-          <Heading fontSize={"4xl"}>Log in to your account</Heading>
-        </Stack>
-        <Box
-          rounded={"lg"}
-          bg={useColorModeValue("white", "gray.700")}
-          boxShadow={"lg"}
-          p={8}
-        >
-          <Stack spacing={6}>
-            <form onSubmit={handleSubmit}>
-              <Box textAlign="center">
-                <Heading>Login</Heading>
-              </Box>
-              <FormControl isInvalid={!!errors.username} mb={4}>
-                <FormLabel htmlFor="username">Username</FormLabel>
-                <Input
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Username"
-                />
-                <FormErrorMessage>{errors.username}</FormErrorMessage>
-              </FormControl>
-              <FormControl isInvalid={!!errors.password} mb={4}>
-                <FormLabel htmlFor="password">Password</FormLabel>
-                <Input
-                  id="password"
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  autoComplete="current-password"
-                />
-                <FormErrorMessage>{errors.password}</FormErrorMessage>
-              </FormControl>
-              <Center mt={6}>
-                <Button
-                  type="submit"
-                  colorScheme={"blue"}
-                  bg={"blue.400"}
-                  rounded={"full"}
-                  px={6}
-                  isLoading={isSubmitting}
-                  loadingText="Logging in..."
-                  _hover={{
-                    bg: "blue.500",
-                  }}
-                >
-                  Log in
-                </Button>
-              </Center>
-              {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
-            </form>
-          </Stack>
-        </Box>
-      </Stack>
+      <Box mx="auto" maxW="lg" py={12} px={6}>
+        <VStack spacing={6}>
+          <Heading size="lg" color={headingColor}>
+            Log in to your account
+          </Heading>
+          <Card p={6}>
+            <CardBody>
+              <form onSubmit={handleSubmit}>
+                <VStack spacing={4}>
+                  <Box textAlign="center" w="full">
+                    <Heading size="lg" color={headingColor}>
+                      Login
+                    </Heading>
+                  </Box>
+                  <FormControl isInvalid={!!errors.username}>
+                    <FormLabel htmlFor="username">Username</FormLabel>
+                    <Input
+                      id="username"
+                      name="username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      placeholder="Username"
+                    />
+                    <FormErrorMessage>{errors.username}</FormErrorMessage>
+                  </FormControl>
+                  <FormControl isInvalid={!!errors.password}>
+                    <FormLabel htmlFor="password">Password</FormLabel>
+                    <Input
+                      id="password"
+                      type="password"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      autoComplete="current-password"
+                    />
+                    <FormErrorMessage>{errors.password}</FormErrorMessage>
+                  </FormControl>
+                  <Center mt={2} w="full">
+                    <Button
+                      type="submit"
+                      variant="solid"
+                      isLoading={isSubmitting}
+                      loadingText="Logging in..."
+                    >
+                      Log in
+                    </Button>
+                  </Center>
+                  {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
+                </VStack>
+              </form>
+            </CardBody>
+          </Card>
+        </VStack>
+      </Box>
     </Flex>
   );
 };

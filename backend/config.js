@@ -1,6 +1,7 @@
 "use strict";
 
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 require("colors");
 
 const SECRET_KEY = process.env.SECRET_KEY || process.env.JWT_SECRET || "secret-dev";

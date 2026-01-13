@@ -1,22 +1,26 @@
 import { useState, useContext } from "react";
-import SeatingApi from "../api.js";
+import useApi from "../hooks/useApi";
 import UserContext from "../auth/UserContext";
+import MakeAlert from "../common/MakeAlert";
 import {
   Box,
   FormControl,
   FormLabel,
   Input,
   Button,
-  Alert,
-  AlertIcon,
   Heading,
   Text,
-  Flex
+  Flex,
+  VStack,
+  Card,
+  CardBody,
+  useColorModeValue,
 } from "@chakra-ui/react";
 
 //Profile form
 const ProfileForm = () => {
   const { currentUser, setCurrentUser } = useContext(UserContext);
+  const { api } = useApi();
   const username = currentUser.username;
   const [formData, setFormData] = useState({
     firstName: currentUser.firstName,
@@ -24,6 +28,10 @@ const ProfileForm = () => {
   });
   const [formErrors, setFormErrors] = useState([]);
   const [saveConfirmed, setSaveConfirmed] = useState(false);
+
+  const headingColor = useColorModeValue("brand.800", "brand.100");
+  const textColor = useColorModeValue("brand.600", "brand.300");
+  const bgColor = useColorModeValue("brand.50", "brand.900");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -33,17 +41,18 @@ const ProfileForm = () => {
     };
 
     try {
-      const updatedUser = await SeatingApi.saveUserProfile(
+      const updatedUser = await api.saveUserProfile(
         username,
         profileData
       );
       setCurrentUser(updatedUser);
       setFormData((f) => ({ ...f, password: "" }));
       setFormErrors([]);
-      setSaveConfirmed("Profile successfully updated");
+      setSaveConfirmed(true);
     } catch (err) {
       console.error(err);
       setFormErrors([err.message]);
+      setSaveConfirmed(false);
     }
   }
 
@@ -58,66 +67,56 @@ const ProfileForm = () => {
 
   return (
     <Flex
-    Flex
-    width={"100vw"}
-    height={"70vh"}
-    alignContent={"center"}
-    justifyContent={"center"}
-  >
-    <Box padding="5" bg="white" shadow="md" borderRadius="md" mt={20}>
-      <form id="profile" onSubmit={handleSubmit}>
-        <Heading as="h2" size="lg" marginBottom="5">
-          Profile
-        </Heading>
-        <Text>Username: {username}</Text>
+      width="100vw"
+      minH="70vh"
+      alignItems="center"
+      justifyContent="center"
+      bg={bgColor}
+    >
+      <Card p={6} mt={20}>
+        <CardBody>
+          <form id="profile" onSubmit={handleSubmit}>
+            <VStack spacing={4} align="stretch">
+              <Heading size="lg" color={headingColor}>
+                Profile
+              </Heading>
+              <Text color={textColor}>Username: {username}</Text>
 
-        <FormControl marginBottom="3">
-          <FormLabel htmlFor="firstName">First Name</FormLabel>
-          <Input
-            type="text"
-            name="FirstName" 
-            value={formData.firstName}
-            onChange={handleChange}
-          />
-        </FormControl>
+              <FormControl>
+                <FormLabel htmlFor="firstName">First Name</FormLabel>
+                <Input
+                  type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                />
+              </FormControl>
 
-        <FormControl marginBottom="3">
-          <FormLabel htmlFor="lastName">Last Name</FormLabel>
-          <Input
-            type="text"
-            name="LastName"
-            value={formData.lastName}
-            onChange={handleChange}
-          />
-        </FormControl>
+              <FormControl>
+                <FormLabel htmlFor="lastName">Last Name</FormLabel>
+                <Input
+                  type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                />
+              </FormControl>
 
-        <Button colorScheme="teal" type="submit">
-          Save
-        </Button>
+              <Button variant="solid" type="submit">
+                Save
+              </Button>
 
-        {formErrors.length ? (
-          <MakeAlert status="error" marginTop="4">
-            <AlertIcon />
-            {formErrors.map((error, index) => (
-              <Box key={index} ml="2">
-                {error}
-              </Box>
-            ))}
-          </MakeAlert>
-        ) : null}
+              {formErrors.length > 0 && (
+                <MakeAlert messages={formErrors} status="error" />
+              )}
 
-        {saveConfirmed.length ? (
-          <Alert status="success" marginTop="4">
-            <AlertIcon />
-            {saveConfirmed.map((message, index) => (
-              <Box key={index} ml="2">
-                {message}
-              </Box>
-            ))}
-          </Alert>
-        ) : null}
-      </form>
-    </Box>
+              {saveConfirmed && (
+                <MakeAlert messages={["Profile successfully updated"]} status="success" />
+              )}
+            </VStack>
+          </form>
+        </CardBody>
+      </Card>
     </Flex>
   );
 };

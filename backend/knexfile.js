@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 module.exports = {
   development: {
@@ -32,7 +33,7 @@ module.exports = {
       directory: './migrations',
     },
     pool: {
-      min: 2,
+      min: 0,
       max: 10
     }
   },
@@ -50,7 +51,7 @@ module.exports = {
       directory: './migrations',
     },
     pool: {
-      min: 2,
+      min: 0,
       max: 10
     }
   },

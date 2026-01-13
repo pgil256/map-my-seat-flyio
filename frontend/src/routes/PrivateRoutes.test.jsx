@@ -1,38 +1,45 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { ChakraProvider } from "@chakra-ui/react";
+import { describe, it, expect } from "vitest";
 import UserContext from "../auth/UserContext";
-import PrivateRoute from "./PrivateRoute";
+import { DemoProvider } from "../demo/DemoContext";
+import PrivateRoute from "./PrivateRoutes";
+
+const renderWithProviders = (currentUser, initialRoute = "/protected") => {
+  return render(
+    <ChakraProvider>
+      <DemoProvider>
+        <UserContext.Provider value={{ currentUser }}>
+          <MemoryRouter initialEntries={[initialRoute]}>
+            <Routes>
+              <Route element={<PrivateRoute />}>
+                <Route path="/protected" element={<div data-testid="protected">Protected Content</div>} />
+              </Route>
+              <Route path="/login" element={<div data-testid="login">Login Page</div>} />
+            </Routes>
+          </MemoryRouter>
+        </UserContext.Provider>
+      </DemoProvider>
+    </ChakraProvider>
+  );
+};
 
 describe("PrivateRoute", () => {
-  test("renders children when currentUser is present", () => {
-    const currentUser = { name: "Test User" };
-    render(
-      <UserContext.Provider value={{ currentUser }}>
-        <MemoryRouter>
-          <PrivateRoute path="/test">
-            <div data-testid="child">Child component</div>
-          </PrivateRoute>
-        </MemoryRouter>
-      </UserContext.Provider>
-    );
+  it("renders children when currentUser is present", () => {
+    const currentUser = { username: "testuser" };
+    renderWithProviders(currentUser);
 
-    expect(screen.getByTestId("child")).toBeInTheDocument();
+    expect(screen.getByTestId("protected")).toBeInTheDocument();
+    expect(screen.getByText("Protected Content")).toBeInTheDocument();
   });
 
-  test("redirects to login page when currentUser is not present", () => {
-    const currentUser = null;
-    const historyMock = { push: jest.fn() };
-    render(
-      <UserContext.Provider value={{ currentUser }}>
-        <MemoryRouter>
-          <PrivateRoute path="/test" history={historyMock}>
-            <div data-testid="child">Child component</div>
-          </PrivateRoute>
-        </MemoryRouter>
-      </UserContext.Provider>
-    );
+  it("redirects to login page when currentUser is not present", () => {
+    renderWithProviders(null);
 
-    expect(historyMock.push).toHaveBeenCalledWith("/login");
+    expect(screen.getByTestId("login")).toBeInTheDocument();
+    expect(screen.getByText("Login Page")).toBeInTheDocument();
+    expect(screen.queryByTestId("protected")).not.toBeInTheDocument();
   });
 });

@@ -17,7 +17,7 @@ class Period {
       );
     }
 
-    const period = await db('periods')
+    const [period] = await db('periods')
       .insert({
         user_username: username,
         school_year: schoolYear,
@@ -54,6 +54,22 @@ class Period {
   }
 
   static async getPeriod(periodId) {
+    const period = await db('periods')
+      .select([
+        db.raw('period_id AS "periodId"'),
+        db.raw('user_username AS "username"'),
+        db.raw('school_year AS "schoolYear"'),
+        'title',
+        'number'
+      ])
+      .where('period_id', periodId)
+      .first();
+
+    if (!period) {
+      throw new NotFoundError(`No period: ${periodId}`);
+    }
+
+    // Also get students for this period
     const students = await db('students as s')
       .select([
         db.raw('s.student_id AS "studentId"'),
@@ -69,11 +85,7 @@ class Period {
       .where('s.period_id', periodId)
       .orderBy('s.name');
 
-    if (students.length === 0) {
-      throw new NotFoundError(`No students in this period`);
-    }
-
-    return students;
+    return { ...period, students };
   }
 
   static async updatePeriod(periodId, data) {

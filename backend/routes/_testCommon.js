@@ -12,6 +12,7 @@ let adminToken;
 async function commonBeforeAll() {
   // Delete in correct order due to foreign key constraints
   await db.raw("DELETE FROM seating_charts");
+  await db.raw("DELETE FROM student_constraints");
   await db.raw("DELETE FROM students");
   await db.raw("DELETE FROM classrooms");
   await db.raw("DELETE FROM periods");
@@ -41,13 +42,13 @@ async function commonBeforeAll() {
     INSERT INTO classrooms(
       user_username,
       seat_alphabetical,
-      randomize,
+      seat_randomize,
       seat_high_low,
       seat_male_female,
-      ESE_is_priority,
-      ELL_is_priority,
+      ese_is_priority,
+      ell_is_priority,
       fivezerofour_is_priority,
-      EBD_is_priority,
+      ebd_is_priority,
       seating_config
     )
     VALUES(
@@ -62,6 +63,23 @@ async function commonBeforeAll() {
       false,
       '[[null,null,"desk"],[null,null,"desk"]]'
     )
+  `);
+
+  // Insert test students for constraint tests
+  await db.raw(`
+    INSERT INTO students (period_id, name, grade, gender, is_ese, has_504, is_ell, is_ebd)
+    SELECT period_id, 'Student 1', 10, 'M', false, false, false, false
+    FROM periods WHERE number = 1 AND user_username = 'u1'
+  `);
+  await db.raw(`
+    INSERT INTO students (period_id, name, grade, gender, is_ese, has_504, is_ell, is_ebd)
+    SELECT period_id, 'Student 2', 10, 'F', false, false, false, false
+    FROM periods WHERE number = 1 AND user_username = 'u1'
+  `);
+  await db.raw(`
+    INSERT INTO students (period_id, name, grade, gender, is_ese, has_504, is_ell, is_ebd)
+    SELECT period_id, 'Student 3', 10, 'M', false, false, false, false
+    FROM periods WHERE number = 1 AND user_username = 'u1'
   `);
 
   // Create tokens
@@ -79,7 +97,7 @@ async function commonAfterEach() {
 }
 
 async function commonAfterAll() {
-  await db.destroy();
+  // db.destroy() is handled by jest.globalTeardown.js
 }
 
 module.exports = {

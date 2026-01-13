@@ -133,7 +133,7 @@ describe("Period Routes", () => {
         .set("Authorization", `Bearer ${getU1Token()}`)
         .expect(200);
 
-      expect(res.body.periodId).toBe(periodId);
+      expect(res.body.deleted).toBe(String(periodId));
     });
   });
 });

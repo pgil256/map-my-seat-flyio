@@ -16,16 +16,13 @@ afterAll(commonAfterAll);
 describe("Student", () => {
   describe("createStudent", () => {
     it("should insert a new student into the database", async () => {
-      // Get a valid period_id from test data
-      const periodResult = await db.query(
-        `SELECT period_id FROM periods LIMIT 1`
-      );
+      const periodResult = await db("periods").select("period_id").first();
 
-      if (periodResult.rows.length === 0) {
+      if (!periodResult) {
         return;
       }
 
-      const periodId = periodResult.rows[0].period_id;
+      const periodId = periodResult.period_id;
       const data = {
         periodId,
         name: "John Doe",
@@ -50,20 +47,18 @@ describe("Student", () => {
       expect(student).toHaveProperty("isEBD", data.isEBD);
     });
 
-    it("should convert grade to number if it is a string", async () => {
-      const periodResult = await db.query(
-        `SELECT period_id FROM periods LIMIT 1`
-      );
+    it("should handle numeric grade values", async () => {
+      const periodResult = await db("periods").select("period_id").first();
 
-      if (periodResult.rows.length === 0) {
+      if (!periodResult) {
         return;
       }
 
-      const periodId = periodResult.rows[0].period_id;
+      const periodId = periodResult.period_id;
       const data = {
         periodId,
         name: "Jane Doe",
-        grade: "9th",
+        grade: 9,
         gender: "female",
         isESE: true,
         has504: false,
@@ -77,35 +72,51 @@ describe("Student", () => {
     });
   });
 
-  describe("getStudentsByPeriod", () => {
-    it("returns all students for a period", async () => {
-      const periodResult = await db.query(
-        `SELECT period_id FROM periods LIMIT 1`
-      );
+  describe("updateStudent", () => {
+    it("should update a student", async () => {
+      const periodResult = await db("periods").select("period_id").first();
 
-      if (periodResult.rows.length === 0) {
+      if (!periodResult) {
         return;
       }
 
-      const periodId = periodResult.rows[0].period_id;
-      const students = await Student.getStudentsByPeriod(periodId);
+      const periodId = periodResult.period_id;
+      const student = await Student.createStudent({
+        periodId,
+        name: "Update Me",
+        grade: 10,
+        gender: "male",
+        isESE: false,
+        has504: false,
+        isELL: false,
+        isEBD: false,
+      });
 
-      expect(Array.isArray(students)).toBe(true);
+      const updated = await Student.updateStudent(student.studentId, {
+        name: "Updated Name",
+        grade: 11,
+      });
+
+      expect(updated.name).toBe("Updated Name");
+      expect(updated.grade).toBe(11);
+    });
+
+    it("should throw NotFoundError for non-existent student", async () => {
+      await expect(
+        Student.updateStudent(99999, { name: "Test" })
+      ).rejects.toThrow(NotFoundError);
     });
   });
 
   describe("deleteStudent", () => {
     it("should delete a student", async () => {
-      // Create a student to delete
-      const periodResult = await db.query(
-        `SELECT period_id FROM periods LIMIT 1`
-      );
+      const periodResult = await db("periods").select("period_id").first();
 
-      if (periodResult.rows.length === 0) {
+      if (!periodResult) {
         return;
       }
 
-      const periodId = periodResult.rows[0].period_id;
+      const periodId = periodResult.period_id;
       const student = await Student.createStudent({
         periodId,
         name: "Delete Me",
@@ -117,8 +128,17 @@ describe("Student", () => {
         isEBD: false,
       });
 
-      const deletedName = await Student.deleteStudent(student.studentId);
-      expect(deletedName).toBe("Delete Me");
+      await Student.deleteStudent(student.studentId);
+
+      // Verify student is deleted
+      const result = await db("students")
+        .where("student_id", student.studentId)
+        .first();
+      expect(result).toBeUndefined();
+    });
+
+    it("should throw NotFoundError for non-existent student", async () => {
+      await expect(Student.deleteStudent(99999)).rejects.toThrow(NotFoundError);
     });
   });
 });

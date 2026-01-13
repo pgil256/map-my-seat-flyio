@@ -1,11 +1,11 @@
 import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import SeatingApi from "../api.js";
+import useApi from "../hooks/useApi";
 import UserContext from "../auth/UserContext";
 import MakeAlert from "../common/MakeAlert";
 import EmptyState from "../common/EmptyState";
 import {
-  Stack,
+  VStack,
   Box,
   Heading,
   Container,
@@ -18,7 +18,8 @@ import {
   Input,
   Text,
   Flex,
-  Spacer,
+  HStack,
+  useColorModeValue,
 } from "@chakra-ui/react";
 
 //Gets all periods on mount, returns message if there are none yet
@@ -26,6 +27,7 @@ import {
 //Allows user to add new periods and add to aforementioned list
 const PeriodForm = () => {
   const { currentUser } = useContext(UserContext);
+  const { api } = useApi();
   const username = currentUser.username;
   const navigate = useNavigate();
 
@@ -43,17 +45,22 @@ const PeriodForm = () => {
   const [formErrors, setFormErrors] = useState([]);
   const [saveConfirmed, setSaveConfirmed] = useState(false);
 
+  const headingColor = useColorModeValue("brand.800", "brand.100");
+  const textColor = useColorModeValue("brand.600", "brand.300");
+  const cardBg = useColorModeValue("white", "brand.800");
+  const borderColor = useColorModeValue("brand.200", "brand.700");
+
   useEffect(() => {
     async function getPeriodsOnMount() {
       try {
-        let periods = await SeatingApi.getPeriods(username);
+        let periods = await api.getPeriods(username);
         setPeriods(periods);
       } catch (err) {
         console.error("Periods could not be retrieved", err.message);
       }
     }
     getPeriodsOnMount();
-  }, [username]);
+  }, [username, api]);
 
   const updatePeriod = async (e, period) => {
     e.preventDefault();
@@ -66,7 +73,7 @@ const PeriodForm = () => {
     };
 
     try {
-      const updatedPeriod = await SeatingApi.updatePeriod(
+      const updatedPeriod = await api.updatePeriod(
         username,
         periodId,
         data
@@ -91,7 +98,7 @@ const PeriodForm = () => {
   const deletePeriod = async (e, period) => {
     e.preventDefault();
     try {
-      await SeatingApi.deletePeriod(username, period.periodId);
+      await api.deletePeriod(username, period.periodId);
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       setPeriods((p) => p.filter((p) => p.periodId !== period.periodId));
@@ -115,11 +122,11 @@ const PeriodForm = () => {
       return setFormErrors("Period number must be greater than one");
     }
     try {
-      const addedPeriod = await SeatingApi.createPeriod(username, data);
+      const addedPeriod = await api.createPeriod(username, data);
       await new Promise((resolve) => setTimeout(resolve, 0));
       if (addedPeriod) {
         try {
-          let fetchedPeriods = await SeatingApi.getPeriods(username);
+          let fetchedPeriods = await api.getPeriods(username);
           setPeriods(fetchedPeriods);
         } catch (err) {
           console.error("Periods could not be retrieved", err.message);
@@ -138,19 +145,17 @@ const PeriodForm = () => {
   };
 
   return (
-    <>
-      <Flex direction="row" justifyContent="space-between" w="100vw">
-        <Card mt={2} w="29%" id="forms">
-          <CardBody mt={1} ml={1} p={1}>
-            <form id="newPeriodForm" onSubmit={createPeriod}>
-              <Center>
-                <Heading mb={2} as="h3" size="md">
-                  New Period
-                </Heading>
-              </Center>
+    <Flex direction="row" justifyContent="space-between" w="100vw" gap={4} p={2}>
+      <Card w="29%" p={6}>
+        <CardBody p={0}>
+          <form id="newPeriodForm" onSubmit={createPeriod}>
+            <VStack spacing={4}>
+              <Heading size="md" color={headingColor}>
+                New Period
+              </Heading>
 
-              <Flex mb={2}>
-                <FormLabel htmlFor="schoolYear" flex="29%">
+              <Flex w="full" alignItems="center">
+                <FormLabel htmlFor="schoolYear" flex="30%" mb={0}>
                   School Year:
                 </FormLabel>
                 <Input
@@ -165,8 +170,8 @@ const PeriodForm = () => {
                 />
               </Flex>
 
-              <Flex mb={2}>
-                <FormLabel htmlFor="title" flex="29%">
+              <Flex w="full" alignItems="center">
+                <FormLabel htmlFor="title" flex="30%" mb={0}>
                   Class title:
                 </FormLabel>
                 <Input
@@ -181,8 +186,8 @@ const PeriodForm = () => {
                 />
               </Flex>
 
-              <Flex mb={2}>
-                <FormLabel htmlFor="number" flex="30%">
+              <Flex w="full" alignItems="center">
+                <FormLabel htmlFor="number" flex="30%" mb={0}>
                   Period number:
                 </FormLabel>
                 <Input
@@ -197,24 +202,22 @@ const PeriodForm = () => {
                 />
               </Flex>
 
-              <Center>
-                <Button mb={2} colorScheme="blue" onClick={createPeriod}>
-                  Create Period
-                </Button>
-              </Center>
-            </form>
-          </CardBody>
+              <Button variant="solid" onClick={createPeriod}>
+                Create Period
+              </Button>
+            </VStack>
+          </form>
+        </CardBody>
 
-          <CardBody m={1} p={2} key={selectedPeriod.id}>
-            <form id="selectedPeriodForm">
-              <Center>
-                <Heading mb={2} as="h3" size="md">
-                  Edit Period
-                </Heading>
-              </Center>
+        <CardBody p={0} mt={6} key={selectedPeriod.id}>
+          <form id="selectedPeriodForm">
+            <VStack spacing={4}>
+              <Heading size="md" color={headingColor}>
+                Edit Period
+              </Heading>
 
-              <Flex mb={2}>
-                <FormLabel htmlFor="schoolYear" flex="30%">
+              <Flex w="full" alignItems="center">
+                <FormLabel htmlFor="schoolYear" flex="30%" mb={0}>
                   School Year:
                 </FormLabel>
                 <Input
@@ -231,12 +234,12 @@ const PeriodForm = () => {
                 />
               </Flex>
 
-              <Flex mb={2}>
-                <FormLabel htmlFor="title" flex="30%">
+              <Flex w="full" alignItems="center">
+                <FormLabel htmlFor="title" flex="30%" mb={0}>
                   Class title:
                 </FormLabel>
                 <Input
-                  flex="74%"
+                  flex="70%"
                   type="text"
                   id="titleInput"
                   value={selectedPeriod.title || ""}
@@ -246,8 +249,8 @@ const PeriodForm = () => {
                 />
               </Flex>
 
-              <Flex mb={2}>
-                <FormLabel htmlFor="number" flex="30%">
+              <Flex w="full" alignItems="center">
+                <FormLabel htmlFor="number" flex="30%" mb={0}>
                   Period number:
                 </FormLabel>
                 <Input
@@ -261,130 +264,110 @@ const PeriodForm = () => {
                 />
               </Flex>
 
-              <Center>
+              <HStack spacing={4}>
                 <Button
-                  mb={2}
-                  mr={2}
-                  colorScheme="blue"
+                  variant="solid"
                   id="saveButton"
                   onClick={(e) => updatePeriod(e, selectedPeriod)}
                 >
                   Save
                 </Button>
                 <Button
-                  mb={2}
-                  ml={2}
-                  colorScheme="blue"
+                  variant="outline"
                   id="deleteButton"
                   onClick={(e) => deletePeriod(e, selectedPeriod)}
                 >
                   Delete
                 </Button>
-              </Center>
+              </HStack>
 
-              <Center>
-                {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
-                {saveConfirmed ? (
-                  <MakeAlert messages={["Changes saved successfully."]} />
-                ) : null}
-              </Center>
-            </form>
-          </CardBody>
-        </Card>
+              {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
+              {saveConfirmed ? (
+                <MakeAlert messages={["Changes saved successfully."]} />
+              ) : null}
+            </VStack>
+          </form>
+        </CardBody>
+      </Card>
 
-        <Card m={3} w="69%" id="periodContainer">
-          <Center>
-            <Box mt={1} p={1} flex="1">
-              <Center>
-                <Heading>Enter Class Periods</Heading>
-              </Center>
-              <Container mt={2} maxW="4xl" centerContent>
-                <Box padding="1" color="black">
-                  Use this page to enter each of your course sections. Once
-                  finished, hit the 'Add Students' Button to add student
-                  rosters. Each period will populate below and can be modified
-                  by hitting the 'Edit Period' button.
-                </Box>
-              </Container>
-            </Box>
-          </Center>
-          <CardBody>
-            {periods && periods.length === 0 ? (
-              <EmptyState
-                title="No periods yet"
-                description="Create your first class period to start adding students and generating seating charts."
-                actionLabel="Create Period"
-                onAction={() => document.getElementById("titleInput")?.focus()}
-              />
-            ) : (
-              <SimpleGrid columns={3} spacing={2}>
-                {periods.map((period, index) => (
-                  <Box py={4} key={period.periodId}>
-                    <Box
-                      maxW={"280px"}
-                      w={"full"}
-                      bg={"white"}
-                      boxShadow={"2xl"}
-                      rounded={"lg"}
-                      p={2}
-                      textAlign={"center"}
-                    >
-                      <Heading fontSize={"2xl"} fontFamily={"body"}>
-                        Period {period.number}
-                      </Heading>
-                      <Center>
-                        <Stack direction="row">
-                          <Text fontWeight={600} color={"gray.500"} mb={2}>
-                            {period.title}
-                          </Text>
-                          <Text fontWeight={600} color={"gray.500"}>
-                            {period.schoolYear}
-                          </Text>
-                        </Stack>
-                      </Center>
+      <Card w="69%" p={6} id="periodContainer">
+        <VStack spacing={4}>
+          <Heading size="lg" color={headingColor}>
+            Enter Class Periods
+          </Heading>
+          <Container maxW="4xl" centerContent>
+            <Text color={textColor} textAlign="center">
+              Use this page to enter each of your course sections. Once
+              finished, hit the 'Add Students' Button to add student
+              rosters. Each period will populate below and can be modified
+              by hitting the 'Edit Period' button.
+            </Text>
+          </Container>
+        </VStack>
+        <CardBody>
+          {periods && periods.length === 0 ? (
+            <EmptyState
+              title="No periods yet"
+              description="Create your first class period to start adding students and generating seating charts."
+              actionLabel="Create Period"
+              onAction={() => document.getElementById("titleInput")?.focus()}
+            />
+          ) : (
+            <SimpleGrid columns={3} spacing={4}>
+              {periods.map((period, index) => (
+                <Box py={4} key={period.periodId}>
+                  <Box
+                    maxW="280px"
+                    w="full"
+                    bg={cardBg}
+                    borderWidth="1px"
+                    borderColor={borderColor}
+                    borderRadius="md"
+                    p={4}
+                    textAlign="center"
+                  >
+                    <Heading size="md" color={headingColor}>
+                      Period {period.number}
+                    </Heading>
+                    <Center>
+                      <HStack spacing={2} mt={2}>
+                        <Text fontWeight="medium" color={textColor}>
+                          {period.title}
+                        </Text>
+                        <Text fontWeight="medium" color={textColor}>
+                          {period.schoolYear}
+                        </Text>
+                      </HStack>
+                    </Center>
 
-                      <Stack mt={2} direction={"row"} spacing={2}>
-                        <Button
-                          onClick={() => handleEdit(index)}
-                          flex={1}
-                          fontSize={"sm"}
-                          _focus={{
-                            bg: "gray.200",
-                          }}
-                        >
-                          Edit Period
-                        </Button>
-                        <Button
-                          onClick={() =>
-                            navigate(`/periods/${period.periodId}`)
-                          }
-                          flex={1}
-                          fontSize={"sm"}
-                          bg={"blue.400"}
-                          color={"white"}
-                          boxShadow={
-                            "0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)"
-                          }
-                          _hover={{
-                            bg: "blue.500",
-                          }}
-                          _focus={{
-                            bg: "blue.500",
-                          }}
-                        >
-                          Add Students
-                        </Button>
-                      </Stack>
-                    </Box>
-                    <Spacer />
+                    <HStack mt={4} spacing={2}>
+                      <Button
+                        onClick={() => handleEdit(index)}
+                        flex={1}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Edit Period
+                      </Button>
+                      <Button
+                        onClick={() =>
+                          navigate(`/periods/${period.periodId}`)
+                        }
+                        flex={1}
+                        variant="solid"
+                        size="sm"
+                      >
+                        Add Students
+                      </Button>
+                    </HStack>
                   </Box>
-                ))}
-              </SimpleGrid>
-            )}
-          </CardBody>
-        </Card>
-      </Flex>
-    </>
+                </Box>
+              ))}
+            </SimpleGrid>
+          )}
+        </CardBody>
+      </Card>
+    </Flex>
   );
 };
 

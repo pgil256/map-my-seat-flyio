@@ -4,10 +4,9 @@
     "type": "object",
     "default": {},
     "title": "Root Schema",
-    "required": [
-        "firstName",
-        "lastName"
-    ],
+    "required": [],
+    "minProperties": 1,
+    "additionalProperties": false,
     "properties": {
         "firstName": {
             "type": "string",
