@@ -8,6 +8,7 @@ const {
   commonAfterAll,
   getAdminToken,
   getU1Token,
+  getU2Token,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -16,6 +17,87 @@ afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
 describe("User Endpoints", () => {
+  describe("POST /users", () => {
+    const newUser = {
+      username: "newuser",
+      password: "password123",
+      email: "new@email.com",
+      title: "Mrs.",
+      isAdmin: false,
+      firstName: "New",
+      lastName: "User",
+    };
+
+    test("works for admin", async () => {
+      const res = await request(app)
+        .post("/users")
+        .send(newUser)
+        .set("Authorization", `Bearer ${getAdminToken()}`)
+        .expect(201);
+
+      expect(res.body.user).toBeDefined();
+      expect(res.body.user.username).toBe("newuser");
+      expect(res.body.token).toBeDefined();
+    });
+
+    test("unauth for non-admin", async () => {
+      await request(app)
+        .post("/users")
+        .send(newUser)
+        .set("Authorization", `Bearer ${getU1Token()}`)
+        .expect(401);
+    });
+
+    test("bad request with missing fields", async () => {
+      await request(app)
+        .post("/users")
+        .send({ username: "incomplete" })
+        .set("Authorization", `Bearer ${getAdminToken()}`)
+        .expect(400);
+    });
+
+    test("bad request with duplicate username", async () => {
+      await request(app)
+        .post("/users")
+        .send({ ...newUser, username: "u1" })
+        .set("Authorization", `Bearer ${getAdminToken()}`)
+        .expect(400);
+    });
+  });
+
+  describe("DELETE /users/:username", () => {
+    test("works for correct user", async () => {
+      const res = await request(app)
+        .delete("/users/u1")
+        .set("Authorization", `Bearer ${getU1Token()}`)
+        .expect(200);
+
+      expect(res.body).toEqual({ deleted: "u1" });
+    });
+
+    test("works for admin", async () => {
+      const res = await request(app)
+        .delete("/users/u1")
+        .set("Authorization", `Bearer ${getAdminToken()}`)
+        .expect(200);
+
+      expect(res.body).toEqual({ deleted: "u1" });
+    });
+
+    test("unauth for wrong user", async () => {
+      await request(app)
+        .delete("/users/u1")
+        .set("Authorization", `Bearer ${getU2Token()}`)
+        .expect(401);
+    });
+
+    test("unauth for anon", async () => {
+      await request(app)
+        .delete("/users/u1")
+        .expect(401);
+    });
+  });
+
   describe("GET /users", () => {
     test("Admin can get all users", async () => {
       const res = await request(app)

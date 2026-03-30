@@ -72,7 +72,6 @@ router.delete(
   adminOrCorrectUser,
   async function (req, res, next) {
     try {
-      app.use("/settings", settingsRoutes);
       await User.remove(req.params.username);
       return res.json({ deleted: req.params.username });
     } catch (err) {
