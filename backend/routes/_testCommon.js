@@ -8,6 +8,9 @@ const { BCRYPT_WORK_FACTOR } = require("../config");
 let u1Token;
 let u2Token;
 let adminToken;
+let testPeriodId;
+let testClassroomId;
+let testStudentIds = [];
 
 async function commonBeforeAll() {
   // Delete in correct order due to foreign key constraints
@@ -37,6 +40,10 @@ async function commonBeforeAll() {
            ('u1', '2023-2024', 'Math Period 2', 2)
   `);
 
+  // Capture period ID for u1's period 1
+  const periods = await db.raw(`SELECT period_id FROM periods WHERE user_username = 'u1' AND number = 1`);
+  testPeriodId = periods.rows[0].period_id;
+
   // Insert test classroom
   await db.raw(`
     INSERT INTO classrooms(
@@ -65,6 +72,10 @@ async function commonBeforeAll() {
     )
   `);
 
+  // Capture classroom ID
+  const classrooms = await db.raw(`SELECT classroom_id FROM classrooms WHERE user_username = 'u1'`);
+  testClassroomId = classrooms.rows[0].classroom_id;
+
   // Insert test students for constraint tests
   await db.raw(`
     INSERT INTO students (period_id, name, grade, gender, is_ese, has_504, is_ell, is_ebd)
@@ -81,6 +92,10 @@ async function commonBeforeAll() {
     SELECT period_id, 'Student 3', 10, 'M', false, false, false, false
     FROM periods WHERE number = 1 AND user_username = 'u1'
   `);
+
+  // Capture student IDs
+  const students = await db.raw(`SELECT student_id FROM students WHERE period_id = ${testPeriodId} ORDER BY name`);
+  testStudentIds = students.rows.map(s => s.student_id);
 
   // Create tokens
   u1Token = createToken({ username: "u1", isAdmin: false });
@@ -108,4 +123,7 @@ module.exports = {
   getU1Token: () => u1Token,
   getU2Token: () => u2Token,
   getAdminToken: () => adminToken,
+  getTestPeriodId: () => testPeriodId,
+  getTestClassroomId: () => testClassroomId,
+  getTestStudentIds: () => testStudentIds,
 };
