@@ -137,3 +137,46 @@ describe("Period Routes", () => {
     });
   });
 });
+
+describe("DELETE /periods/:username/:periodId - edge cases", () => {
+  test("deleting a period cascades students and constraints", async () => {
+    // Create a period
+    const createResp = await request(app)
+      .post("/periods/u1")
+      .send({
+        username: "u1",
+        schoolYear: "2025-2026",
+        title: "Cascade Test",
+        number: 99,
+      })
+      .set("authorization", `Bearer ${getU1Token()}`);
+    const periodId = createResp.body.period.periodId;
+
+    // Add a student
+    await request(app)
+      .post(`/periods/u1/${periodId}/students`)
+      .send({
+        periodId,
+        name: "Cascade Student",
+        grade: 10,
+        gender: "M",
+        isESE: false,
+        has504: false,
+        isELL: false,
+        isEBD: false,
+      })
+      .set("authorization", `Bearer ${getU1Token()}`);
+
+    // Delete the period
+    const deleteResp = await request(app)
+      .delete(`/periods/u1/${periodId}`)
+      .set("authorization", `Bearer ${getU1Token()}`);
+    expect(deleteResp.statusCode).toEqual(200);
+
+    // Verify period is gone
+    const getResp = await request(app)
+      .get(`/periods/u1/${periodId}`)
+      .set("authorization", `Bearer ${getU1Token()}`);
+    expect(getResp.statusCode).toEqual(404);
+  });
+});

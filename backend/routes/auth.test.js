@@ -37,6 +37,13 @@ describe("POST /auth/token", () => {
 
     expect(response.body).toHaveProperty("error");
   });
+
+  test("401 for nonexistent user", async () => {
+    const resp = await request(app)
+      .post("/auth/token")
+      .send({ username: "nonexistent", password: "nope" });
+    expect(resp.statusCode).toEqual(401);
+  });
 });
 
 describe("POST /auth/register", () => {
