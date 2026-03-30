@@ -146,6 +146,31 @@ describe("PATCH /classrooms/:username/:classroomId", () => {
 
     expect(resp.statusCode).toEqual(401);
   });
+
+  test("works for admin", async () => {
+    const classroom = await db("classrooms")
+      .where("user_username", "u1")
+      .first();
+
+    const resp = await request(app)
+      .patch(`/classrooms/u1/${classroom.classroom_id}`)
+      .send({ seatAlphabetical: true })
+      .set("authorization", `Bearer ${getAdminToken()}`);
+
+    expect(resp.statusCode).toEqual(200);
+  });
+
+  test("unauth for anon", async () => {
+    const classroom = await db("classrooms")
+      .where("user_username", "u1")
+      .first();
+
+    const resp = await request(app)
+      .patch(`/classrooms/u1/${classroom.classroom_id}`)
+      .send({ seatAlphabetical: true });
+
+    expect(resp.statusCode).toEqual(401);
+  });
 });
 
 describe("DELETE /classrooms/:username/:classroomId", () => {
