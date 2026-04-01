@@ -11,8 +11,6 @@ const StudentGrid = ({ students }) => {
           setExpandedCard(null);
         } else {
           setExpandedCard(student.studentId);
-          console.log(student.studentId);
-          console.log(expandedCard);
         }
       };
 

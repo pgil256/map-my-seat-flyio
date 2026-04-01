@@ -48,7 +48,6 @@ export default function Home() {
           loading: false,
         });
       } catch (err) {
-        console.error("Failed to fetch setup status:", err);
         setSetupStatus(prev => ({ ...prev, loading: false }));
       }
     }

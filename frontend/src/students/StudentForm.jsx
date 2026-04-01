@@ -77,9 +77,7 @@ const StudentForm = () => {
           setStudents(result?.students || []);
           setNewStudent({});
         } catch (error) {
-          console.error(
-            `Students from period with id of ${periodId} could not be retrieved`
-          );
+          setFormErrors([error.message || "Failed to load students"]);
         }
       }
       setInfoLoading(false);

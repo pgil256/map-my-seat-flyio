@@ -6,111 +6,121 @@ import {
   Box,
   Flex,
   Container,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
+  HStack,
   Link as ChakraLink,
   IconButton,
   useColorMode,
   useColorModeValue,
+  Text,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
+
+function NavLink({ to, children, onClick }) {
+  return (
+    <ChakraLink
+      as={Link}
+      to={to}
+      onClick={onClick}
+      px={3}
+      py={1}
+      rounded="md"
+      fontSize="sm"
+      fontWeight="medium"
+      color="white"
+      _hover={{ bg: "whiteAlpha.200", textDecoration: "none" }}
+      transition="background 0.2s"
+    >
+      {children}
+    </ChakraLink>
+  );
+}
 
 const Navigation = ({ logout }) => {
   const { currentUser } = useContext(UserContext);
   const { colorMode, toggleColorMode } = useColorMode();
-  const bgColor = useColorModeValue("teal.400", "teal.600");
+  const bgColor = useColorModeValue("teal.500", "teal.700");
 
-  const loggedInNav = () => {
-    return (
-      <Box bg={bgColor} w="100%" p={4} color="white">
-        <Container maxW="container.xl" px={0}>
-          <Flex justify="space-between" align="center">
-            <Box display={{ base: "none", md: "block" }}>
-              <Breadcrumb spacing="8px" separator="|" fontSize="lg">
-                {['/', '/periods', `/classrooms/${currentUser.username}`, '/profile'].map((path, index) => (
-                  <BreadcrumbItem key={path}>
-                    <BreadcrumbLink
-                      as={Link}
-                      to={path}
-                      _hover={{ textDecoration: 'underline' }}
-                      _active={{ color: "teal.600" }}
-                    >
-                      {['Home', 'Set Up Classes', 'Create Classroom', 'Profile'][index]}
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                ))}
-                <BreadcrumbItem>
-                  <BreadcrumbLink as={Link} to="/" onClick={logout}>
-                    Logout
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-              </Breadcrumb>
-            </Box>
-            <Box display={{ base: "block", md: "none" }} ml="auto">
-              <ChakraLink as={Link} to="/" fontSize="lg" fontWeight="bold" _hover={{ textDecoration: 'none' }}>
-                Map My Seat
-              </ChakraLink>
-            </Box>
+  const loggedInNav = () => (
+    <Box bg={bgColor} w="100%" py={3} px={4} color="white">
+      <Container maxW="container.xl" px={0}>
+        <Flex justify="space-between" align="center">
+          <HStack spacing={1} display={{ base: "none", md: "flex" }}>
+            <ChakraLink
+              as={Link}
+              to="/"
+              fontWeight="bold"
+              fontSize="lg"
+              mr={4}
+              _hover={{ textDecoration: "none", opacity: 0.9 }}
+            >
+              Map My Seat
+            </ChakraLink>
+            <NavLink to="/periods">Classes</NavLink>
+            <NavLink to={`/classrooms/${currentUser.username}`}>Classrooms</NavLink>
+            <NavLink to="/profile">Profile</NavLink>
+          </HStack>
+          <HStack spacing={2} display={{ base: "none", md: "flex" }}>
+            <NavLink to="/" onClick={logout}>Log out</NavLink>
             <IconButton
               aria-label="Toggle dark mode"
               icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
               onClick={toggleColorMode}
               variant="ghost"
               color="white"
+              size="sm"
               _hover={{ bg: "whiteAlpha.200" }}
-              ml={2}
-              display={{ base: "none", md: "flex" }}
             />
-            <MobileNav currentUser={currentUser} logout={logout} />
-          </Flex>
-        </Container>
-      </Box>
-    );
-  };
+          </HStack>
+          <Box display={{ base: "block", md: "none" }} ml="auto">
+            <ChakraLink as={Link} to="/" fontSize="lg" fontWeight="bold" _hover={{ textDecoration: "none" }}>
+              Map My Seat
+            </ChakraLink>
+          </Box>
+          <MobileNav currentUser={currentUser} logout={logout} />
+        </Flex>
+      </Container>
+    </Box>
+  );
 
-  const loggedOutNav = () => {
-    return (
-      <Box bg={bgColor} w="100%" p={4} color="white">
-        <Container maxW="container.xl" px={0}>
-          <Flex justify="space-between" align="center">
-            <Box display={{ base: "none", md: "block" }}>
-              <Breadcrumb fontWeight="medium" fontSize="lg" spacing="8px" separator="|">
-                {['/', '/login', '/signup'].map((path, index) => (
-                  <BreadcrumbItem key={path}>
-                    <BreadcrumbLink
-                      as={Link}
-                      to={path}
-                      _hover={{ textDecoration: 'underline' }}
-                      _active={{ color: "teal.600" }}
-                    >
-                      {['Home', 'Log In', 'Sign Up'][index]}
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                ))}
-              </Breadcrumb>
-            </Box>
-            <Box display={{ base: "block", md: "none" }} ml="auto">
-              <ChakraLink as={Link} to="/" fontSize="lg" fontWeight="bold" _hover={{ textDecoration: 'none' }}>
-                Map My Seat
-              </ChakraLink>
-            </Box>
+  const loggedOutNav = () => (
+    <Box bg={bgColor} w="100%" py={3} px={4} color="white">
+      <Container maxW="container.xl" px={0}>
+        <Flex justify="space-between" align="center">
+          <HStack spacing={1} display={{ base: "none", md: "flex" }}>
+            <ChakraLink
+              as={Link}
+              to="/"
+              fontWeight="bold"
+              fontSize="lg"
+              mr={4}
+              _hover={{ textDecoration: "none", opacity: 0.9 }}
+            >
+              Map My Seat
+            </ChakraLink>
+            <NavLink to="/login">Log In</NavLink>
+            <NavLink to="/signup">Sign Up</NavLink>
+          </HStack>
+          <HStack display={{ base: "none", md: "flex" }}>
             <IconButton
               aria-label="Toggle dark mode"
               icon={colorMode === "light" ? <MoonIcon /> : <SunIcon />}
               onClick={toggleColorMode}
               variant="ghost"
               color="white"
+              size="sm"
               _hover={{ bg: "whiteAlpha.200" }}
-              ml={2}
-              display={{ base: "none", md: "flex" }}
             />
-            <MobileNav currentUser={currentUser} logout={logout} />
-          </Flex>
-        </Container>
-      </Box>
-    );
-  };
+          </HStack>
+          <Box display={{ base: "block", md: "none" }} ml="auto">
+            <ChakraLink as={Link} to="/" fontSize="lg" fontWeight="bold" _hover={{ textDecoration: "none" }}>
+              Map My Seat
+            </ChakraLink>
+          </Box>
+          <MobileNav currentUser={currentUser} logout={logout} />
+        </Flex>
+      </Container>
+    </Box>
+  );
 
   return <nav>{!currentUser ? loggedOutNav() : loggedInNav()}</nav>;
 };

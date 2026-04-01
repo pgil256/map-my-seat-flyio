@@ -10,10 +10,12 @@ import {
   FormControl,
   FormErrorMessage,
   Stack,
+  Text,
+  Link,
   useColorModeValue,
 } from "@chakra-ui/react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import MakeAlert from "../common/MakeAlert";
 import useFormValidation, { validators } from "../hooks/useFormValidation";
 
@@ -72,9 +74,6 @@ const LoginForm = ({ login }) => {
         >
           <Stack spacing={6}>
             <form onSubmit={handleSubmit}>
-              <Box textAlign="center">
-                <Heading>Login</Heading>
-              </Box>
               <FormControl isInvalid={!!errors.username} mb={4}>
                 <FormLabel htmlFor="username">Username</FormLabel>
                 <Input
@@ -103,20 +102,23 @@ const LoginForm = ({ login }) => {
               <Center mt={6}>
                 <Button
                   type="submit"
-                  colorScheme={"blue"}
-                  bg={"blue.400"}
+                  colorScheme={"green"}
                   rounded={"full"}
                   px={6}
+                  w="full"
                   isLoading={isSubmitting}
                   loadingText="Logging in..."
-                  _hover={{
-                    bg: "blue.500",
-                  }}
                 >
                   Log in
                 </Button>
               </Center>
               {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
+              <Text mt={4} textAlign="center" fontSize="sm" color="gray.500">
+                Don't have an account?{" "}
+                <Link as={RouterLink} to="/signup" color="blue.400" fontWeight="medium">
+                  Sign up
+                </Link>
+              </Text>
             </form>
           </Stack>
         </Box>

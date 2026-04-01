@@ -33,7 +33,7 @@ function StudentConstraints({ periodId, students }) {
         const data = await api.getConstraints(currentUser.username, periodId);
         setConstraints(data);
       } catch (err) {
-        console.error("Failed to fetch constraints:", err);
+        toast({ title: "Failed to load constraints", status: "error" });
       }
     }
     if (periodId) fetchConstraints();

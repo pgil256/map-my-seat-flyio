@@ -46,6 +46,7 @@ describe("SeatingApi", () => {
           Authorization: "Bearer test-token",
           "Content-Type": "application/json",
         },
+        timeout: 15000,
       });
       expect(result).toEqual({ success: true });
     });
@@ -61,6 +62,7 @@ describe("SeatingApi", () => {
         data: { name: "test" },
         params: {},
         headers: expect.any(Object),
+        timeout: 15000,
       });
       expect(result).toEqual({ created: true });
     });

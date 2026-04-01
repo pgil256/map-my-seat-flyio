@@ -50,7 +50,7 @@ const PeriodForm = () => {
         let periods = await api.getPeriods(username);
         setPeriods(periods);
       } catch (err) {
-        console.error("Periods could not be retrieved", err.message);
+        setFormErrors([err.message || "Periods could not be retrieved"]);
       }
     }
     getPeriodsOnMount();
@@ -123,7 +123,7 @@ const PeriodForm = () => {
           let fetchedPeriods = await api.getPeriods(username);
           setPeriods(fetchedPeriods);
         } catch (err) {
-          console.error("Periods could not be retrieved", err.message);
+          setFormErrors([err.message || "Periods could not be retrieved"]);
         }
       }
       setFormData({ schoolYear: "", title: "", number: "" });

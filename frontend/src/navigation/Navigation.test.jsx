@@ -29,17 +29,17 @@ describe("Navigation component", () => {
     const currentUser = { username: "johndoe", firstName: "John" };
     renderWithProviders(currentUser);
 
-    expect(screen.getByText("Home")).toBeInTheDocument();
-    expect(screen.getByText("Set Up Classes")).toBeInTheDocument();
-    expect(screen.getByText("Create Classroom")).toBeInTheDocument();
+    expect(screen.getAllByText("Map My Seat").length).toBeGreaterThan(0);
+    expect(screen.getByText("Classes")).toBeInTheDocument();
+    expect(screen.getByText("Classrooms")).toBeInTheDocument();
     expect(screen.getByText("Profile")).toBeInTheDocument();
-    expect(screen.getByText("Logout")).toBeInTheDocument();
+    expect(screen.getByText("Log out")).toBeInTheDocument();
   });
 
   it("renders correct navigation links when user is not logged in", () => {
     renderWithProviders(null);
 
-    expect(screen.getByText("Home")).toBeInTheDocument();
+    expect(screen.getAllByText("Map My Seat").length).toBeGreaterThan(0);
     expect(screen.getByText("Log In")).toBeInTheDocument();
     expect(screen.getByText("Sign Up")).toBeInTheDocument();
   });
@@ -48,7 +48,7 @@ describe("Navigation component", () => {
     const currentUser = { username: "johndoe", firstName: "John" };
     renderWithProviders(currentUser);
 
-    const logoutLink = screen.getByText("Logout");
+    const logoutLink = screen.getByText("Log out");
     fireEvent.click(logoutLink);
 
     expect(mockLogout).toHaveBeenCalledTimes(1);

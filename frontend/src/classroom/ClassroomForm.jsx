@@ -53,7 +53,7 @@ const ClassroomForm = () => {
       });
       toast.info("Layout auto-saved");
     } catch (err) {
-      console.error("Autosave failed:", err);
+      toast.error("Auto-save failed");
     }
   }, [classroomId, username, toast, api]);
 
@@ -80,10 +80,7 @@ const ClassroomForm = () => {
 
       setInfoLoading(false);
     } catch (err) {
-      console.error(
-        "Error while retrieving or creating classroom:",
-        err.message
-      );
+      toast.error(err.message || "Failed to load classroom");
     }
   }, [username, api]);
 
@@ -125,7 +122,7 @@ const ClassroomForm = () => {
       setClassroom(updatedClassroom);
       setSaveConfirmed(["Changes saved successfully"]);
     } catch (err) {
-      console.error("Classroom update failed", err);
+      toast.error(err.message || "Failed to save classroom");
     }
   };
 

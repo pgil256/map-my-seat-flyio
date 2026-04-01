@@ -25,7 +25,7 @@ describe("LoginForm", () => {
 
   it("renders without crashing", () => {
     renderWithProviders();
-    expect(screen.getByText("Login")).toBeInTheDocument();
+    expect(screen.getByText("Log in to your account")).toBeInTheDocument();
   });
 
   it("can fill out the form and submit successfully", async () => {

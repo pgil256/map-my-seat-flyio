@@ -54,7 +54,7 @@ function ClassroomList() {
         const data = await api.getClassrooms(currentUser.username);
         setClassrooms(data);
       } catch (err) {
-        console.error("Failed to fetch classrooms:", err);
+        // Handled by API layer
       } finally {
         setLoading(false);
       }
@@ -72,7 +72,7 @@ function ClassroomList() {
       setNewClassroomName("");
       onClose();
     } catch (err) {
-      console.error("Failed to create classroom:", err);
+      // Handled by API layer
     }
   };
 
@@ -84,7 +84,7 @@ function ClassroomList() {
       await api.deleteClassroom(currentUser.username, classroomId);
       setClassrooms(classrooms.filter(c => c.classroomId !== classroomId));
     } catch (err) {
-      console.error("Failed to delete classroom:", err);
+      // Handled by API layer
     }
   };
 

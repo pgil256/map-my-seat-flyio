@@ -65,12 +65,12 @@ describe("AppRouter", () => {
 
   it("renders LoginForm component for /login route", () => {
     renderWithProviders("/login");
-    expect(screen.getByText("Login")).toBeInTheDocument();
+    expect(screen.getByText("Log in to your account")).toBeInTheDocument();
   });
 
   it("renders SignupForm component for /signup route", () => {
     renderWithProviders("/signup");
-    expect(screen.getByRole("heading", { name: "Sign up" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Create your account" })).toBeInTheDocument();
   });
 
   it("renders PeriodForm component for /periods route", async () => {

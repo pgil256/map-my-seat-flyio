@@ -1,18 +1,19 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 
-//Returns JWT for each instance of user (non-admin)
+/** Returns signed JWT for the given user. */
 function createToken(user) {
-  console.log(user);
-  console.assert(user.isAdmin !== undefined,
-      "createToken passed user without isAdmin property");
+  if (process.env.NODE_ENV !== "production") {
+    console.assert(user.isAdmin !== undefined,
+        "createToken passed user without isAdmin property");
+  }
 
   let payload = {
     username: user.username,
     isAdmin: user.isAdmin || false,
   };
 
-  return jwt.sign(payload, SECRET_KEY);
+  return jwt.sign(payload, SECRET_KEY, { expiresIn: "7d" });
 }
 
 module.exports = { createToken };

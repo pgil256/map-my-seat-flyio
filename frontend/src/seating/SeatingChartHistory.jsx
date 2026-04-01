@@ -38,7 +38,7 @@ function SeatingChartHistory({ classroomId, periodId, onSelectChart }) {
           : data;
         setCharts(filtered);
       } catch (err) {
-        console.error("Failed to fetch charts:", err);
+        toast({ title: "Failed to load chart history", status: "error" });
       } finally {
         setLoading(false);
       }

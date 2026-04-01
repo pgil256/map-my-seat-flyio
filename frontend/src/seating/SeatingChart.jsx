@@ -216,31 +216,24 @@ const SeatingChart = () => {
       if (classroomData) {
         setClassroom(classroomData);
         setMatrix(classroomData.seatingConfig);
-      } else {
-        console.error("Classroom data is undefined.");
       }
       let periods = await api.getPeriods(username);
       const currentPeriod = periods.find((p) => p.number === number);
 
       if (currentPeriod && currentPeriod.periodId) {
-        let studentsData = await api.getPeriod(
+        let periodData = await api.getPeriod(
           username,
           currentPeriod.periodId
         );
-        setStudents(studentsData);
-      } else {
-        console.error("Period or periodId is undefined");
+        setStudents(periodData.students || []);
       }
     } catch (err) {
-      console.error(err.message || "An error occurred");
+      // Error is handled by the API layer
     }
   };
 
   useEffect(() => {
-    if (!username || !number) {
-      console.error("Username is not available.");
-      return;
-    }
+    if (!username || !number) return;
     getClassroomData();
   }, [username, number]);
 

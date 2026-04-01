@@ -118,12 +118,18 @@ class User {
       .where('username', username)
       .update(dataToUpdate)
       .returning([
+        'username',
+        'title',
         db.raw('first_name AS "firstName"'),
-        db.raw('last_name AS "lastName"')
+        db.raw('last_name AS "lastName"'),
+        'email',
+        db.raw('is_admin AS "isAdmin"')
       ]);
-  
+
     if (!user) throw new NotFoundError(`User not found: ${username}`);
-  
+
+    // Never expose password hash
+    delete user.password;
     return user;
   }
   

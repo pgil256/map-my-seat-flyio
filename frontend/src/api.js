@@ -21,8 +21,6 @@ class SeatingApi {
   static token;
 
   static async request(endpoint, data = {}, method = "get") {
-    console.debug("API Call:", endpoint, data, method);
-
     const url = `${BASE_URL}${endpoint}`;
     const headers = {
       Authorization: `Bearer ${SeatingApi.token}`,
@@ -31,9 +29,8 @@ class SeatingApi {
     const params = method === "get" ? data : {};
 
     try {
-      return (await axios({ url, method, data, params, headers })).data;
+      return (await axios({ url, method, data, params, headers, timeout: 15000 })).data;
     } catch (err) {
-      console.error("API Error:", err.response);
 
       // Handle network errors
       if (!err.response) {

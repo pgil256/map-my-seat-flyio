@@ -24,7 +24,7 @@ const ClassroomRedirect = (props) => {
         setInfoLoading(false);
       }
     } catch (error) {
-      console.error("Error fetching data", error);
+      if (isMounted) setInfoLoading(false);
     }
   };
 

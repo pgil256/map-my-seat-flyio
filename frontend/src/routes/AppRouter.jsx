@@ -73,15 +73,16 @@ const AppRouter = ({ login, signup }) => {
             } />
           </Route>
 
-          <Route
-            exact='true'
-            path='classrooms/:classroomId/seating-charts/:number'
-            element={
-              <Suspense fallback={<PageSkeleton variant="seating" />}>
-                <SeatingChart />
-              </Suspense>
-            }
-          />
+          <Route path='/classrooms/:classroomId/seating-charts/:number' element={<PrivateRoute />}>
+            <Route
+              path='/classrooms/:classroomId/seating-charts/:number'
+              element={
+                <Suspense fallback={<PageSkeleton variant="seating" />}>
+                  <SeatingChart />
+                </Suspense>
+              }
+            />
+          </Route>
 
           <Route path='/profile' element={<PrivateRoute />}>
             <Route path='/profile' element={

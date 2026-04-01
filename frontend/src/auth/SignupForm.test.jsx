@@ -25,7 +25,7 @@ describe("SignupForm", () => {
 
   it("renders without crashing", () => {
     renderWithProviders();
-    expect(screen.getByRole("heading", { name: "Sign up" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Create your account" })).toBeInTheDocument();
   });
 
   it("can fill out the form and submit successfully", async () => {

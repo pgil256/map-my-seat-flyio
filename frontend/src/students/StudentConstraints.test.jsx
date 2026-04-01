@@ -326,7 +326,6 @@ describe("StudentConstraints", { timeout: 15000 }, () => {
 
   describe("error handling", () => {
     it("handles API error when fetching constraints", async () => {
-      const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
       SeatingApi.getConstraints.mockRejectedValue(new Error("API Error"));
 
       renderWithProviders(
@@ -334,10 +333,8 @@ describe("StudentConstraints", { timeout: 15000 }, () => {
       );
 
       await waitFor(() => {
-        expect(consoleSpy).toHaveBeenCalled();
+        expect(SeatingApi.getConstraints).toHaveBeenCalled();
       });
-
-      consoleSpy.mockRestore();
     });
 
     it("handles API error when creating constraint", async () => {

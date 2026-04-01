@@ -11,7 +11,8 @@ import {
   AlertIcon,
   Heading,
   Text,
-  Flex
+  Flex,
+  useColorModeValue,
 } from "@chakra-ui/react";
 
 //Profile form
@@ -25,6 +26,7 @@ const ProfileForm = () => {
   });
   const [formErrors, setFormErrors] = useState([]);
   const [saveConfirmed, setSaveConfirmed] = useState(false);
+  const cardBg = useColorModeValue("white", "gray.700");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -43,7 +45,6 @@ const ProfileForm = () => {
       setFormErrors([]);
       setSaveConfirmed("Profile successfully updated");
     } catch (err) {
-      console.error(err);
       setFormErrors([err.message]);
     }
   }
@@ -65,7 +66,7 @@ const ProfileForm = () => {
     alignContent={"center"}
     justifyContent={"center"}
   >
-    <Box padding="5" bg="white" shadow="md" borderRadius="md" mt={20}>
+    <Box padding="5" bg={cardBg} shadow="md" borderRadius="md" mt={20}>
       <form id="profile" onSubmit={handleSubmit}>
         <Heading as="h2" size="lg" marginBottom="5">
           Profile

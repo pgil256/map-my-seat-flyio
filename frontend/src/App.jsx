@@ -19,18 +19,6 @@ function AppContent({ token, setToken }) {
   const toast = useAppToast();
   const { isDemo, demoData, exitDemo } = useDemo();
 
-  console.debug(
-    "App",
-    "infoLoaded=",
-    infoLoaded,
-    "currentUser=",
-    currentUser,
-    "token=",
-    token,
-    "isDemo=",
-    isDemo
-  );
-
   useEffect(
     function loadUserInfo() {
       async function getCurrentUser() {
@@ -48,7 +36,6 @@ function AppContent({ token, setToken }) {
             let currentUser = await SeatingApi.getCurrentUser(username);
             setCurrentUser(currentUser);
           } catch (err) {
-            console.error("App loadUserInfo: problem loading", err);
             setCurrentUser(null);
             setToken(null);
             if (err instanceof ApiError) {
@@ -80,7 +67,6 @@ function AppContent({ token, setToken }) {
       toast.success("Account created successfully!");
       return { success: true };
     } catch (err) {
-      console.error("signup failed", err);
       const message = err instanceof ApiError ? err.message : "Signup failed";
       toast.error(message);
       return { success: false, errors: [message] };
@@ -94,7 +80,6 @@ function AppContent({ token, setToken }) {
       toast.success("Welcome back!");
       return { success: true };
     } catch (err) {
-      console.error("login failed", err);
       const message = err instanceof ApiError ? err.message : "Login failed";
       toast.error(message);
       return { success: false, errors: [message] };

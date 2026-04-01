@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MakeAlert from "../common/MakeAlert";
 import useFormValidation, { validators } from "../hooks/useFormValidation";
+import { Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Button,
@@ -14,6 +15,8 @@ import {
   FormControl,
   FormErrorMessage,
   Stack,
+  Text,
+  Link,
   useColorModeValue,
 } from "@chakra-ui/react";
 
@@ -90,7 +93,7 @@ const SignupForm = ({ signup }) => {
     >
       <Stack spacing={12} mx={"auto"} maxW={"5xl"} maxH={"5xl"} py={4} px={4}>
         <Stack align={"center"}>
-          <Heading fontSize={"4xl"}>Sign up for Map my Seat</Heading>
+          <Heading fontSize={"4xl"}>Create your account</Heading>
         </Stack>
         <Box
           rounded={"lg"}
@@ -101,9 +104,6 @@ const SignupForm = ({ signup }) => {
           <Center>
             <Stack spacing={5}>
               <form onSubmit={handleSubmit}>
-                <Box textAlign="center">
-                  <Heading>Sign up</Heading>
-                </Box>
                 <Box style={{ display: "flex", flexDirection: "row" }}>
                   <Box mr={"4"} mt="4" mb="4">
                     <FormControl isInvalid={!!errors.username} mb={3}>
@@ -195,20 +195,22 @@ const SignupForm = ({ signup }) => {
                 <Center>
                   <Button
                     type="submit"
-                    colorScheme={"blue"}
-                    bg={"blue.400"}
+                    colorScheme={"green"}
                     rounded={"full"}
                     px={6}
                     isLoading={isSubmitting}
                     loadingText="Signing up..."
-                    _hover={{
-                      bg: "green.500",
-                    }}
                   >
                     Sign up
                   </Button>
                 </Center>
                 {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
+                <Text mt={4} textAlign="center" fontSize="sm" color="gray.500">
+                  Already have an account?{" "}
+                  <Link as={RouterLink} to="/login" color="blue.400" fontWeight="medium">
+                    Log in
+                  </Link>
+                </Text>
               </form>
             </Stack>
           </Center>
