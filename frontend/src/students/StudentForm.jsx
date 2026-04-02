@@ -389,7 +389,7 @@ const StudentForm = () => {
                     <Button
                       w="50%"
                       m={2}
-                      colorScheme="blue"
+                      colorScheme="green"
                       onClick={createStudent}
                     >
                       Add Student
@@ -545,7 +545,7 @@ const StudentForm = () => {
                     </Stack>
                     <Button
                       m={2}
-                      colorScheme="blue"
+                      colorScheme="green"
                       type="button"
                       name="updateStudent"
                       onClick={(e) => updateStudent(e)}
@@ -555,7 +555,8 @@ const StudentForm = () => {
 
                     <Button
                       m={2}
-                      colorScheme="blue"
+                      colorScheme="red"
+                      variant="outline"
                       type="button"
                       name="deleteStudent"
                       onClick={(e) => deleteStudent(e)}
@@ -598,7 +599,7 @@ const StudentForm = () => {
                   accept=".csv"
                 />
                 <Stack>
-                  <Button colorScheme="blue" ml={4} onClick={handleCSVSubmit}>
+                  <Button colorScheme="green" ml={4} onClick={handleCSVSubmit}>
                     Submit CSV file
                   </Button>
                   {saveConfirmed && (
@@ -620,26 +621,30 @@ const StudentForm = () => {
               />
             ) : (
               <Box overflowY={"auto"} maxHeight="280px">
-                <SimpleGrid columns={5} spacing={2}>
+                <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} spacing={3}>
                   {students.map((student) => (
                     <React.Fragment key={student.studentId}>
-                      <Flex py={5} position="relative">
-                        <Box
-                          maxW={"510px"}
-                          w={"full"}
-                          bg={"white"}
-                          boxShadow={"2xl"}
-                          rounded={"lg"}
-                          p={5}
-                          textAlign={"center"}
+                      <Box
+                        w={"full"}
+                        bg={"white"}
+                        boxShadow={"md"}
+                        rounded={"lg"}
+                        p={4}
+                        textAlign={"center"}
+                        cursor="pointer"
+                        onClick={() => setSelectedStudent(student)}
+                        _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
+                        transition="all 0.2s"
+                        borderWidth={selectedStudent?.studentId === student.studentId ? "2px" : "1px"}
+                        borderColor={selectedStudent?.studentId === student.studentId ? "green.400" : "gray.100"}
+                      >
+                        <Heading
+                          fontSize={"md"}
+                          fontFamily={"body"}
+                          noOfLines={1}
                         >
-                          <Heading
-                            fontSize={"2xl"}
-                            fontFamily={"body"}
-                            style={{ cursor: "pointer" }}
-                          >
-                            {student.name}
-                          </Heading>
+                          {student.name}
+                        </Heading>
                           <Collapse in={allCardsExpanded}>
                             <>
                               <Center>
@@ -669,23 +674,18 @@ const StudentForm = () => {
                                   </SimpleGrid>
                                 </Stack>
                               </Center>
-                              <Stack mt={4} direction={"row"} spacing={4}>
-                                <Button
-                                  onClick={() => setSelectedStudent(student)}
-                                  flex={1}
-                                  fontSize={"sm"}
-                                  rounded={"full"}
-                                  _focus={{
-                                    bg: "gray.200",
-                                  }}
-                                >
-                                  Edit Student
-                                </Button>
-                              </Stack>
+                              <Button
+                                mt={3}
+                                size="xs"
+                                colorScheme="green"
+                                variant="outline"
+                                onClick={() => setSelectedStudent(student)}
+                              >
+                                Edit
+                              </Button>
                             </>
                           </Collapse>
                         </Box>
-                      </Flex>
                     </React.Fragment>
                   ))}
                 </SimpleGrid>

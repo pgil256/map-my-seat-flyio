@@ -1,126 +1,152 @@
 import { useState, useContext } from "react";
 import useApi from "../hooks/useApi";
 import UserContext from "../auth/UserContext";
+import { useAppToast } from "../common/ToastContext";
 import {
   Box,
+  Container,
   FormControl,
   FormLabel,
   Input,
   Button,
-  Alert,
-  AlertIcon,
   Heading,
   Text,
-  Flex,
+  VStack,
+  HStack,
+  Avatar,
+  Divider,
   useColorModeValue,
 } from "@chakra-ui/react";
 
-//Profile form
 const ProfileForm = () => {
   const { currentUser, setCurrentUser } = useContext(UserContext);
   const { api } = useApi();
+  const toast = useAppToast();
   const username = currentUser.username;
   const [formData, setFormData] = useState({
-    firstName: currentUser.firstName,
-    lastName: currentUser.lastName,
+    firstName: currentUser.firstName || "",
+    lastName: currentUser.lastName || "",
   });
-  const [formErrors, setFormErrors] = useState([]);
-  const [saveConfirmed, setSaveConfirmed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const cardBg = useColorModeValue("white", "gray.700");
+  const subtleBg = useColorModeValue("gray.50", "gray.600");
 
   async function handleSubmit(e) {
     e.preventDefault();
-    let profileData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-    };
-
+    setIsSubmitting(true);
     try {
-      const updatedUser = await api.saveUserProfile(
-        username,
-        profileData
-      );
+      const updatedUser = await api.saveUserProfile(username, {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      });
       setCurrentUser(updatedUser);
-      setFormData((f) => ({ ...f, password: "" }));
-      setFormErrors([]);
-      setSaveConfirmed("Profile successfully updated");
+      toast.success("Profile updated successfully");
     } catch (err) {
-      setFormErrors([err.message]);
+      toast.error(err.message || "Failed to update profile");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((f) => ({
-      ...f,
-      [name]: value,
-    }));
-    setFormErrors([]);
+    setFormData((f) => ({ ...f, [name]: value }));
   };
 
+  const initials = `${(formData.firstName || "")[0] || ""}${(formData.lastName || "")[0] || ""}`.toUpperCase();
+
   return (
-    <Flex
-    Flex
-    width={"100vw"}
-    height={"70vh"}
-    alignContent={"center"}
-    justifyContent={"center"}
-  >
-    <Box padding="5" bg={cardBg} shadow="md" borderRadius="md" mt={20}>
-      <form id="profile" onSubmit={handleSubmit}>
-        <Heading as="h2" size="lg" marginBottom="5">
-          Profile
-        </Heading>
-        <Text>Username: {username}</Text>
-
-        <FormControl marginBottom="3">
-          <FormLabel htmlFor="firstName">First Name</FormLabel>
-          <Input
-            type="text"
-            name="FirstName" 
-            value={formData.firstName}
-            onChange={handleChange}
+    <Container maxW="lg" py={{ base: 8, md: 14 }}>
+      <VStack spacing={6}>
+        <VStack spacing={3}>
+          <Avatar
+            size="xl"
+            name={`${formData.firstName} ${formData.lastName}`}
+            bg="green.400"
+            color="white"
+            fontSize="2xl"
           />
-        </FormControl>
+          <Heading size="lg">
+            {formData.firstName} {formData.lastName}
+          </Heading>
+          <Text color="gray.500" fontSize="sm">@{username}</Text>
+        </VStack>
 
-        <FormControl marginBottom="3">
-          <FormLabel htmlFor="lastName">Last Name</FormLabel>
-          <Input
-            type="text"
-            name="LastName"
-            value={formData.lastName}
-            onChange={handleChange}
-          />
-        </FormControl>
+        <Box
+          w="full"
+          bg={cardBg}
+          shadow="sm"
+          borderRadius="lg"
+          border="1px"
+          borderColor={useColorModeValue("gray.100", "gray.600")}
+          p={6}
+        >
+          <Heading size="md" mb={4}>Account Details</Heading>
 
-        <Button colorScheme="teal" type="submit">
-          Save
-        </Button>
+          <Box bg={subtleBg} borderRadius="md" p={4} mb={5}>
+            <HStack justify="space-between">
+              <Text fontSize="sm" color="gray.500">Username</Text>
+              <Text fontWeight="medium">{username}</Text>
+            </HStack>
+            {currentUser.email && (
+              <>
+                <Divider my={2} />
+                <HStack justify="space-between">
+                  <Text fontSize="sm" color="gray.500">Email</Text>
+                  <Text fontWeight="medium">{currentUser.email}</Text>
+                </HStack>
+              </>
+            )}
+            {currentUser.title && (
+              <>
+                <Divider my={2} />
+                <HStack justify="space-between">
+                  <Text fontSize="sm" color="gray.500">Title</Text>
+                  <Text fontWeight="medium">{currentUser.title}</Text>
+                </HStack>
+              </>
+            )}
+          </Box>
 
-        {formErrors.length ? (
-          <MakeAlert status="error" marginTop="4">
-            <AlertIcon />
-            {formErrors.map((error, index) => (
-              <Box key={index} ml="2">
-                {error}
-              </Box>
-            ))}
-          </MakeAlert>
-        ) : null}
+          <Divider mb={5} />
 
-        {saveConfirmed.length ? (
-          <Alert status="success" marginTop="4">
-            <AlertIcon />
-            {saveConfirmed.map((message, index) => (
-              <Box key={index} ml="2">
-                {message}
-              </Box>
-            ))}
-          </Alert>
-        ) : null}
-      </form>
-    </Box>
-    </Flex>
+          <form onSubmit={handleSubmit}>
+            <VStack spacing={4}>
+              <FormControl>
+                <FormLabel fontSize="sm">First Name</FormLabel>
+                <Input
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  placeholder="Enter first name"
+                />
+              </FormControl>
+
+              <FormControl>
+                <FormLabel fontSize="sm">Last Name</FormLabel>
+                <Input
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  placeholder="Enter last name"
+                />
+              </FormControl>
+
+              <Button
+                colorScheme="green"
+                type="submit"
+                w="full"
+                isLoading={isSubmitting}
+                loadingText="Saving..."
+              >
+                Save Changes
+              </Button>
+            </VStack>
+          </form>
+        </Box>
+      </VStack>
+    </Container>
   );
 };
 

@@ -1,4 +1,5 @@
 import { useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import UserContext from "../auth/UserContext";
 import useApi from "../hooks/useApi";
 import WelcomeModal from "../common/WelcomeModal";
@@ -10,15 +11,43 @@ import {
   Heading,
   Container,
   Text,
-  OrderedList,
-  ListItem,
   Stack,
-  Flex,
+  SimpleGrid,
+  VStack,
+  Icon,
+  Button,
+  useColorModeValue,
 } from "@chakra-ui/react";
+import { TimeIcon, SettingsIcon, ViewIcon } from "@chakra-ui/icons";
+
+function QuickAction({ icon, title, description, onClick, colorScheme = "blue" }) {
+  const bg = useColorModeValue("white", "gray.700");
+  return (
+    <Box
+      bg={bg}
+      p={5}
+      borderRadius="lg"
+      boxShadow="sm"
+      border="1px"
+      borderColor={useColorModeValue("gray.100", "gray.600")}
+      cursor="pointer"
+      onClick={onClick}
+      _hover={{ boxShadow: "md", transform: "translateY(-2px)" }}
+      transition="all 0.2s"
+    >
+      <VStack spacing={3} align="start">
+        <Icon as={icon} boxSize={5} color={`${colorScheme}.500`} />
+        <Heading size="sm">{title}</Heading>
+        <Text fontSize="sm" color="gray.500">{description}</Text>
+      </VStack>
+    </Box>
+  );
+}
 
 export default function Home() {
   const { currentUser } = useContext(UserContext);
   const { api } = useApi();
+  const navigate = useNavigate();
 
   const [setupStatus, setSetupStatus] = useState({
     hasPeriods: false,
@@ -55,71 +84,63 @@ export default function Home() {
     fetchSetupStatus();
   }, [currentUser, api]);
 
-  // Show landing page for non-logged-in visitors
   if (!currentUser) {
     return <LandingPage />;
   }
 
-  // Show dashboard for logged-in users
   return (
-    <Flex
-      width="100vw"
-      minH="80vh"
-      alignContent="center"
-      justifyContent="center"
-    >
-      <Container maxW="3xl">
-        <Stack
-          as={Box}
-          textAlign="center"
-          spacing={{ base: 4, md: 7 }}
-          py={{ base: 18, md: 34 }}
-        >
+    <Box minH="80vh">
+      <Container maxW="4xl" py={{ base: 8, md: 14 }}>
+        <WelcomeModal />
+
+        <VStack spacing={8} textAlign="center" mb={10}>
           <Heading
-            fontWeight={600}
-            fontSize={{ base: "2xl", sm: "4xl", md: "6xl" }}
-            lineHeight="110%"
+            fontWeight={700}
+            fontSize={{ base: "2xl", sm: "4xl", md: "5xl" }}
+            lineHeight="1.2"
           >
-            Seating charts <br />
-            <Text as="span" color="green.400">
-              made easy
-            </Text>
+            Welcome back, {currentUser.firstName || currentUser.username}
           </Heading>
-
-          <WelcomeModal />
-          <Text fontSize="3xl">
-            Welcome, {currentUser.firstName || currentUser.username}!
+          <Text fontSize="lg" color="gray.500" maxW="lg">
+            Manage your classes, design classroom layouts, and generate seating charts.
           </Text>
+        </VStack>
 
-          {!setupStatus.loading && (
-            <Box display="flex" justifyContent="center">
-              <SetupProgress
-                hasPeriods={setupStatus.hasPeriods}
-                hasStudents={setupStatus.hasStudents}
-                hasClassroom={setupStatus.hasClassroom}
-                username={currentUser.username}
-              />
-            </Box>
-          )}
+        {!setupStatus.loading && (
+          <Box display="flex" justifyContent="center" mb={10}>
+            <SetupProgress
+              hasPeriods={setupStatus.hasPeriods}
+              hasStudents={setupStatus.hasStudents}
+              hasClassroom={setupStatus.hasClassroom}
+              username={currentUser.username}
+            />
+          </Box>
+        )}
 
-          <Heading fontSize="lg" textAlign="left">
-            To get started:
-          </Heading>
-          <OrderedList spacing={3} fontSize="lg" textAlign="left">
-            <ListItem>
-              Enter your class and student in the "Set Up Classes" tab.
-            </ListItem>
-            <ListItem>
-              Set up the classroom configuration and seating
-              specifications under the "Create Classroom" tab.
-            </ListItem>
-            <ListItem>
-              Click on any of the "Period" buttons on the "Create
-              Classroom" page to render a seating chart for that period.
-            </ListItem>
-          </OrderedList>
-        </Stack>
+        <SimpleGrid columns={{ base: 1, md: 3 }} spacing={5}>
+          <QuickAction
+            icon={TimeIcon}
+            title="Set Up Classes"
+            description="Create class periods and manage your student rosters."
+            onClick={() => navigate("/periods")}
+            colorScheme="green"
+          />
+          <QuickAction
+            icon={SettingsIcon}
+            title="Design Classrooms"
+            description="Build desk layouts and configure seating preferences."
+            onClick={() => navigate(`/classrooms/${currentUser.username}`)}
+            colorScheme="blue"
+          />
+          <QuickAction
+            icon={ViewIcon}
+            title="View Profile"
+            description="Update your name and account settings."
+            onClick={() => navigate("/profile")}
+            colorScheme="purple"
+          />
+        </SimpleGrid>
       </Container>
-    </Flex>
+    </Box>
   );
 }

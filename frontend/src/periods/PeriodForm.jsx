@@ -199,7 +199,7 @@ const PeriodForm = () => {
               </Flex>
 
               <Center>
-                <Button mb={2} colorScheme="blue" onClick={createPeriod}>
+                <Button mb={2} colorScheme="green" onClick={createPeriod}>
                   Create Period
                 </Button>
               </Center>
@@ -266,7 +266,7 @@ const PeriodForm = () => {
                 <Button
                   mb={2}
                   mr={2}
-                  colorScheme="blue"
+                  colorScheme="green"
                   id="saveButton"
                   onClick={(e) => updatePeriod(e, selectedPeriod)}
                 >
@@ -275,7 +275,8 @@ const PeriodForm = () => {
                 <Button
                   mb={2}
                   ml={2}
-                  colorScheme="blue"
+                  colorScheme="red"
+                  variant="outline"
                   id="deleteButton"
                   onClick={(e) => deletePeriod(e, selectedPeriod)}
                 >
@@ -361,17 +362,7 @@ const PeriodForm = () => {
                           }
                           flex={1}
                           fontSize={"sm"}
-                          bg={"blue.400"}
-                          color={"white"}
-                          boxShadow={
-                            "0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)"
-                          }
-                          _hover={{
-                            bg: "blue.500",
-                          }}
-                          _focus={{
-                            bg: "blue.500",
-                          }}
+                          colorScheme="green"
                         >
                           Add Students
                         </Button>

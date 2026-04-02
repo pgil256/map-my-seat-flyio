@@ -49,7 +49,7 @@ describe("Home", () => {
 
       await waitFor(
         () => {
-          expect(screen.getByText(/Welcome, John/)).toBeInTheDocument();
+          expect(screen.getByText(/Welcome back, John/)).toBeInTheDocument();
         },
         { timeout: 10000 }
       );
@@ -61,7 +61,7 @@ describe("Home", () => {
     renderWithProviders(currentUser);
 
     await waitFor(() => {
-      expect(screen.getByText(/Welcome, johndoe/)).toBeInTheDocument();
+      expect(screen.getByText(/Welcome back, johndoe/)).toBeInTheDocument();
     });
   });
 
@@ -72,12 +72,13 @@ describe("Home", () => {
     expect(screen.getByRole("button", { name: /log in/i })).toBeInTheDocument();
   });
 
-  it("shows getting started instructions when logged in", async () => {
+  it("shows quick action cards when logged in", async () => {
     const currentUser = { firstName: "John", username: "johndoe" };
     renderWithProviders(currentUser);
 
     await waitFor(() => {
-      expect(screen.getByText(/To get started:/i)).toBeInTheDocument();
+      expect(screen.getByText(/Design Classrooms/)).toBeInTheDocument();
+      expect(screen.getByText(/View Profile/)).toBeInTheDocument();
     });
   });
 });

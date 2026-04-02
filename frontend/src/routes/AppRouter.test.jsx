@@ -57,7 +57,7 @@ describe("AppRouter", () => {
     await waitFor(
       () => {
         // When logged in, shows personalized welcome message
-        expect(screen.getByText(/Welcome, testuser/)).toBeInTheDocument();
+        expect(screen.getByText(/Welcome back, testuser/)).toBeInTheDocument();
       },
       { timeout: 10000 }
     );
@@ -104,7 +104,7 @@ describe("AppRouter", () => {
   it("renders ProfileForm component for /profile route", async () => {
     renderWithProviders("/profile");
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: "Profile" })).toBeInTheDocument();
+      expect(screen.getByText("Account Details")).toBeInTheDocument();
     });
   });
 });
