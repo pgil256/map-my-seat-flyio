@@ -8,6 +8,7 @@
   body {
     margin: 0;
     padding: 0;
+    background: white !important;
   }
 
   .seating-chart-container {
@@ -21,18 +22,24 @@
   }
 
   .seating-chart-container td {
-    border: 1px solid #333 !important;
+    border: 2px solid #1e293b !important;
     background: white !important;
-    color: black !important;
+    color: #1e293b !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
   .seating-chart-container td.desk {
-    background: #e0e0e0 !important;
+    background: #f1f5f9 !important;
   }
 
   .seating-chart-container td.teacher-desk {
-    background: #bdbdbd !important;
+    background: #e2e8f0 !important;
+  }
+
+  .accommodation-badge {
+    background: none !important;
+    color: #1e293b !important;
+    font-size: 10px;
   }
 }

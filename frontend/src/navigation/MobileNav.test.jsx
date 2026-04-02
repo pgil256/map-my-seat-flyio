@@ -78,7 +78,7 @@ describe("MobileNav", () => {
         expect(screen.getByText("Menu")).toBeInTheDocument();
       });
 
-      expect(screen.queryByText("Set Up Classes")).not.toBeInTheDocument();
+      expect(screen.queryByText("Classes")).not.toBeInTheDocument();
       expect(screen.queryByText("Profile")).not.toBeInTheDocument();
       expect(screen.queryByText("Logout")).not.toBeInTheDocument();
     });
@@ -98,10 +98,10 @@ describe("MobileNav", () => {
         () => {
           // NavLink renders Button as RouterLink (anchor tag)
           expect(
-            screen.getByRole("link", { name: "Set Up Classes" })
+            screen.getByRole("link", { name: "Classes" })
           ).toBeInTheDocument();
           expect(
-            screen.getByRole("link", { name: "Create Classroom" })
+            screen.getByRole("link", { name: "Classrooms" })
           ).toBeInTheDocument();
           expect(
             screen.getByRole("link", { name: "Profile" })
@@ -175,7 +175,7 @@ describe("MobileNav", () => {
           () => {
             // NavLink renders Button as RouterLink (anchor tag)
             const classroomLink = screen.getByRole("link", {
-              name: "Create Classroom",
+              name: "Classrooms",
             });
             expect(classroomLink).toHaveAttribute("href", "/classrooms/testuser");
           },

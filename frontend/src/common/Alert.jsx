@@ -1,13 +1,31 @@
-import React from "react";
+import {
+  Alert as ChakraAlert,
+  AlertIcon,
+  AlertDescription,
+  VStack,
+} from "@chakra-ui/react";
 
-//Component that populates error messages on screen upon error encounter
-const Alert = ({ messages = [] }) => {
+// Component that displays error messages using the theme's Alert styling
+// Uses the subtle variant which has left border styling defined in theme
+const Alert = ({ messages = [], status = "error" }) => {
+  if (messages.length === 0) {
+    return null;
+  }
+
   return (
-    <div>
-      {messages.map((error) => (
-        <p key={error}>{error}</p>
+    <VStack spacing={2} align="stretch" w="100%">
+      {messages.map((message) => (
+        <ChakraAlert
+          key={message}
+          status={status}
+          variant="subtle"
+          borderRadius="base"
+        >
+          <AlertIcon />
+          <AlertDescription>{message}</AlertDescription>
+        </ChakraAlert>
       ))}
-    </div>
+    </VStack>
   );
 };
 

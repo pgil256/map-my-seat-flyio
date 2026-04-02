@@ -24,10 +24,16 @@ import { useDemo } from "../demo/DemoContext";
 
 // Feature card component
 function Feature({ icon, title, description }) {
+  const cardBg = useColorModeValue("white", "brand.800");
+  const iconBg = useColorModeValue("accent.100", "accent.900");
+  const iconColor = useColorModeValue("accent.600", "accent.400");
+  const headingColor = useColorModeValue("brand.800", "brand.100");
+  const textColor = useColorModeValue("brand.600", "brand.300");
+
   return (
     <VStack
       p={6}
-      bg={useColorModeValue("white", "gray.800")}
+      bg={cardBg}
       borderRadius="lg"
       boxShadow="md"
       spacing={4}
@@ -35,30 +41,34 @@ function Feature({ icon, title, description }) {
       _hover={{ transform: "translateY(-4px)", boxShadow: "lg" }}
       transition="all 0.2s"
     >
-      <Circle size={12} bg="green.100" color="green.600">
+      <Circle size={12} bg={iconBg} color={iconColor}>
         <Icon as={icon} boxSize={6} />
       </Circle>
-      <Heading size="md">{title}</Heading>
-      <Text color="gray.600">{description}</Text>
+      <Heading size="md" color={headingColor}>{title}</Heading>
+      <Text color={textColor}>{description}</Text>
     </VStack>
   );
 }
 
 // Step component for "How it works"
 function Step({ number, title, description }) {
+  const circleBg = useColorModeValue("accent.500", "accent.600");
+  const headingColor = useColorModeValue("brand.800", "brand.100");
+  const textColor = useColorModeValue("brand.600", "brand.300");
+
   return (
     <VStack spacing={3} textAlign="center">
       <Circle
         size={14}
-        bg="green.400"
+        bg={circleBg}
         color="white"
         fontWeight="bold"
         fontSize="xl"
       >
         {number}
       </Circle>
-      <Heading size="md">{title}</Heading>
-      <Text color="gray.600" maxW="250px">
+      <Heading size="md" color={headingColor}>{title}</Heading>
+      <Text color={textColor} maxW="250px">
         {description}
       </Text>
     </VStack>
@@ -68,10 +78,27 @@ function Step({ number, title, description }) {
 export default function LandingPage() {
   const navigate = useNavigate();
   const { startDemo } = useDemo();
+
+  // Color mode values
   const bgGradient = useColorModeValue(
-    "linear(to-b, green.50, white)",
-    "linear(to-b, gray.900, gray.800)"
+    "linear(to-b, brand.100, brand.50)",
+    "linear(to-b, brand.900, brand.800)"
   );
+  const heroHighlightColor = useColorModeValue("accent.600", "accent.400");
+  const heroTextColor = useColorModeValue("brand.600", "brand.300");
+  const sectionHeadingColor = useColorModeValue("brand.800", "brand.100");
+  const sectionTextColor = useColorModeValue("brand.600", "brand.300");
+  const checkIconColor = useColorModeValue("accent.500", "accent.400");
+  const subtleTextColor = useColorModeValue("brand.500", "brand.400");
+  const sectionBg = useColorModeValue("brand.50", "brand.900");
+  const previewBg = useColorModeValue("white", "brand.700");
+  const previewInnerBg = useColorModeValue("brand.100", "brand.800");
+  const deskHighlight = useColorModeValue("accent.400", "accent.500");
+  const deskDefault = useColorModeValue("brand.300", "brand.600");
+  const footerBorderColor = useColorModeValue("brand.200", "brand.700");
+  const footerLinkColor = useColorModeValue("brand.600", "brand.300");
+  const footerLinkHoverColor = useColorModeValue("accent.600", "accent.400");
+  const brandTextColor = useColorModeValue("brand.700", "brand.200");
 
   const handleTryDemo = () => {
     startDemo();
@@ -94,21 +121,22 @@ export default function LandingPage() {
                 size="3xl"
                 fontWeight="800"
                 lineHeight="1.1"
+                color={sectionHeadingColor}
               >
                 Seating charts{" "}
-                <Text as="span" color="green.400">
+                <Text as="span" color={heroHighlightColor}>
                   made easy
                 </Text>
               </Heading>
-              <Text fontSize="xl" color="gray.600" maxW="lg">
-                Create optimized classroom seating arrangements in minutes. 
-                Import your roster, set your preferences, and let Map My Seat 
+              <Text fontSize="xl" color={heroTextColor} maxW="lg">
+                Create optimized classroom seating arrangements in minutes.
+                Import your roster, set your preferences, and let Map My Seat
                 do the rest.
               </Text>
               <HStack spacing={4} pt={4} flexWrap="wrap">
                 <Button
                   size="lg"
-                  colorScheme="green"
+                  variant="solid"
                   onClick={() => navigate("/signup")}
                   px={8}
                 >
@@ -117,7 +145,6 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  colorScheme="green"
                   onClick={() => navigate("/login")}
                 >
                   Log In
@@ -125,19 +152,18 @@ export default function LandingPage() {
                 <Button
                   size="lg"
                   variant="ghost"
-                  colorScheme="green"
                   onClick={handleTryDemo}
                 >
                   Try Demo
                 </Button>
               </HStack>
-              <HStack spacing={6} pt={2} color="gray.500" fontSize="sm">
+              <HStack spacing={6} pt={2} color={subtleTextColor} fontSize="sm">
                 <HStack>
-                  <CheckCircleIcon color="green.400" />
+                  <CheckCircleIcon color={checkIconColor} />
                   <Text>No credit card required</Text>
                 </HStack>
                 <HStack>
-                  <CheckCircleIcon color="green.400" />
+                  <CheckCircleIcon color={checkIconColor} />
                   <Text>Free for teachers</Text>
                 </HStack>
               </HStack>
@@ -146,14 +172,14 @@ export default function LandingPage() {
             {/* App Preview/Mockup */}
             <Box
               flex={1}
-              bg="white"
+              bg={previewBg}
               p={4}
               borderRadius="xl"
               boxShadow="2xl"
               maxW="500px"
             >
               <Box
-                bg="gray.100"
+                bg={previewInnerBg}
                 borderRadius="lg"
                 p={6}
                 minH="300px"
@@ -168,12 +194,12 @@ export default function LandingPage() {
                         key={i}
                         w={10}
                         h={8}
-                        bg={i % 5 === 0 ? "green.300" : "gray.300"}
+                        bg={i % 5 === 0 ? deskHighlight : deskDefault}
                         borderRadius="sm"
                       />
                     ))}
                   </SimpleGrid>
-                  <Text fontSize="sm" color="gray.500" fontWeight="medium">
+                  <Text fontSize="sm" color={subtleTextColor} fontWeight="medium">
                     Classroom Layout Preview
                   </Text>
                 </VStack>
@@ -187,9 +213,11 @@ export default function LandingPage() {
       <Box py={20}>
         <Container maxW="6xl">
           <VStack spacing={4} mb={12} textAlign="center">
-            <Heading size="xl">Why teachers love Map My Seat</Heading>
-            <Text fontSize="lg" color="gray.600" maxW="2xl">
-              Built by educators, for educators. Save hours of manual seating 
+            <Heading size="xl" color={sectionHeadingColor}>
+              Why teachers love Map My Seat
+            </Heading>
+            <Text fontSize="lg" color={sectionTextColor} maxW="2xl">
+              Built by educators, for educators. Save hours of manual seating
               arrangement with smart automation.
             </Text>
           </VStack>
@@ -215,11 +243,13 @@ export default function LandingPage() {
       </Box>
 
       {/* How It Works Section */}
-      <Box py={20} bg={useColorModeValue("gray.50", "gray.900")}>
+      <Box py={20} bg={sectionBg}>
         <Container maxW="6xl">
           <VStack spacing={4} mb={16} textAlign="center">
-            <Heading size="xl">How it works</Heading>
-            <Text fontSize="lg" color="gray.600">
+            <Heading size="xl" color={sectionHeadingColor}>
+              How it works
+            </Heading>
+            <Text fontSize="lg" color={sectionTextColor}>
               Three simple steps to your perfect seating chart
             </Text>
           </VStack>
@@ -250,7 +280,7 @@ export default function LandingPage() {
           <VStack mt={16}>
             <Button
               size="lg"
-              colorScheme="green"
+              variant="accent"
               onClick={() => navigate("/signup")}
               px={10}
             >
@@ -261,7 +291,7 @@ export default function LandingPage() {
       </Box>
 
       {/* Footer */}
-      <Box py={12} borderTop="1px" borderColor="gray.200">
+      <Box py={12} borderTop="1px" borderColor={footerBorderColor}>
         <Container maxW="6xl">
           <Flex
             direction={{ base: "column", md: "row" }}
@@ -269,27 +299,27 @@ export default function LandingPage() {
             align="center"
             gap={4}
           >
-            <Text fontWeight="bold" fontSize="lg" color="green.500">
+            <Text fontWeight="bold" fontSize="lg" color={brandTextColor}>
               Map My Seat
             </Text>
-            <HStack spacing={6} color="gray.600">
-              <Text 
-                cursor="pointer" 
-                _hover={{ color: "green.500" }}
+            <HStack spacing={6} color={footerLinkColor}>
+              <Text
+                cursor="pointer"
+                _hover={{ color: footerLinkHoverColor }}
                 onClick={() => navigate("/login")}
               >
                 Login
               </Text>
-              <Text 
-                cursor="pointer" 
-                _hover={{ color: "green.500" }}
+              <Text
+                cursor="pointer"
+                _hover={{ color: footerLinkHoverColor }}
                 onClick={() => navigate("/signup")}
               >
                 Sign Up
               </Text>
             </HStack>
-            <Text fontSize="sm" color="gray.500">
-              © {new Date().getFullYear()} Map My Seat. Built for teachers.
+            <Text fontSize="sm" color={subtleTextColor}>
+              &copy; {new Date().getFullYear()} Map My Seat. Built for teachers.
             </Text>
           </Flex>
         </Container>

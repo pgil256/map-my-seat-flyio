@@ -6,45 +6,45 @@ const ToastContext = createContext(null);
 export function ToastProvider({ children }) {
   const toast = useToast();
 
+  // Default toast options following design system
+  const defaultOptions = {
+    duration: 4000,
+    isClosable: true,
+    position: "bottom-right",
+    variant: "left-accent", // White background with colored left bar
+  };
+
   const showToast = {
     success: (message, title = "Success") => {
       toast({
+        ...defaultOptions,
         title,
         description: message,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-        position: "top",
+        status: "success", // Uses accent.600 (teal) via theme
       });
     },
     error: (message, title = "Error") => {
       toast({
+        ...defaultOptions,
         title,
         description: message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "top",
+        status: "error", // Uses error.500 (red) via theme
       });
     },
     warning: (message, title = "Warning") => {
       toast({
+        ...defaultOptions,
         title,
         description: message,
         status: "warning",
-        duration: 4000,
-        isClosable: true,
-        position: "top",
       });
     },
     info: (message, title = "Info") => {
       toast({
+        ...defaultOptions,
         title,
         description: message,
-        status: "info",
-        duration: 3000,
-        isClosable: true,
-        position: "top",
+        status: "info", // Uses brand.600 (slate) via theme
       });
     },
   };

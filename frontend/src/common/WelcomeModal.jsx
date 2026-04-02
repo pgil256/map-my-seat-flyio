@@ -11,6 +11,7 @@ import {
   HStack,
   Box,
   useDisclosure,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
@@ -19,6 +20,15 @@ const WELCOME_SHOWN_KEY = "seating-welcome-shown";
 function WelcomeModal() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [hasShown, setHasShown] = useState(true);
+
+  // Design system colors
+  const modalBg = useColorModeValue("white", "brand.800");
+  const borderColor = useColorModeValue("brand.200", "brand.700");
+  const headingColor = useColorModeValue("brand.800", "brand.100");
+  const textColor = useColorModeValue("brand.600", "brand.300");
+  const subtextColor = useColorModeValue("brand.500", "brand.400");
+  const stepBg = useColorModeValue("brand.600", "brand.500");
+  const stepTitleColor = useColorModeValue("brand.800", "brand.100");
 
   useEffect(() => {
     const shown = localStorage.getItem(WELCOME_SHOWN_KEY);
@@ -57,13 +67,18 @@ function WelcomeModal() {
   return (
     <Modal isOpen={isOpen} onClose={handleClose} size="lg" isCentered>
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader textAlign="center" pt={6}>
+      <ModalContent
+        bg={modalBg}
+        borderWidth="1px"
+        borderColor={borderColor}
+        borderRadius="md"
+      >
+        <ModalHeader textAlign="center" pt={6} color={headingColor}>
           Welcome to Map My Seat!
         </ModalHeader>
         <ModalBody>
           <VStack spacing={6} align="stretch">
-            <Text textAlign="center" color="gray.600">
+            <Text textAlign="center" color={textColor}>
               Create optimized seating charts for your classroom in three simple steps:
             </Text>
 
@@ -71,7 +86,7 @@ function WelcomeModal() {
               {steps.map((step) => (
                 <HStack key={step.number} spacing={4} align="start">
                   <Box
-                    bg="blue.500"
+                    bg={stepBg}
                     color="white"
                     borderRadius="full"
                     w={8}
@@ -85,8 +100,10 @@ function WelcomeModal() {
                     {step.number}
                   </Box>
                   <Box>
-                    <Text fontWeight="semibold">{step.title}</Text>
-                    <Text fontSize="sm" color="gray.500">
+                    <Text fontWeight="semibold" color={stepTitleColor}>
+                      {step.title}
+                    </Text>
+                    <Text fontSize="sm" color={subtextColor}>
                       {step.description}
                     </Text>
                   </Box>
@@ -96,7 +113,7 @@ function WelcomeModal() {
           </VStack>
         </ModalBody>
         <ModalFooter justifyContent="center" pb={6}>
-          <Button colorScheme="blue" size="lg" onClick={handleClose}>
+          <Button variant="solid" size="lg" onClick={handleClose}>
             Get Started
           </Button>
         </ModalFooter>
