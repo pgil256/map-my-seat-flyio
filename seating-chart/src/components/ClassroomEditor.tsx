@@ -6,16 +6,20 @@ interface Props {
   onLayoutChange: (layout: ClassroomLayout) => void
   onNext: () => void
   addToast: (msg: string, type?: 'success' | 'info' | 'warning') => void
+  onUndo?: () => void
+  onRedo?: () => void
+  canUndo?: boolean
+  canRedo?: boolean
 }
 
-let deskIdCounter = Date.now()
+let deskIdCounter = 0
 function nextDeskId() {
-  return `desk_${++deskIdCounter}`
+  return `desk_${++deskIdCounter}_${Math.random().toString(36).slice(2, 8)}`
 }
 
-let furnitureIdCounter = Date.now()
+let furnitureIdCounter = 0
 function nextFurnitureId() {
-  return `furniture_${++furnitureIdCounter}`
+  return `furniture_${++furnitureIdCounter}_${Math.random().toString(36).slice(2, 8)}`
 }
 
 const FURNITURE_CATALOG: { type: FurnitureType; label: string; icon: string; colSpan: number; rowSpan: number; color: string }[] = [
@@ -38,13 +42,14 @@ function getEffectiveSpan(f: FurnitureItem): { cs: number; rs: number } {
   return { cs: f.colSpan || 1, rs: f.rowSpan || 1 }
 }
 
-export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToast }: Props) {
+export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToast, onUndo, onRedo, canUndo, canRedo }: Props) {
   const [deskType, setDeskType] = useState<'single' | 'double'>('single')
   const [tool, setTool] = useState<'add' | 'remove'>('add')
   const [dragDesk, setDragDesk] = useState<string | null>(null)
   const [dragFurniture, setDragFurniture] = useState<string | null>(null)
   const [hoveredCell, setHoveredCell] = useState<string | null>(null)
   const [selectedFurniture, setSelectedFurniture] = useState<string | null>(null)
+  const [confirmClear, setConfirmClear] = useState(false)
 
   const furniture = layout.furniture || []
 
@@ -53,10 +58,6 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
 
   const minFurnitureRow = furniture.length > 0 ? Math.min(0, ...furniture.map(f => f.row)) : 0
   const extraRowsAbove = Math.abs(Math.min(0, minFurnitureRow))
-  const maxFurnitureRow = furniture.length > 0
-    ? Math.max(layout.rows - 1, ...furniture.map(f => f.row + getEffectiveSpan(f).rs - 1))
-    : layout.rows - 1
-
   const renderStartRow = minFurnitureRow < 0 ? minFurnitureRow : 0
 
   function isCellOccupiedByFurniture(row: number, col: number, excludeId?: string) {
@@ -128,7 +129,13 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
   }
 
   function clearAll() {
+    if (!confirmClear) {
+      setConfirmClear(true)
+      setTimeout(() => setConfirmClear(false), 3000)
+      return
+    }
     onLayoutChange({ ...layout, desks: [], furniture: [] })
+    setConfirmClear(false)
     addToast('Layout cleared', 'info')
   }
 
@@ -311,6 +318,45 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
     addToast(`Filled with ${newDesks.length} single desks`)
   }
 
+  function exportLayout() {
+    const data = JSON.stringify({ layout }, null, 2)
+    const blob = new Blob([data], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${layout.name.replace(/[^a-zA-Z0-9-_ ]/g, '')}-layout.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    addToast('Layout exported')
+  }
+
+  function importLayout() {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (!file) return
+      const reader = new FileReader()
+      reader.onload = (evt) => {
+        try {
+          const parsed = JSON.parse(evt.target?.result as string)
+          if (parsed.layout && Array.isArray(parsed.layout.desks)) {
+            onLayoutChange(parsed.layout)
+            addToast(`Imported "${parsed.layout.name || 'layout'}"`)
+          } else {
+            addToast('Invalid layout file', 'warning')
+          }
+        } catch {
+          addToast('Could not parse JSON file', 'warning')
+        }
+      }
+      reader.onerror = () => addToast('Failed to read file', 'warning')
+      reader.readAsText(file)
+    }
+    input.click()
+  }
+
   const totalSeats = layout.desks.reduce((s, d) => s + (d.type === 'double' ? 2 : 1), 0)
 
   function getCatalogInfo(type: FurnitureType) {
@@ -341,7 +387,8 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
           <input
             type="text"
             value={layout.name}
-            onChange={e => onLayoutChange({ ...layout, name: e.target.value })}
+            onChange={e => { if (e.target.value.length <= 60) onLayoutChange({ ...layout, name: e.target.value }) }}
+            maxLength={60}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-gray-50 hover:bg-white transition-colors w-44"
           />
         </div>
@@ -378,6 +425,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
         <div className="flex rounded-xl overflow-hidden border border-gray-200 shadow-sm">
           <button
             onClick={() => setTool('add')}
+            aria-pressed={tool === 'add'}
             className={`px-4 py-2 text-sm font-semibold transition-all ${
               tool === 'add'
                 ? 'bg-blue-600 text-white shadow-inner'
@@ -388,6 +436,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
           </button>
           <button
             onClick={() => setTool('remove')}
+            aria-pressed={tool === 'remove'}
             className={`px-4 py-2 text-sm font-semibold transition-all border-l border-gray-200 ${
               tool === 'remove'
                 ? 'bg-red-500 text-white shadow-inner'
@@ -402,6 +451,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
         <div className="flex rounded-xl overflow-hidden border border-gray-200 shadow-sm">
           <button
             onClick={() => setDeskType('single')}
+            aria-pressed={deskType === 'single'}
             className={`px-3 py-2 text-sm font-semibold transition-all flex items-center gap-1.5 ${
               deskType === 'single'
                 ? 'bg-indigo-600 text-white'
@@ -415,6 +465,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
           </button>
           <button
             onClick={() => setDeskType('double')}
+            aria-pressed={deskType === 'double'}
             className={`px-3 py-2 text-sm font-semibold transition-all flex items-center gap-1.5 border-l border-gray-200 ${
               deskType === 'double'
                 ? 'bg-indigo-600 text-white'
@@ -432,11 +483,33 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
 
       {/* Quick presets */}
       <div className="flex flex-wrap gap-2">
+        {(onUndo || onRedo) && (
+          <div className="flex gap-1">
+            <button
+              onClick={onUndo}
+              disabled={!canUndo}
+              className="px-3 py-2 text-sm rounded-xl font-semibold transition-all border active:scale-95 bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+              title="Undo (Ctrl+Z)"
+              aria-label="Undo"
+            >
+              ↩ Undo
+            </button>
+            <button
+              onClick={onRedo}
+              disabled={!canRedo}
+              className="px-3 py-2 text-sm rounded-xl font-semibold transition-all border active:scale-95 bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+              title="Redo (Ctrl+Y)"
+              aria-label="Redo"
+            >
+              ↪ Redo
+            </button>
+          </div>
+        )}
         {[
           { label: 'Row of Singles', icon: '▪▪▪▪▪', action: addPresetRow, color: 'bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200' },
           { label: 'Row of Pairs', icon: '▪▪ ▪▪', action: addPresetPairs, color: 'bg-violet-50 text-violet-700 hover:bg-violet-100 border-violet-200' },
           { label: 'Fill Grid', icon: '▦', action: fillClassroom, color: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200' },
-          { label: 'Clear All', icon: '✕', action: clearAll, color: 'bg-red-50 text-red-600 hover:bg-red-100 border-red-200' },
+          { label: confirmClear ? 'Confirm Clear?' : 'Clear All', icon: '✕', action: clearAll, color: confirmClear ? 'bg-red-500 text-white hover:bg-red-600 border-red-500 animate-pulse' : 'bg-red-50 text-red-600 hover:bg-red-100 border-red-200' },
         ].map(p => (
           <button
             key={p.label}
@@ -447,6 +520,22 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
             {p.label}
           </button>
         ))}
+        <div className="flex gap-1 ml-auto">
+          <button
+            onClick={exportLayout}
+            className="px-3 py-2 text-sm rounded-xl font-semibold transition-all border active:scale-95 bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200"
+            title="Export layout as JSON"
+          >
+            ↓ Export
+          </button>
+          <button
+            onClick={importLayout}
+            className="px-3 py-2 text-sm rounded-xl font-semibold transition-all border active:scale-95 bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200"
+            title="Import layout from JSON"
+          >
+            ↑ Import
+          </button>
+        </div>
       </div>
 
       {/* Furniture palette */}
@@ -599,6 +688,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
                         onClick={() => toggleDesk(r, c)}
                         onMouseEnter={() => setHoveredCell(cellKey)}
                         onMouseLeave={() => setHoveredCell(null)}
+                        aria-label={`Double desk at row ${r + 1}, column ${c + 1}. Drag to move or click to remove.`}
                         className="desk-glow rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center cursor-move select-none shadow-lg animate-pop-in"
                         style={{
                           gridColumn: 'span 2',
@@ -634,6 +724,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
                         onClick={() => toggleDesk(r, c)}
                         onMouseEnter={() => setHoveredCell(cellKey)}
                         onMouseLeave={() => setHoveredCell(null)}
+                        aria-label={`Single desk at row ${r + 1}, column ${c + 1}. Drag to move or click to remove.`}
                         className="desk-glow rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 text-white flex items-center justify-center cursor-move select-none shadow-lg animate-pop-in relative"
                         style={{ height: cellSize }}
                       >
@@ -654,9 +745,13 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
                   return (
                     <div
                       key={cellKey}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Empty cell row ${r + 1}, column ${c + 1}. Click to ${tool === 'add' ? 'place' : 'remove'} desk`}
                       onDragOver={e => e.preventDefault()}
                       onDrop={() => handleDrop(r, c)}
                       onClick={() => toggleDesk(r, c)}
+                      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleDesk(r, c) } }}
                       onMouseEnter={() => setHoveredCell(cellKey)}
                       onMouseLeave={() => setHoveredCell(null)}
                       className={`rounded-xl border-2 border-dashed flex items-center justify-center transition-all cursor-pointer ${
@@ -666,7 +761,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
                       }`}
                       style={{ height: cellSize }}
                     >
-                      <svg className="w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                      <svg className="w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                       </svg>
                     </div>

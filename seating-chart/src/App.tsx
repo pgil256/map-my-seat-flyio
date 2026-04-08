@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Tab, ClassroomLayout, Student } from './types'
 import { demoLayout, demoStudents } from './demoData'
 import ClassroomEditor from './components/ClassroomEditor'
@@ -17,12 +17,18 @@ function loadState() {
       }
       return state
     }
-  } catch {}
+  } catch (err) {
+    console.warn('Failed to load saved state:', err)
+  }
   return null
 }
 
 function saveState(layout: ClassroomLayout, students: Student[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ layout, students }))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ layout, students }))
+  } catch (err) {
+    console.warn('Failed to save state to localStorage:', err)
+  }
 }
 
 const defaultLayout: ClassroomLayout = {
@@ -90,6 +96,50 @@ export default function App() {
   const [layout, setLayout] = useState<ClassroomLayout>(() => saved?.layout || defaultLayout)
   const [students, setStudents] = useState<Student[]>(() => saved?.students || [])
   const [toasts, setToasts] = useState<Toast[]>([])
+
+  // ── Undo/Redo for layout ─────────────────────────────────
+  const undoStack = useRef<ClassroomLayout[]>([])
+  const redoStack = useRef<ClassroomLayout[]>([])
+  const skipUndoRef = useRef(false)
+
+  const handleLayoutChange = useCallback((newLayout: ClassroomLayout) => {
+    if (!skipUndoRef.current) {
+      undoStack.current.push(layout)
+      if (undoStack.current.length > 50) undoStack.current.shift()
+      redoStack.current = []
+    }
+    skipUndoRef.current = false
+    setLayout(newLayout)
+  }, [layout])
+
+  const handleUndo = useCallback(() => {
+    if (undoStack.current.length === 0) return
+    redoStack.current.push(layout)
+    skipUndoRef.current = true
+    setLayout(undoStack.current.pop()!)
+  }, [layout])
+
+  const handleRedo = useCallback(() => {
+    if (redoStack.current.length === 0) return
+    undoStack.current.push(layout)
+    skipUndoRef.current = true
+    setLayout(redoStack.current.pop()!)
+  }, [layout])
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey && activeTab === 'layout') {
+        e.preventDefault()
+        handleUndo()
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey)) && activeTab === 'layout') {
+        e.preventDefault()
+        handleRedo()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [activeTab, handleUndo, handleRedo])
 
   useEffect(() => {
     saveState(layout, students)
@@ -160,7 +210,7 @@ export default function App() {
           </div>
 
           <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 mb-3">
-            Seating Chart Builder
+            Map My Seat
           </h1>
           <p className="text-lg text-gray-500 mb-10 max-w-md mx-auto leading-relaxed">
             Design your classroom layout, import your roster, and generate optimized seating assignments in seconds.
@@ -206,6 +256,16 @@ export default function App() {
               </div>
             </button>
           </div>
+
+          {/* Continue button when data exists */}
+          {hasExistingData && (
+            <button
+              onClick={() => setShowWelcome(false)}
+              className="mt-6 w-full max-w-[calc(50%+50%+16px)] text-center py-3 rounded-xl border-2 border-dashed border-gray-300 text-gray-500 font-semibold text-sm hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50/50 transition-all active:scale-[0.98]"
+            >
+              Continue where you left off ({layout.desks.length} desks, {students.length} students)
+            </button>
+          )}
 
           {/* Features preview */}
           <div className="mt-12 flex items-center justify-center gap-8 text-xs text-gray-400 font-medium">
@@ -283,23 +343,27 @@ export default function App() {
               </svg>
             </button>
             <div>
-              <h1 className="text-xl font-bold tracking-tight">Seating Chart Builder</h1>
+              <h1 className="text-xl font-bold tracking-tight">Map My Seat</h1>
               <p className="text-xs text-blue-100 font-medium">Design, import, arrange</p>
             </div>
           </div>
 
           {/* Stats pills */}
           <div className="flex gap-2">
-            {[
-              { label: 'Desks', value: layout.desks.length, color: layout.desks.length > 0 ? 'bg-blue-500/30' : 'bg-white/15' },
-              { label: 'Seats', value: totalSeats, color: totalSeats > 0 ? 'bg-indigo-500/30' : 'bg-white/15' },
-              { label: 'Students', value: students.length, color: students.length > 0 ? 'bg-emerald-500/30' : 'bg-white/15' },
-            ].map(stat => (
-              <div key={stat.label} className={`${stat.color} backdrop-blur rounded-lg px-3 py-1.5 text-center min-w-[68px] transition-colors`}>
-                <div className="text-lg font-bold leading-tight">{stat.value}</div>
-                <div className="text-[10px] text-blue-100 uppercase tracking-wider font-medium">{stat.label}</div>
-              </div>
-            ))}
+            {(() => {
+              const hasMismatch = students.length > 0 && totalSeats > 0 && students.length !== totalSeats
+              const tooMany = students.length > totalSeats
+              return [
+                { label: 'Desks', value: layout.desks.length, color: layout.desks.length > 0 ? 'bg-blue-500/30' : 'bg-white/15' },
+                { label: 'Seats', value: totalSeats, color: hasMismatch && !tooMany ? 'bg-amber-500/40' : totalSeats > 0 ? 'bg-indigo-500/30' : 'bg-white/15' },
+                { label: 'Students', value: students.length, color: tooMany ? 'bg-red-500/40' : students.length > 0 ? 'bg-emerald-500/30' : 'bg-white/15' },
+              ].map(stat => (
+                <div key={stat.label} className={`${stat.color} backdrop-blur rounded-lg px-3 py-1.5 text-center min-w-[68px] transition-colors`}>
+                  <div className="text-lg font-bold leading-tight">{stat.value}</div>
+                  <div className="text-[10px] text-blue-100 uppercase tracking-wider font-medium">{stat.label}</div>
+                </div>
+              ))
+            })()}
           </div>
         </div>
       </header>
@@ -374,9 +438,13 @@ export default function App() {
           {activeTab === 'layout' && (
             <ClassroomEditor
               layout={layout}
-              onLayoutChange={setLayout}
+              onLayoutChange={handleLayoutChange}
               onNext={() => setActiveTab('students')}
               addToast={addToast}
+              onUndo={handleUndo}
+              onRedo={handleRedo}
+              canUndo={undoStack.current.length > 0}
+              canRedo={redoStack.current.length > 0}
             />
           )}
           {activeTab === 'students' && (
@@ -400,7 +468,7 @@ export default function App() {
       </main>
 
       {/* ── Toasts ────────────────────────────────────────── */}
-      <div className="fixed bottom-6 right-6 flex flex-col gap-2 z-50">
+      <div className="fixed bottom-6 right-6 flex flex-col gap-2 z-50" role="status" aria-live="polite">
         {toasts.map(toast => (
           <div
             key={toast.id}

@@ -2,6 +2,8 @@ import { useRef, useState, useCallback } from 'react'
 import { Student } from '../types'
 import { parseGradebookCSV } from '../utils/seatingAlgorithm'
 
+let manualIdCounter = 0
+
 interface Props {
   students: Student[]
   onStudentsChange: (students: Student[]) => void
@@ -43,6 +45,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
   const [editName, setEditName] = useState('')
   const [search, setSearch] = useState('')
   const [isDragOver, setIsDragOver] = useState(false)
+  const [confirmClear, setConfirmClear] = useState(false)
 
   function handleCSV(text: string) {
     const parsed = parseGradebookCSV(text)
@@ -59,6 +62,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
     if (!file) return
     const reader = new FileReader()
     reader.onload = (evt) => handleCSV(evt.target?.result as string)
+    reader.onerror = () => addToast('Failed to read file', 'warning')
     reader.readAsText(file)
     e.target.value = ''
   }
@@ -77,6 +81,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
     if (file && (file.name.endsWith('.csv') || file.type === 'text/csv')) {
       const reader = new FileReader()
       reader.onload = (evt) => handleCSV(evt.target?.result as string)
+      reader.onerror = () => addToast('Failed to read file', 'warning')
       reader.readAsText(file)
     } else {
       addToast('Please drop a .csv file', 'warning')
@@ -84,17 +89,27 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
   }, [])
 
   function addStudent() {
-    if (!addName.trim()) return
+    const trimmed = addName.trim()
+    if (!trimmed) return
+    if (trimmed.length > 100) {
+      addToast('Name is too long (max 100 characters)', 'warning')
+      return
+    }
+    const isDuplicate = students.some(s => s.name.toLowerCase() === trimmed.toLowerCase())
+    if (isDuplicate) {
+      addToast(`"${trimmed}" is already in the roster`, 'warning')
+      return
+    }
     const newStudent: Student = {
-      id: `manual_${Date.now()}`,
-      name: addName.trim(),
+      id: `manual_${++manualIdCounter}_${Math.random().toString(36).slice(2, 8)}`,
+      name: trimmed,
       grade: '',
       scores: {},
       performanceLevel: 'ungraded',
     }
     onStudentsChange([...students, newStudent])
     setAddName('')
-    addToast(`Added ${addName.trim()}`)
+    addToast(`Added ${trimmed}`)
   }
 
   function removeStudent(id: string) {
@@ -173,6 +188,9 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
 
       {/* ── Drag-drop upload zone ──────────────────────────── */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Upload CSV file. Click to browse or drag and drop."
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -180,6 +198,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
           isDragOver ? 'dropzone-active !border-blue-400' : ''
         }`}
         onClick={() => fileInputRef.current?.click()}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click() } }}
       >
         <input
           ref={fileInputRef}
@@ -210,6 +229,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
             onChange={e => setAddName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addStudent()}
             placeholder="Type a student name (Last, First) and press Enter"
+            maxLength={100}
             className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-gray-50 hover:bg-white transition-colors placeholder:text-gray-400"
           />
           <button
@@ -231,12 +251,22 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
             {students.length > 0 && (
               <button
                 onClick={() => {
+                  if (!confirmClear) {
+                    setConfirmClear(true)
+                    setTimeout(() => setConfirmClear(false), 3000)
+                    return
+                  }
                   onStudentsChange([])
+                  setConfirmClear(false)
                   addToast('All students removed', 'info')
                 }}
-                className="text-xs text-red-500 hover:text-red-700 font-medium transition-colors"
+                className={`text-xs font-medium transition-all ${
+                  confirmClear
+                    ? 'text-white bg-red-500 px-2 py-0.5 rounded-md animate-pulse'
+                    : 'text-red-500 hover:text-red-700'
+                }`}
               >
-                Clear all
+                {confirmClear ? 'Click again to confirm' : 'Clear all'}
               </button>
             )}
           </div>
@@ -286,7 +316,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
           </div>
         ) : (
           <div className="space-y-1 max-h-[440px] overflow-y-auto custom-scroll stagger-children">
-            {filtered.map((student, i) => {
+            {filtered.map((student) => {
               const ls = levelStyles[student.performanceLevel]
               return (
                 <div
@@ -333,7 +363,8 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
                   {/* Delete */}
                   <button
                     onClick={() => removeStudent(student.id)}
-                    className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-300 hover:text-red-500 hover:bg-red-50 transition-all opacity-0 group-hover:opacity-100"
+                    aria-label={`Remove ${student.name}`}
+                    className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-200 hover:text-red-500 hover:bg-red-50 transition-all sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
                     title="Remove student"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>

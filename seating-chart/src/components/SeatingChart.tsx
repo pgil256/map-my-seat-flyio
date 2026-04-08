@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react'
+import React, { useState, useRef, useMemo, useCallback } from 'react'
 import { ClassroomLayout, Student, SeatAssignment, SeatingConfig, FurnitureType } from '../types'
 import { generateSeatingChart } from '../utils/seatingAlgorithm'
 
@@ -113,6 +113,10 @@ const strategies: { key: SeatingConfig['strategy']; label: string; description: 
   },
 ]
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+}
+
 function buildPrintDocument(title: string, contentHtml: string): string {
   const styles = [
     '* { margin: 0; padding: 0; box-sizing: border-box; }',
@@ -142,7 +146,7 @@ function buildPrintDocument(title: string, contentHtml: string): string {
     '@media print { body { padding: 12px; } }',
   ].join('\n')
 
-  return `<!DOCTYPE html><html><head><title>${title}</title><style>${styles}</style></head><body>${contentHtml}</body></html>`
+  return `<!DOCTYPE html><html><head><title>${escapeHtml(title)}</title><style>${styles}</style></head><body>${contentHtml}</body></html>`
 }
 
 // ── Component ────────────────────────────────────────────
@@ -182,7 +186,7 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
       : 'Reshuffled!')
   }
 
-  function handleSeatClick(deskId: string, seatIndex: number) {
+  const handleSeatClick = useCallback(function handleSeatClick(deskId: string, seatIndex: number) {
     if (!swapMode) return
     const key = `${deskId}-${seatIndex}`
     if (lockedSeats.has(key)) {
@@ -210,9 +214,9 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
       }
       setSwapFirst(null)
     }
-  }
+  }, [swapMode, swapFirst, assignments, lockedSeats, addToast])
 
-  function toggleLock(deskId: string, seatIndex: number) {
+  const toggleLock = useCallback(function toggleLock(deskId: string, seatIndex: number) {
     const key = `${deskId}-${seatIndex}`
     setLockedSeats(prev => {
       const next = new Set(prev)
@@ -220,12 +224,19 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
       else next.add(key)
       return next
     })
-  }
+  }, [])
+
+  const studentMap = useMemo(() => new Map(students.map(s => [s.id, s])), [students])
+  const assignmentMap = useMemo(() => {
+    const m = new Map<string, SeatAssignment>()
+    for (const a of assignments) m.set(`${a.deskId}-${a.seatIndex}`, a)
+    return m
+  }, [assignments])
 
   function getStudentForSeat(deskId: string, seatIndex: number): Student | undefined {
-    const assignment = assignments.find(a => a.deskId === deskId && a.seatIndex === seatIndex)
+    const assignment = assignmentMap.get(`${deskId}-${seatIndex}`)
     if (!assignment) return undefined
-    return students.find(s => s.id === assignment.studentId)
+    return studentMap.get(assignment.studentId)
   }
 
   const totalSeats = layout.desks.reduce((s, d) => s + (d.type === 'double' ? 2 : 1), 0)
@@ -241,10 +252,12 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
     const content = printRef.current
     if (!content) return
     const win = window.open('', '_blank')
-    if (!win) return
+    if (!win) {
+      addToast('Pop-up blocked — please allow pop-ups for this site', 'warning')
+      return
+    }
 
     const title = `${layout.name} - Seating Chart`
-    // The content comes from our own React-rendered DOM, not user input
     const doc = buildPrintDocument(title, content.innerHTML)
     win.document.open()
     win.document.writeln(doc)
@@ -261,8 +274,8 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
 
     if (!student) {
       return (
-        <div className="flex-1 flex items-center justify-center p-1 bg-gray-50/50">
-          <span className="text-[10px] text-gray-300 font-medium">Empty</span>
+        <div className="flex-1 flex items-center justify-center p-1 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,rgba(0,0,0,0.02)_4px,rgba(0,0,0,0.02)_8px)]">
+          <span className="text-[9px] text-gray-200 select-none">—</span>
         </div>
       )
     }
@@ -271,8 +284,15 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
 
     return (
       <div
+        role="button"
+        tabIndex={0}
+        aria-label={`${student.name}, ${lc.label} performer${isLocked ? ', locked' : ''}${isSwapSelected ? ', selected for swap' : ''}`}
         onClick={() => handleSeatClick(deskId, seatIndex)}
         onDoubleClick={() => toggleLock(deskId, seatIndex)}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSeatClick(deskId, seatIndex) }
+          if (e.key === 'l' || e.key === 'L') toggleLock(deskId, seatIndex)
+        }}
         className={`flex-1 flex flex-col items-center justify-center p-2 bg-gradient-to-b ${lc.gradient} relative group/seat transition-all ${
           swapMode ? 'cursor-pointer hover:ring-2 hover:ring-yellow-400' : ''
         } ${isSwapSelected ? 'swap-highlight ring-2 ring-yellow-400' : ''}`}
@@ -362,10 +382,12 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
 
       {/* ── Strategy cards ─────────────────────────────────── */}
       {!generated && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-fade-in">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-fade-in" role="radiogroup" aria-label="Seating strategy">
           {strategies.map(s => (
             <button
               key={s.key}
+              role="radio"
+              aria-checked={strategy === s.key}
               onClick={() => setStrategy(s.key)}
               className={`strategy-card p-4 rounded-xl border-2 text-left cursor-pointer transition-all active:scale-95 ${
                 strategy === s.key
@@ -435,6 +457,7 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
 
             <button
               onClick={() => { setSwapMode(!swapMode); setSwapFirst(null) }}
+              aria-pressed={swapMode}
               className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-2 active:scale-95 ${
                 swapMode
                   ? 'bg-yellow-400 text-yellow-900 shadow-md shadow-yellow-200'

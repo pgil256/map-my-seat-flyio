@@ -110,8 +110,8 @@ export function parseGradebookCSV(csvText: string): Student[] {
     if (!/^\d+$/.test(fields[0].trim())) continue
 
     const studentId = fields[0].trim()
-    const name = fields[1]?.trim() || ''
-    const grade = fields[2]?.trim() || ''
+    const name = (fields[1]?.trim() || '').slice(0, 100)
+    const grade = (fields[2]?.trim() || '').slice(0, 20)
 
     if (!name) continue
 
