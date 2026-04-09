@@ -1,8 +1,7 @@
 import { useRef, useState, useCallback } from 'react'
 import { Student } from '../types'
 import { parseGradebookCSV } from '../utils/seatingAlgorithm'
-
-let manualIdCounter = 0
+import { getInitials, getAvatarColor } from '../utils/helpers'
 
 interface Props {
   students: Student[]
@@ -10,32 +9,6 @@ interface Props {
   onNext: () => void
   onBack: () => void
   addToast: (msg: string, type?: 'success' | 'info' | 'warning') => void
-}
-
-function getInitials(name: string): string {
-  const parts = name.split(',')
-  if (parts.length >= 2) {
-    return (parts[1].trim().charAt(0) + parts[0].trim().charAt(0)).toUpperCase()
-  }
-  const words = name.trim().split(/\s+/)
-  return words.map(w => w.charAt(0)).slice(0, 2).join('').toUpperCase()
-}
-
-const avatarColors = [
-  'from-blue-400 to-blue-600',
-  'from-emerald-400 to-emerald-600',
-  'from-violet-400 to-violet-600',
-  'from-amber-400 to-amber-600',
-  'from-rose-400 to-rose-600',
-  'from-cyan-400 to-cyan-600',
-  'from-fuchsia-400 to-fuchsia-600',
-  'from-teal-400 to-teal-600',
-]
-
-function getAvatarColor(name: string): string {
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = (hash << 5) - hash + name.charCodeAt(i)
-  return avatarColors[Math.abs(hash) % avatarColors.length]
 }
 
 export default function GradebookManager({ students, onStudentsChange, onNext, onBack, addToast }: Props) {
@@ -46,15 +19,26 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
   const [search, setSearch] = useState('')
   const [isDragOver, setIsDragOver] = useState(false)
   const [confirmClear, setConfirmClear] = useState(false)
+  const [isImporting, setIsImporting] = useState(false)
 
   function handleCSV(text: string) {
-    const parsed = parseGradebookCSV(text)
-    if (parsed.length > 0) {
-      onStudentsChange(parsed)
-      addToast(`Imported ${parsed.length} students from CSV`)
-    } else {
-      addToast('No students found in CSV', 'warning')
-    }
+    setIsImporting(true)
+    // Defer parsing to allow the loading state to render
+    setTimeout(() => {
+      try {
+        const parsed = parseGradebookCSV(text)
+        if (parsed.length > 0) {
+          onStudentsChange(parsed)
+          addToast(`Imported ${parsed.length} students from CSV`)
+        } else {
+          addToast('No students found in CSV', 'warning')
+        }
+      } catch {
+        addToast('Failed to parse CSV file', 'warning')
+      } finally {
+        setIsImporting(false)
+      }
+    }, 0)
   }
 
   function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -101,7 +85,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
       return
     }
     const newStudent: Student = {
-      id: `manual_${++manualIdCounter}_${Math.random().toString(36).slice(2, 8)}`,
+      id: `manual_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       name: trimmed,
       grade: '',
       scores: {},
@@ -143,7 +127,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
     )
   }
 
-  const levelStyles: Record<Student['performanceLevel'], { bg: string; text: string; label: string; dot: string }> = {
+  const levelStylesMap: Record<Student['performanceLevel'], { bg: string; text: string; label: string; dot: string }> = {
     high:     { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'High',   dot: 'bg-emerald-400' },
     medium:   { bg: 'bg-amber-50',   text: 'text-amber-700',   label: 'Medium', dot: 'bg-amber-400' },
     low:      { bg: 'bg-red-50',     text: 'text-red-700',     label: 'Low',    dot: 'bg-red-400' },
@@ -164,22 +148,22 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
   return (
     <div className="flex flex-col gap-6">
       {/* ── Header ─────────────────────────────────────────── */}
-      <div className="flex items-end justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Student Roster</h2>
-          <p className="text-sm text-gray-500 mt-1">Import a CSV gradebook or add students manually. Click the level badge to adjust.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Student Roster</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">Import a CSV gradebook or add students manually. Click the level badge to adjust.</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={onBack}
-            className="px-4 py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold text-sm transition-all active:scale-95"
+            className="px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold text-sm transition-all active:scale-95"
           >
             &larr; Layout
           </button>
           <button
             onClick={onNext}
             disabled={students.length === 0}
-            className="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-sm transition-all shadow-md shadow-blue-200 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
+            className="px-4 sm:px-5 py-2 sm:py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold text-sm transition-all shadow-md shadow-blue-200 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
           >
             Next: Generate Chart &rarr;
           </button>
@@ -196,7 +180,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
         onDrop={handleDrop}
         className={`card p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer ${
           isDragOver ? 'dropzone-active !border-blue-400' : ''
-        }`}
+        } ${isImporting ? 'pointer-events-none opacity-60' : ''}`}
         onClick={() => fileInputRef.current?.click()}
         onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click() } }}
       >
@@ -208,14 +192,14 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
           className="hidden"
         />
         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-colors ${
-          isDragOver ? 'bg-blue-100' : 'bg-gray-100'
+          isImporting ? 'bg-blue-100 animate-pulse' : isDragOver ? 'bg-blue-100' : 'bg-gray-100'
         }`}>
-          <svg className={`w-7 h-7 ${isDragOver ? 'text-blue-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+          <svg className={`w-7 h-7 ${isImporting || isDragOver ? 'text-blue-600' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
           </svg>
         </div>
         <p className="text-sm font-semibold text-gray-700">
-          {isDragOver ? 'Drop your CSV here' : 'Drag & drop a CSV file, or click to browse'}
+          {isImporting ? 'Importing students...' : isDragOver ? 'Drop your CSV here' : 'Drag & drop a CSV file, or click to browse'}
         </p>
         <p className="text-xs text-gray-400 mt-1">Supports standard gradebook exports (Student ID, Name, Grade, Scores)</p>
       </div>
@@ -243,9 +227,9 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
       </div>
 
       {/* ── Student list ───────────────────────────────────── */}
-      <div className="card p-5">
+      <div className="card p-3 sm:p-5">
         {/* List header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-3">
             <h3 className="text-lg font-bold text-gray-900">{students.length} Students</h3>
             {students.length > 0 && (
@@ -276,9 +260,9 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
             {(['high', 'medium', 'low', 'ungraded'] as const).map(level => (
               <div
                 key={level}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${levelStyles[level].bg} ${levelStyles[level].text}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold ${levelStylesMap[level].bg} ${levelStylesMap[level].text}`}
               >
-                <div className={`w-2 h-2 rounded-full ${levelStyles[level].dot}`} />
+                <div className={`w-2 h-2 rounded-full ${levelStylesMap[level].dot}`} />
                 {counts[level]}
               </div>
             ))}
@@ -317,7 +301,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
         ) : (
           <div className="space-y-1 max-h-[440px] overflow-y-auto custom-scroll stagger-children">
             {filtered.map((student) => {
-              const ls = levelStyles[student.performanceLevel]
+              const ls = levelStylesMap[student.performanceLevel]
               return (
                 <div
                   key={student.id}

@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd seating-chart && npm run build",
+  "outputDirectory": "seating-chart/dist",
+  "installCommand": "cd seating-chart && npm install",
+  "framework": "vite"
+}

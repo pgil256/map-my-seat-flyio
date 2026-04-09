@@ -1,73 +1,13 @@
 import React, { useState, useRef, useMemo, useCallback } from 'react'
-import { ClassroomLayout, Student, SeatAssignment, SeatingConfig, FurnitureType } from '../types'
+import { ClassroomLayout, Student, SeatAssignment, SeatingConfig } from '../types'
 import { generateSeatingChart } from '../utils/seatingAlgorithm'
+import { getInitials, getDisplayName, getAvatarColor, getEffectiveSpan, furnitureConfig, levelConfig, escapeHtml } from '../utils/helpers'
 
 interface Props {
   layout: ClassroomLayout
   students: Student[]
   onBack: () => void
   addToast: (msg: string, type?: 'success' | 'info' | 'warning') => void
-}
-
-// ── Helpers ──────────────────────────────────────────────
-function getDisplayName(student: Student): string {
-  const parts = student.name.split(',')
-  if (parts.length >= 2) {
-    const firstName = parts[1].trim().split(' ')[0]
-    const last = parts[0].trim()
-    return `${firstName} ${last.charAt(0)}.`
-  }
-  return student.name
-}
-
-function getInitials(name: string): string {
-  const parts = name.split(',')
-  if (parts.length >= 2) {
-    return (parts[1].trim().charAt(0) + parts[0].trim().charAt(0)).toUpperCase()
-  }
-  const words = name.trim().split(/\s+/)
-  return words.map(w => w.charAt(0)).slice(0, 2).join('').toUpperCase()
-}
-
-const levelConfig = {
-  high:     { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-800', gradient: 'from-emerald-50 to-emerald-100', dot: 'bg-emerald-400', ring: 'ring-emerald-200', label: 'High' },
-  medium:   { bg: 'bg-amber-50',   border: 'border-amber-200',   text: 'text-amber-800',   gradient: 'from-amber-50 to-amber-100',   dot: 'bg-amber-400',   ring: 'ring-amber-200',   label: 'Medium' },
-  low:      { bg: 'bg-red-50',     border: 'border-red-200',     text: 'text-red-800',     gradient: 'from-red-50 to-red-100',       dot: 'bg-red-400',     ring: 'ring-red-200',     label: 'Low' },
-  ungraded: { bg: 'bg-slate-50',   border: 'border-slate-200',   text: 'text-slate-700',   gradient: 'from-slate-50 to-slate-100',   dot: 'bg-slate-400',   ring: 'ring-slate-200',   label: 'N/A' },
-}
-
-const furnitureConfig: Record<FurnitureType, { icon: string; color: string }> = {
-  'teacher-desk':    { icon: '🖥️', color: 'from-gray-600 to-gray-800' },
-  'student-desk':    { icon: '🪑', color: 'from-blue-500 to-cyan-600' },
-  'bookshelf':       { icon: '📚', color: 'from-amber-600 to-amber-800' },
-  'filing-cabinet':  { icon: '🗄️', color: 'from-slate-500 to-slate-700' },
-  'rug':             { icon: '🟫', color: 'from-orange-400 to-orange-600' },
-  'table':           { icon: '🍽️', color: 'from-yellow-600 to-yellow-800' },
-  'whiteboard':      { icon: '📋', color: 'from-sky-400 to-sky-600' },
-  'door':            { icon: '🚪', color: 'from-stone-500 to-stone-700' },
-  'window':          { icon: '🪟', color: 'from-cyan-400 to-cyan-600' },
-}
-
-function getEffectiveSpan(f: { colSpan: number; rowSpan: number; rotated?: boolean }) {
-  if (f.rotated) return { cs: f.rowSpan || 1, rs: f.colSpan || 1 }
-  return { cs: f.colSpan || 1, rs: f.rowSpan || 1 }
-}
-
-const avatarColors = [
-  'from-blue-400 to-blue-600',
-  'from-emerald-400 to-emerald-600',
-  'from-violet-400 to-violet-600',
-  'from-amber-400 to-amber-600',
-  'from-rose-400 to-rose-600',
-  'from-cyan-400 to-cyan-600',
-  'from-fuchsia-400 to-fuchsia-600',
-  'from-teal-400 to-teal-600',
-]
-
-function getAvatarColor(name: string): string {
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = (hash << 5) - hash + name.charCodeAt(i)
-  return avatarColors[Math.abs(hash) % avatarColors.length]
 }
 
 const strategies: { key: SeatingConfig['strategy']; label: string; description: string; icon: React.ReactNode }[] = [
@@ -112,10 +52,6 @@ const strategies: { key: SeatingConfig['strategy']; label: string; description: 
     ),
   },
 ]
-
-function escapeHtml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-}
 
 function buildPrintDocument(title: string, contentHtml: string): string {
   const styles = [
@@ -312,7 +248,7 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
         </div>
 
         <span className={`text-[11px] font-semibold leading-tight text-center ${lc.text}`}>
-          {getDisplayName(student)}
+          {getDisplayName(student.name)}
         </span>
 
         <div className={`w-1.5 h-1.5 rounded-full ${lc.dot} mt-1`} />
@@ -323,7 +259,7 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
   // ── Empty states ───────────────────────────────────────
   if (layout.desks.length === 0) {
     return (
-      <div className="card p-16 text-center animate-fade-in">
+      <div className="card p-8 sm:p-16 text-center animate-fade-in">
         <div className="w-20 h-20 rounded-3xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
           <svg className="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
             <rect x="3" y="3" width="7" height="7" rx="1.5" />
@@ -343,7 +279,7 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
 
   if (students.length === 0) {
     return (
-      <div className="card p-16 text-center animate-fade-in">
+      <div className="card p-8 sm:p-16 text-center animate-fade-in">
         <div className="w-20 h-20 rounded-3xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
           <svg className="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
@@ -363,10 +299,10 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
   return (
     <div className="flex flex-col gap-6">
       {/* ── Header ─────────────────────────────────────────── */}
-      <div className="flex items-end justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Seating Chart</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Seating Chart</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">
             {generated
               ? 'Click two seats in swap mode to exchange. Double-click to lock a seat from reshuffling.'
               : 'Pick a seating strategy, then generate your chart.'}
@@ -410,7 +346,7 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
       )}
 
       {/* ── Generate / Controls ────────────────────────────── */}
-      <div className="card p-4 flex flex-wrap items-center gap-3">
+      <div className="card p-3 sm:p-4 flex flex-wrap items-center gap-2 sm:gap-3">
         {generated && (
           <div className="flex items-center gap-2">
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Strategy</label>
@@ -528,7 +464,7 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
       {/* ── Chart ──────────────────────────────────────────── */}
       {generated && (
         <div ref={printRef}>
-          <div className="card p-8 overflow-auto">
+          <div className="card p-3 sm:p-8 overflow-auto">
             <h1 className="text-xl font-bold text-gray-900 mb-0.5">{layout.name}</h1>
             <p className="text-xs text-gray-400 mb-5">
               {students.length} students &middot; Strategy: {strategy} &middot; Generated {new Date().toLocaleDateString()}
@@ -652,7 +588,7 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
 
       {/* ── Roster list ────────────────────────────────────── */}
       {generated && (
-        <div className="card p-6 animate-slide-up">
+        <div className="card p-3 sm:p-6 animate-slide-up">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Seat Assignments</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 stagger-children">
             {assignments.map(a => {

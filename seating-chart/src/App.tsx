@@ -6,26 +6,32 @@ import GradebookManager from './components/GradebookManager'
 import SeatingChart from './components/SeatingChart'
 
 const STORAGE_KEY = 'seating-chart-state'
+const STORAGE_VERSION = 2
 
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (raw) {
       const state = JSON.parse(raw)
+      if (state.version && state.version > STORAGE_VERSION) {
+        console.warn('Saved state is from a newer version, ignoring')
+        return null
+      }
       if (state.layout && !state.layout.furniture) {
         state.layout.furniture = []
       }
       return state
     }
   } catch (err) {
-    console.warn('Failed to load saved state:', err)
+    console.warn('Failed to load saved state, resetting:', err)
+    localStorage.removeItem(STORAGE_KEY)
   }
   return null
 }
 
 function saveState(layout: ClassroomLayout, students: Student[]) {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ layout, students }))
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: STORAGE_VERSION, layout, students }))
   } catch (err) {
     console.warn('Failed to save state to localStorage:', err)
   }
@@ -302,6 +308,7 @@ export default function App() {
   // ── Main App ──────────────────────────────────────────────
   return (
     <div className="min-h-screen flex flex-col">
+      <a href="#main-content" className="skip-link">Skip to content</a>
       {/* ── Demo Banner ──────────────────────────────────────── */}
       {isDemo && (
         <div className="bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-300 text-amber-900 animate-slide-down">
@@ -328,12 +335,13 @@ export default function App() {
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/5 rounded-full blur-2xl" />
         <div className="absolute -bottom-8 -left-8 w-36 h-36 bg-white/5 rounded-full blur-xl" />
 
-        <div className="relative max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="relative max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-5 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setShowWelcome(true)}
-              className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center text-xl shadow-lg hover:bg-white/25 transition-colors"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center text-xl shadow-lg hover:bg-white/25 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
               title="Back to home"
+              aria-label="Back to home"
             >
               <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth="1.8">
                 <rect x="3" y="3" width="7" height="7" rx="1.5" />
@@ -349,7 +357,7 @@ export default function App() {
           </div>
 
           {/* Stats pills */}
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 sm:gap-2">
             {(() => {
               const hasMismatch = students.length > 0 && totalSeats > 0 && students.length !== totalSeats
               const tooMany = students.length > totalSeats
@@ -358,9 +366,9 @@ export default function App() {
                 { label: 'Seats', value: totalSeats, color: hasMismatch && !tooMany ? 'bg-amber-500/40' : totalSeats > 0 ? 'bg-indigo-500/30' : 'bg-white/15' },
                 { label: 'Students', value: students.length, color: tooMany ? 'bg-red-500/40' : students.length > 0 ? 'bg-emerald-500/30' : 'bg-white/15' },
               ].map(stat => (
-                <div key={stat.label} className={`${stat.color} backdrop-blur rounded-lg px-3 py-1.5 text-center min-w-[68px] transition-colors`}>
-                  <div className="text-lg font-bold leading-tight">{stat.value}</div>
-                  <div className="text-[10px] text-blue-100 uppercase tracking-wider font-medium">{stat.label}</div>
+                <div key={stat.label} className={`${stat.color} backdrop-blur rounded-lg px-2 sm:px-3 py-1 sm:py-1.5 text-center min-w-[52px] sm:min-w-[68px] transition-colors`}>
+                  <div className="text-base sm:text-lg font-bold leading-tight">{stat.value}</div>
+                  <div className="text-[9px] sm:text-[10px] text-blue-100 uppercase tracking-wider font-medium">{stat.label}</div>
                 </div>
               ))
             })()}
@@ -370,18 +378,21 @@ export default function App() {
 
       {/* ── Stepper ───────────────────────────────────────── */}
       <div className="bg-white border-b border-gray-100 shadow-sm">
-        <div className="max-w-3xl mx-auto px-6 py-4">
-          <div className="flex items-center">
+        <div className="max-w-3xl mx-auto px-3 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center" role="tablist" aria-label="Setup steps">
             {steps.map((step, i) => {
               const status = stepStatus(i)
               return (
                 <div key={step.key} className="flex items-center flex-1 last:flex-initial">
                   <button
+                    role="tab"
+                    aria-selected={status === 'active'}
+                    aria-label={`${step.label}: ${step.description}${status === 'done' ? ' (completed)' : ''}`}
                     onClick={() => setActiveTab(step.key)}
-                    className="flex items-center gap-3 group cursor-pointer"
+                    className="flex items-center gap-2 sm:gap-3 group cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg p-1"
                   >
                     <div
-                      className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                      className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                         status === 'active'
                           ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 scale-110'
                           : status === 'done'
@@ -411,7 +422,7 @@ export default function App() {
                   </button>
 
                   {i < steps.length - 1 && (
-                    <div className="flex-1 mx-4">
+                    <div className="flex-1 mx-2 sm:mx-4">
                       <div
                         className="step-connector rounded-full"
                         style={{
@@ -433,7 +444,7 @@ export default function App() {
       </div>
 
       {/* ── Content ───────────────────────────────────────── */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-6 py-8">
+      <main id="main-content" className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-8">
         <div key={activeTab} className="animate-fade-in">
           {activeTab === 'layout' && (
             <ClassroomEditor

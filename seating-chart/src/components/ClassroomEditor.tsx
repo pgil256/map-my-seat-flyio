@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { ClassroomLayout, Desk, FurnitureItem, FurnitureType } from '../types'
+import { getEffectiveSpan } from '../utils/helpers'
 
 interface Props {
   layout: ClassroomLayout
@@ -12,14 +13,12 @@ interface Props {
   canRedo?: boolean
 }
 
-let deskIdCounter = 0
 function nextDeskId() {
-  return `desk_${++deskIdCounter}_${Math.random().toString(36).slice(2, 8)}`
+  return `desk_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 }
 
-let furnitureIdCounter = 0
 function nextFurnitureId() {
-  return `furniture_${++furnitureIdCounter}_${Math.random().toString(36).slice(2, 8)}`
+  return `furniture_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
 }
 
 const FURNITURE_CATALOG: { type: FurnitureType; label: string; icon: string; colSpan: number; rowSpan: number; color: string }[] = [
@@ -33,14 +32,6 @@ const FURNITURE_CATALOG: { type: FurnitureType; label: string; icon: string; col
   { type: 'door',          label: 'Door',            icon: '🚪', colSpan: 1, rowSpan: 1, color: 'from-stone-500 to-stone-700' },
   { type: 'window',        label: 'Window',          icon: '🪟', colSpan: 1, rowSpan: 1, color: 'from-cyan-400 to-cyan-600' },
 ]
-
-/** Get the effective colSpan/rowSpan accounting for rotation */
-function getEffectiveSpan(f: FurnitureItem): { cs: number; rs: number } {
-  if (f.rotated) {
-    return { cs: f.rowSpan || 1, rs: f.colSpan || 1 }
-  }
-  return { cs: f.colSpan || 1, rs: f.rowSpan || 1 }
-}
 
 export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToast, onUndo, onRedo, canUndo, canRedo }: Props) {
   const [deskType, setDeskType] = useState<'single' | 'double'>('single')
@@ -366,10 +357,10 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
   return (
     <div className="flex flex-col gap-6">
       {/* Section header */}
-      <div className="flex items-end justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Classroom Layout</h2>
-          <p className="text-sm text-gray-500 mt-1">Click cells to place desks. Drag furniture to rearrange. Click furniture to select, then rotate or remove.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Classroom Layout</h2>
+          <p className="text-xs sm:text-sm text-gray-500 mt-1">Click cells to place desks. Drag furniture to rearrange. Click furniture to select, then rotate or remove.</p>
         </div>
         <button
           onClick={onNext}
@@ -380,7 +371,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
       </div>
 
       {/* Toolbar */}
-      <div className="card p-4 flex flex-wrap items-center gap-3">
+      <div className="card p-3 sm:p-4 flex flex-wrap items-center gap-2 sm:gap-3">
         {/* Name */}
         <div className="flex items-center gap-2">
           <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</label>
@@ -560,7 +551,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
       </div>
 
       {/* Grid */}
-      <div className="card p-6 overflow-auto">
+      <div className="card p-3 sm:p-6 overflow-auto">
         {/* Front label */}
         <div className="flex flex-col items-center mb-4">
           <div className="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold mb-2">Front of Classroom</div>
