@@ -409,15 +409,16 @@ export default function App() {
                       )}
                     </div>
 
-                    <div className="hidden sm:block text-left">
+                    <div className="text-left">
                       <div
-                        className={`text-sm font-semibold transition-colors ${
+                        className={`text-xs sm:text-sm font-semibold transition-colors ${
                           status === 'active' ? 'text-blue-700' : status === 'done' ? 'text-emerald-700' : 'text-gray-400'
                         }`}
                       >
-                        {step.label}
+                        <span className="sm:hidden">{step.key === 'layout' ? 'Layout' : step.key === 'students' ? 'Students' : 'Chart'}</span>
+                        <span className="hidden sm:inline">{step.label}</span>
                       </div>
-                      <div className="text-xs text-gray-400">{step.description}</div>
+                      <div className="text-xs text-gray-400 hidden sm:block">{step.description}</div>
                     </div>
                   </button>
 

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ClassroomLayout, Desk, FurnitureItem, FurnitureType } from '../types'
 import { getEffectiveSpan } from '../utils/helpers'
 
@@ -41,6 +41,17 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
   const [hoveredCell, setHoveredCell] = useState<string | null>(null)
   const [selectedFurniture, setSelectedFurniture] = useState<string | null>(null)
   const [confirmClear, setConfirmClear] = useState(false)
+  const [showShortcuts, setShowShortcuts] = useState(false)
+  const shortcutsRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!showShortcuts) return
+    function handleClickOutside(e: MouseEvent) {
+      if (shortcutsRef.current && !shortcutsRef.current.contains(e.target as Node)) setShowShortcuts(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showShortcuts])
 
   const furniture = layout.furniture || []
 
@@ -371,7 +382,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
       </div>
 
       {/* Toolbar */}
-      <div className="card p-3 sm:p-4 flex flex-wrap items-center gap-2 sm:gap-3">
+      <div className="card p-3 sm:p-4 flex flex-wrap items-center gap-2 sm:gap-3 sticky top-0 z-20 backdrop-blur-sm bg-white/95">
         {/* Name */}
         <div className="flex items-center gap-2">
           <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</label>
@@ -511,7 +522,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
             {p.label}
           </button>
         ))}
-        <div className="flex gap-1 ml-auto">
+        <div className="flex gap-1 ml-auto items-center">
           <button
             onClick={exportLayout}
             className="px-3 py-2 text-sm rounded-xl font-semibold transition-all border active:scale-95 bg-gray-50 text-gray-600 hover:bg-gray-100 border-gray-200"
@@ -526,6 +537,35 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
           >
             ↑ Import
           </button>
+          <div className="relative" ref={shortcutsRef}>
+            <button
+              onClick={() => setShowShortcuts(!showShortcuts)}
+              className={`w-8 h-8 rounded-xl text-sm font-bold transition-all border flex items-center justify-center ${
+                showShortcuts ? 'bg-blue-600 text-white border-blue-600' : 'bg-gray-50 text-gray-400 hover:text-gray-600 hover:bg-gray-100 border-gray-200'
+              }`}
+              title="Keyboard shortcuts"
+              aria-label="Keyboard shortcuts"
+            >
+              ?
+            </button>
+            {showShortcuts && (
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl p-3 z-30 animate-fade-in">
+                <p className="text-xs font-bold text-gray-700 mb-2">Keyboard Shortcuts</p>
+                <div className="space-y-1.5 text-xs">
+                  {[
+                    { keys: 'Ctrl+Z', action: 'Undo' },
+                    { keys: 'Ctrl+Y', action: 'Redo' },
+                    { keys: 'Ctrl+Shift+Z', action: 'Redo' },
+                  ].map(s => (
+                    <div key={s.keys} className="flex items-center justify-between">
+                      <span className="text-gray-500">{s.action}</span>
+                      <kbd className="px-1.5 py-0.5 bg-gray-100 border border-gray-200 rounded text-[10px] font-mono font-semibold text-gray-600">{s.keys}</kbd>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -551,7 +591,7 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
       </div>
 
       {/* Grid */}
-      <div className="card p-3 sm:p-6 overflow-auto">
+      <div className="card p-3 sm:p-6 overflow-auto relative group/grid">
         {/* Front label */}
         <div className="flex flex-col items-center mb-4">
           <div className="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-bold mb-2">Front of Classroom</div>
@@ -763,8 +803,16 @@ export default function ClassroomEditor({ layout, onLayoutChange, onNext, addToa
           </div>
         </div>
 
+        {/* Mobile scroll hint */}
+        <div className="sm:hidden mt-3 flex items-center justify-center gap-2 text-xs text-gray-400">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+          </svg>
+          <span>Scroll to see full grid</span>
+        </div>
+
         {/* Stats bar */}
-        <div className="mt-5 flex items-center justify-center gap-6 text-sm">
+        <div className="mt-5 flex items-center justify-center gap-4 sm:gap-6 text-sm flex-wrap">
           <div className="flex items-center gap-2 text-gray-500">
             <div className="w-4 h-4 rounded bg-gradient-to-br from-blue-500 to-cyan-500" />
             <span className="font-medium">{layout.desks.filter(d => d.type === 'single').length} singles</span>

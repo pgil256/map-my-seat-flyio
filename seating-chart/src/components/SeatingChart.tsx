@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useCallback } from 'react'
+import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 import { ClassroomLayout, Student, SeatAssignment, SeatingConfig } from '../types'
 import { generateSeatingChart } from '../utils/seatingAlgorithm'
 import { getInitials, getDisplayName, getAvatarColor, getEffectiveSpan, furnitureConfig, levelConfig, escapeHtml } from '../utils/helpers'
@@ -162,6 +162,16 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
     })
   }, [])
 
+  // ESC to cancel swap mode
+  useEffect(() => {
+    if (!swapMode) return
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') { setSwapMode(false); setSwapFirst(null) }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [swapMode])
+
   const studentMap = useMemo(() => new Map(students.map(s => [s.id, s])), [students])
   const assignmentMap = useMemo(() => {
     const m = new Map<string, SeatAssignment>()
@@ -316,6 +326,32 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
         </button>
       </div>
 
+      {/* ── Mismatch warning banner ─────────────────────────── */}
+      {unseatedCount > 0 && !generated && (
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 animate-fade-in">
+          <div className="w-9 h-9 rounded-lg bg-amber-400 text-white flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-amber-800">
+              Not enough seats for all students
+            </p>
+            <p className="text-xs text-amber-600 mt-0.5">
+              You have <strong>{students.length} students</strong> but only <strong>{totalSeats} seats</strong>.{' '}
+              {unseatedCount} student{unseatedCount > 1 ? 's' : ''} will not be assigned a seat. Go back to add more desks or remove students.
+            </p>
+            <button
+              onClick={onBack}
+              className="mt-2 text-xs font-semibold text-amber-700 hover:text-amber-900 underline underline-offset-2 transition-colors"
+            >
+              &larr; Go back to fix
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ── Strategy cards ─────────────────────────────────── */}
       {!generated && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 animate-fade-in" role="radiogroup" aria-label="Seating strategy">
@@ -419,12 +455,15 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
         )}
 
         {/* Stats */}
-        <div className="ml-auto flex items-center gap-3 text-sm">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3 text-sm flex-wrap justify-end">
           <span className="text-gray-500 font-medium">{students.length} students</span>
           <span className="text-gray-300">/</span>
           <span className="text-gray-500 font-medium">{totalSeats} seats</span>
           {unseatedCount > 0 && (
-            <span className="px-2.5 py-1 bg-red-100 text-red-700 rounded-lg text-xs font-bold animate-pop-in">
+            <span className="px-2.5 py-1.5 bg-red-100 text-red-700 border border-red-200 rounded-lg text-xs font-bold animate-pop-in flex items-center gap-1.5" title={`${unseatedCount} student${unseatedCount > 1 ? 's' : ''} won't get a seat — add more desks`}>
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+              </svg>
               {unseatedCount} unseated
             </span>
           )}
@@ -446,18 +485,30 @@ export default function SeatingChart({ layout, students, onBack, addToast }: Pro
 
       {/* ── Swap mode banner ───────────────────────────────── */}
       {swapMode && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-xl px-4 py-3 flex items-center gap-3 animate-fade-in">
-          <div className="w-8 h-8 rounded-lg bg-yellow-400 text-yellow-900 flex items-center justify-center flex-shrink-0">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+        <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl px-4 py-3 flex items-center gap-3 animate-fade-in shadow-sm shadow-yellow-100">
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
+            swapFirst ? 'bg-yellow-500 text-white animate-pulse' : 'bg-yellow-400 text-yellow-900'
+          }`}>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
             </svg>
           </div>
-          <div>
+          <div className="flex-1">
             <p className="text-sm font-semibold text-yellow-800">
-              {swapFirst ? 'Now click the second seat to swap with' : 'Click the first seat to swap'}
+              {swapFirst ? (
+                <>Step 2: Click the second seat to swap with</>
+              ) : (
+                <>Step 1: Click a seat to start swapping</>
+              )}
             </p>
-            <p className="text-xs text-yellow-600">Click two seats to exchange their students. ESC or click Swap again to cancel.</p>
+            <p className="text-xs text-yellow-600 mt-0.5">Double-click any seat to lock it from reshuffling.</p>
           </div>
+          <button
+            onClick={() => { setSwapMode(false); setSwapFirst(null) }}
+            className="px-3 py-1.5 bg-yellow-200 hover:bg-yellow-300 text-yellow-800 rounded-lg text-xs font-bold transition-colors flex-shrink-0"
+          >
+            Cancel <kbd className="ml-1 px-1 py-0.5 bg-yellow-300 rounded text-[10px]">Esc</kbd>
+          </button>
         </div>
       )}
 

@@ -20,6 +20,7 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
   const [isDragOver, setIsDragOver] = useState(false)
   const [confirmClear, setConfirmClear] = useState(false)
   const [isImporting, setIsImporting] = useState(false)
+  const [sortBy, setSortBy] = useState<'default' | 'name-asc' | 'name-desc' | 'level'>('default')
 
   function handleCSV(text: string) {
     setIsImporting(true)
@@ -134,9 +135,22 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
     ungraded: { bg: 'bg-gray-100',   text: 'text-gray-500',    label: 'N/A',    dot: 'bg-gray-400' },
   }
 
+  const sorted = (() => {
+    const list = [...students]
+    switch (sortBy) {
+      case 'name-asc': return list.sort((a, b) => a.name.localeCompare(b.name))
+      case 'name-desc': return list.sort((a, b) => b.name.localeCompare(a.name))
+      case 'level': {
+        const order = { high: 0, medium: 1, low: 2, ungraded: 3 }
+        return list.sort((a, b) => order[a.performanceLevel] - order[b.performanceLevel])
+      }
+      default: return list
+    }
+  })()
+
   const filtered = search
-    ? students.filter(s => s.name.toLowerCase().includes(search.toLowerCase()))
-    : students
+    ? sorted.filter(s => s.name.toLowerCase().includes(search.toLowerCase()))
+    : sorted
 
   const counts = {
     high: students.filter(s => s.performanceLevel === 'high').length,
@@ -237,20 +251,27 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
                 onClick={() => {
                   if (!confirmClear) {
                     setConfirmClear(true)
-                    setTimeout(() => setConfirmClear(false), 3000)
+                    setTimeout(() => setConfirmClear(false), 4000)
                     return
                   }
                   onStudentsChange([])
                   setConfirmClear(false)
                   addToast('All students removed', 'info')
                 }}
-                className={`text-xs font-medium transition-all ${
+                className={`text-xs font-semibold transition-all rounded-lg px-2.5 py-1 ${
                   confirmClear
-                    ? 'text-white bg-red-500 px-2 py-0.5 rounded-md animate-pulse'
-                    : 'text-red-500 hover:text-red-700'
+                    ? 'text-white bg-red-500 shadow-sm shadow-red-200'
+                    : 'text-red-500 hover:text-red-700 hover:bg-red-50'
                 }`}
               >
-                {confirmClear ? 'Click again to confirm' : 'Clear all'}
+                {confirmClear ? (
+                  <span className="flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                    </svg>
+                    Remove all {students.length}? Click to confirm
+                  </span>
+                ) : 'Clear all'}
               </button>
             )}
           </div>
@@ -269,10 +290,10 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
           </div>
         </div>
 
-        {/* Search */}
+        {/* Search & Sort */}
         {students.length > 5 && (
-          <div className="mb-3">
-            <div className="relative">
+          <div className="mb-3 flex gap-2">
+            <div className="relative flex-1">
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
                 <circle cx="11" cy="11" r="8" />
                 <path strokeLinecap="round" d="m21 21-4.35-4.35" />
@@ -285,6 +306,17 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
                 className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-gray-50"
               />
             </div>
+            <select
+              value={sortBy}
+              onChange={e => setSortBy(e.target.value as typeof sortBy)}
+              className="border border-gray-200 rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-gray-50 hover:bg-white transition-colors cursor-pointer"
+              aria-label="Sort students"
+            >
+              <option value="default">Sort: Added</option>
+              <option value="name-asc">Sort: A-Z</option>
+              <option value="name-desc">Sort: Z-A</option>
+              <option value="level">Sort: Level</option>
+            </select>
           </div>
         )}
 
@@ -326,13 +358,21 @@ export default function GradebookManager({ students, onStudentsChange, onNext, o
                       className="flex-1 border border-blue-400 rounded-lg px-2.5 py-1 text-sm outline-none ring-2 ring-blue-200"
                     />
                   ) : (
-                    <span
-                      className="flex-1 text-sm font-medium text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
-                      onDoubleClick={() => startEdit(student)}
-                      title="Double-click to edit"
-                    >
-                      {student.name}
-                    </span>
+                    <div className="flex-1 flex items-center gap-1.5 min-w-0">
+                      <span className="text-sm font-medium text-gray-800 truncate">
+                        {student.name}
+                      </span>
+                      <button
+                        onClick={() => startEdit(student)}
+                        className="w-6 h-6 rounded-md flex items-center justify-center text-gray-300 hover:text-blue-500 hover:bg-blue-50 transition-all flex-shrink-0 sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100"
+                        aria-label={`Edit ${student.name}`}
+                        title="Edit name"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                        </svg>
+                      </button>
+                    </div>
                   )}
 
                   {/* Level badge */}
