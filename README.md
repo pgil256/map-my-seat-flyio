@@ -26,6 +26,8 @@
 
 Map My Seat helps K-12 teachers create optimized seating charts in minutes, not hours. Import your roster, design your classroom layout, set "keep apart" / "seat together" rules, and let a simulated-annealing solver place students against a weighted objective that scores constraint satisfaction, accommodations, and per-row balance.
 
+For the design rationale — why simulated annealing over ILP or greedy, the objective function, and the "why this seat?" UX — see the [technical case study](docs/CASE_STUDY.md).
+
 ## Screenshots
 
 | Landing Page | Classroom Setup | Seating Chart |
