@@ -181,6 +181,31 @@ describe("solveSeating", () => {
     expect(elapsed).toBeLessThan(100);
   });
 
+  it("stays under 1000ms for a 40-student roster at default iterations", () => {
+    // The plan flagged 35+ student classrooms as the perf danger zone.
+    // Locking in a generous CI-safe budget so any future regression
+    // (e.g. quadratic scoring) trips this. Dev-machine measurement is
+    // ~250ms, so 1000ms gives 4x headroom for slower CI hardware.
+    const bigMatrix = Array.from({ length: 8 }, () =>
+      Array.from({ length: 7 }, () => "desk")
+    );
+    const bigRoster = Array.from({ length: 40 }, (_, i) =>
+      makeStudent(i + 1, `Student ${i + 1}`)
+    );
+    const constraints = [
+      { studentId1: 1, studentId2: 2, constraintType: "separate" },
+      { studentId1: 3, studentId2: 4, constraintType: "separate" },
+      { studentId1: 5, studentId2: 6, constraintType: "pair" },
+    ];
+
+    const t = performance.now();
+    solveSeating(bigRoster, blankClassroom, constraints, bigMatrix, {
+      rng: mulberry32(1),
+    });
+    const elapsed = performance.now() - t;
+    expect(elapsed).toBeLessThan(1000);
+  });
+
   it("handles a 0-iteration call gracefully", () => {
     const { assignment, score, iterations } = solveSeating(
       sixStudents(),

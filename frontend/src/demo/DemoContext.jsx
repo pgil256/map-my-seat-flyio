@@ -45,11 +45,17 @@ export function DemoProvider({ children }) {
   // Auto-start demo when the page is opened with `?demo=1` (so deep-links and
   // headless screenshots land on the populated chart without going through
   // the Try Demo button first).
+  //
+  // Mount-only by design: we read the URL once, and `isDemo` / `startDemo`
+  // are intentionally absent from the dep array. Including `isDemo` would
+  // re-fire after startDemo flips it to true (no-op but noisy); including
+  // `startDemo` would re-fire whenever it changes identity. If a future
+  // eslint upgrade turns this disable into an error, switch to a useRef
+  // sentinel rather than expanding the dep array.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const wantsDemo = new URLSearchParams(window.location.search).get("demo");
     if (wantsDemo && !isDemo) startDemo();
-    // We only want this to fire once on mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -242,7 +242,13 @@ const SeatingChart = () => {
       breakdown: solverBreakdown,
     });
     const updatedSortedStudents = spreadStudents(matrix, sortedStudents);
+    // Re-score so the badge reflects the new positions. We deliberately don't
+    // re-run the solver here — Spread is a layout choice, not a request to
+    // re-optimize. Re-optimize is its own button.
+    const result = scoreAssignment(updatedSortedStudents, seatContext);
     setSortedStudents(updatedSortedStudents);
+    setSolverScore(result.total);
+    setSolverBreakdown(result.breakdown);
   };
 
   const generateTableContent = (matrix, sortedStudents) => {
@@ -407,6 +413,9 @@ const SeatingChart = () => {
   const exportToPDF = async () => {
     if (!containerRef.current) return;
 
+    // containerRef is the seating-chart Container only — the DragOverlay
+    // lives outside this subtree (sibling of the outer Container, under
+    // DndContext) so an in-flight drag never leaks into the captured PDF.
     const canvas = await html2canvas(containerRef.current);
 
     const offScreenCanvas = document.createElement('canvas');

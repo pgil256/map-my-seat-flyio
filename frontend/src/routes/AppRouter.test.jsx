@@ -81,9 +81,15 @@ describe("AppRouter", () => {
 
   it("renders StudentForm component for /periods/:periodId route", async () => {
     renderWithProviders("/periods/1");
-    await waitFor(() => {
-      expect(screen.getByText("Add New Student")).toBeInTheDocument();
-    });
+    // Bumped from the default 1000ms waitFor: the route loads several
+    // lazy-imported chunks and was occasionally flaky under full-suite
+    // resource contention.
+    await waitFor(
+      () => {
+        expect(screen.getByText("Add New Student")).toBeInTheDocument();
+      },
+      { timeout: 5000 }
+    );
   });
 
   it("renders ClassroomForm component for /classrooms route", async () => {
