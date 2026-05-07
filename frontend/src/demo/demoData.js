@@ -1,8 +1,9 @@
 // Sample data for demo mode
 export const demoUser = {
   username: "demo_user",
-  firstName: "Demo",
-  lastName: "User",
+  firstName: "Jordan",
+  lastName: "Sterling",
+  title: "Ms.",
   email: "demo@example.com",
 };
 
@@ -26,6 +27,18 @@ export const demoPeriods = [
       { studentId: 10, name: "Benjamin Jackson", grade: "9", gender: "M", isESE: false, has504: false, isELL: false, isEBD: false },
       { studentId: 11, name: "Mia White", grade: "9", gender: "F", isESE: false, has504: false, isELL: true, isEBD: false },
       { studentId: 12, name: "Lucas Harris", grade: "9", gender: "M", isESE: false, has504: false, isELL: false, isEBD: false },
+      { studentId: 101, name: "Aiden Carter", grade: "9", gender: "M", isESE: false, has504: false, isELL: false, isEBD: false },
+      { studentId: 102, name: "Zoey Phillips", grade: "9", gender: "F", isESE: false, has504: false, isELL: true, isEBD: false },
+      { studentId: 103, name: "Jackson Evans", grade: "9", gender: "M", isESE: false, has504: false, isELL: false, isEBD: false },
+      { studentId: 104, name: "Layla Turner", grade: "9", gender: "F", isESE: false, has504: false, isELL: false, isEBD: false },
+      { studentId: 105, name: "Caleb Diaz", grade: "9", gender: "M", isESE: false, has504: false, isELL: false, isEBD: true },
+      { studentId: 106, name: "Aria Reed", grade: "9", gender: "F", isESE: false, has504: true, isELL: false, isEBD: false },
+      { studentId: 107, name: "Ethan Rivera", grade: "9", gender: "M", isESE: true, has504: false, isELL: false, isEBD: false },
+      { studentId: 108, name: "Penelope Cooper", grade: "9", gender: "F", isESE: false, has504: false, isELL: false, isEBD: false },
+      { studentId: 109, name: "Logan Bailey", grade: "9", gender: "M", isESE: false, has504: false, isELL: false, isEBD: false },
+      { studentId: 110, name: "Ellie Bell", grade: "9", gender: "F", isESE: false, has504: false, isELL: false, isEBD: false },
+      { studentId: 111, name: "Owen Howard", grade: "9", gender: "M", isESE: false, has504: false, isELL: true, isEBD: false },
+      { studentId: 112, name: "Stella Cox", grade: "9", gender: "F", isESE: false, has504: false, isELL: false, isEBD: false },
     ],
   },
   {
@@ -66,7 +79,9 @@ export const demoPeriods = [
   },
 ];
 
-// 5x6 classroom layout
+// 6-row x 6-col room: two desk rows, an aisle, two desk rows, then a sparse
+// row with a teacher desk in the back-right corner. 27 student desks,
+// fitting 24 students with realistic breathing room.
 export const demoClassroom = {
   classroomId: 1,
   userUsername: "demo_user",
@@ -76,11 +91,12 @@ export const demoClassroom = {
     ["desk", "desk", "desk", "desk", "desk", "desk"],
     ["empty", "empty", "empty", "empty", "empty", "empty"],
     ["desk", "desk", "desk", "desk", "desk", "desk"],
-    ["desk", "desk", "desk", "desk", "desk", "teacher-desk"],
+    ["desk", "desk", "desk", "desk", "desk", "desk"],
+    ["desk", "desk", "desk", "empty", "empty", "teacher-desk"],
   ]),
 };
 
-// Pre-generated seating chart for Period 1
+// Pre-generated seating chart for Period 1 (matches the new 6x6 layout).
 export const demoSeatingChart = {
   seatingChartId: 1,
   classroomId: 1,
@@ -89,10 +105,31 @@ export const demoSeatingChart = {
     ["Emma Johnson", "Liam Smith", "Olivia Brown", "Noah Davis", "Ava Wilson", "Mason Miller"],
     ["Sophia Taylor", "James Anderson", "Isabella Thomas", "Benjamin Jackson", "Mia White", "Lucas Harris"],
     ["empty", "empty", "empty", "empty", "empty", "empty"],
-    ["", "", "", "", "", ""],
-    ["", "", "", "", "", "Teacher"],
+    ["Aiden Carter", "Zoey Phillips", "Jackson Evans", "Layla Turner", "Caleb Diaz", "Aria Reed"],
+    ["Ethan Rivera", "Penelope Cooper", "Logan Bailey", "Ellie Bell", "Owen Howard", "Stella Cox"],
+    ["", "", "", "empty", "empty", "Teacher"],
   ]),
   label: "Default Arrangement",
   periodId: 1,
   createdAt: new Date().toISOString(),
+};
+
+// Constraints keyed by periodId. Each entry already has student names
+// enriched, matching what StudentConstraints.jsx renders.
+export const demoConstraints = {
+  1: [
+    { constraintId: 1001, studentId1: 2, studentId2: 6, constraintType: "separate", studentName1: "Liam Smith", studentName2: "Mason Miller" },
+    { constraintId: 1002, studentId1: 4, studentId2: 10, constraintType: "separate", studentName1: "Noah Davis", studentName2: "Benjamin Jackson" },
+    { constraintId: 1003, studentId1: 11, studentId2: 12, constraintType: "separate", studentName1: "Mia White", studentName2: "Lucas Harris" },
+    { constraintId: 1004, studentId1: 1, studentId2: 3, constraintType: "pair", studentName1: "Emma Johnson", studentName2: "Olivia Brown" },
+    { constraintId: 1005, studentId1: 7, studentId2: 9, constraintType: "pair", studentName1: "Sophia Taylor", studentName2: "Isabella Thomas" },
+  ],
+  2: [
+    { constraintId: 2001, studentId1: 14, studentId2: 18, constraintType: "separate", studentName1: "Henry Garcia", studentName2: "William Lewis" },
+    { constraintId: 2002, studentId1: 15, studentId2: 17, constraintType: "pair", studentName1: "Amelia Martinez", studentName2: "Harper Clark" },
+  ],
+  3: [
+    { constraintId: 3001, studentId1: 22, studentId2: 30, constraintType: "separate", studentName1: "Daniel Allen", studentName2: "Andrew Nelson" },
+    { constraintId: 3002, studentId1: 23, studentId2: 25, constraintType: "pair", studentName1: "Emily Young", studentName2: "Elizabeth Wright" },
+  ],
 };

@@ -1,5 +1,14 @@
-import React, { createContext, useContext, useState, useCallback, useRef, useMemo } from "react";
-import { demoUser, demoPeriods, demoClassroom, demoSeatingChart } from "./demoData";
+import { createContext, useContext, useState, useCallback, useRef, useMemo, useEffect } from "react";
+import { demoUser, demoPeriods, demoClassroom, demoSeatingChart, demoConstraints } from "./demoData";
+
+// Deep-clone the period-keyed constraint map so each demo session starts fresh.
+function cloneConstraints(src) {
+  const out = {};
+  for (const [pid, list] of Object.entries(src)) {
+    out[pid] = list.map((c) => ({ ...c }));
+  }
+  return out;
+}
 
 const DemoContext = createContext();
 
@@ -10,6 +19,7 @@ export function DemoProvider({ children }) {
     periods: demoPeriods,
     classrooms: [demoClassroom],
     seatingCharts: [demoSeatingChart],
+    constraints: cloneConstraints(demoConstraints),
   });
 
   // Use ref to always get current demoData in API methods
@@ -24,11 +34,23 @@ export function DemoProvider({ children }) {
       periods: [...demoPeriods],
       classrooms: [{ ...demoClassroom }],
       seatingCharts: [{ ...demoSeatingChart }],
+      constraints: cloneConstraints(demoConstraints),
     });
   }, []);
 
   const exitDemo = useCallback(() => {
     setIsDemo(false);
+  }, []);
+
+  // Auto-start demo when the page is opened with `?demo=1` (so deep-links and
+  // headless screenshots land on the populated chart without going through
+  // the Try Demo button first).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const wantsDemo = new URLSearchParams(window.location.search).get("demo");
+    if (wantsDemo && !isDemo) startDemo();
+    // We only want this to fire once on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Demo API methods that work with local state
@@ -270,9 +292,47 @@ export function DemoProvider({ children }) {
       return Promise.resolve(newChart);
     },
 
-    getConstraints: () => Promise.resolve([]),
-    createConstraint: () => Promise.resolve({ constraintId: Date.now() }),
-    deleteConstraint: () => Promise.resolve(),
+    getConstraints: (username, periodId) => {
+      const id = typeof periodId === 'string' ? parseInt(periodId, 10) : periodId;
+      const list = demoDataRef.current.constraints[id] || [];
+      return Promise.resolve(list.map((c) => ({ ...c })));
+    },
+
+    createConstraint: (username, periodId, data) => {
+      const id = typeof periodId === 'string' ? parseInt(periodId, 10) : periodId;
+      const period = demoDataRef.current.periods.find((p) => p.periodId === id);
+      const s1 = period?.students.find((s) => s.studentId === data.studentId1);
+      const s2 = period?.students.find((s) => s.studentId === data.studentId2);
+      const newConstraint = {
+        constraintId: Date.now(),
+        studentId1: data.studentId1,
+        studentId2: data.studentId2,
+        constraintType: data.constraintType,
+        studentName1: s1?.name,
+        studentName2: s2?.name,
+      };
+      setDemoData((prev) => ({
+        ...prev,
+        constraints: {
+          ...prev.constraints,
+          [id]: [...(prev.constraints[id] || []), newConstraint],
+        },
+      }));
+      return Promise.resolve(newConstraint);
+    },
+
+    deleteConstraint: (username, periodId, constraintId) => {
+      const pid = typeof periodId === 'string' ? parseInt(periodId, 10) : periodId;
+      const cid = typeof constraintId === 'string' ? parseInt(constraintId, 10) : constraintId;
+      setDemoData((prev) => ({
+        ...prev,
+        constraints: {
+          ...prev.constraints,
+          [pid]: (prev.constraints[pid] || []).filter((c) => c.constraintId !== cid),
+        },
+      }));
+      return Promise.resolve();
+    },
   }), []);
 
   return (
@@ -282,6 +342,7 @@ export function DemoProvider({ children }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useDemo() {
   const context = useContext(DemoContext);
   if (!context) {

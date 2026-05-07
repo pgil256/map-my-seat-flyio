@@ -20,9 +20,11 @@
 
 ---
 
+<p align="center"><img src="docs/screenshots/demo.gif" width="720" alt="Drag a student into a keep-apart violation, watch the score crash from 75 to -30, then click Re-optimize to recover" /></p>
+
 ## Overview
 
-Map My Seat helps K-12 teachers create optimized seating charts in minutes, not hours. Import your roster, design your classroom layout, set your preferences, and generate intelligent seating arrangements that respect student accommodations and teacher constraints.
+Map My Seat helps K-12 teachers create optimized seating charts in minutes, not hours. Import your roster, design your classroom layout, set "keep apart" / "seat together" rules, and let a simulated-annealing solver place students against a weighted objective that scores constraint satisfaction, accommodations, and per-row balance.
 
 ## Screenshots
 
@@ -30,19 +32,20 @@ Map My Seat helps K-12 teachers create optimized seating charts in minutes, not 
 |:---:|:---:|:---:|
 | ![Landing](docs/screenshots/landing.png) | ![Classroom](docs/screenshots/classroom.png) | ![Seating](docs/screenshots/seating.png) |
 
-> To add screenshots, run the app and save images to `docs/screenshots/`.
+The seating-chart view shows the **arrangement score** at the top (`No keep-apart violations · 2 seat-together rules met`), per-desk **"why this seat?"** tooltips on hover, and **drag-to-swap** any two students with one-click **Undo** and **Re-optimize**.
 
 ## Key Features
 
-- **Smart Seating Algorithms** - Alphabetical, randomized, high-low academic pairing, male-female alternating
-- **Student Accommodations** - Priority seating for ESE, ELL, 504, and EBD students
-- **Seating Constraints** - Keep specific students together or apart
-- **Flexible Layouts** - Design any desk arrangement on a grid editor
-- **Multiple Classrooms** - Manage different room configurations
-- **CSV Import** - Bulk-upload student rosters via gradebook export
-- **PDF Export** - Print-ready seating chart output
-- **Dark Mode** - Full light/dark theme support
-- **Demo Mode** - Explore every feature without creating an account
+- **Constraint solver** - Simulated annealing over a weighted objective: -100 per "keep apart" pair adjacent, +10 per "seat together" pair adjacent, +5 for accommodation placement (504/EBD/ELL near front, ESE near aisle), plus row-balance penalty for grade/gender clumping. Pure-JS solver, deterministic with an injectable RNG, runs in &lt;300ms for 30 students.
+- **Drag-to-swap** - Manually swap any two students after the solver runs. Score updates live; flips red the moment a hard constraint breaks.
+- **Re-optimize from current** - Roll the solver forward from your manual edits as the seed instead of starting over.
+- **Per-desk rationale** - Hover any desk to see why the solver placed that student there: `✓ Apart from Mason · ✓ Front row (504) · ✓ Next to Olivia (pair)`.
+- **Student accommodations** - Built-in support for ESE, ELL, 504, and EBD flags with priority placement.
+- **Flexible layouts** - Design any desk arrangement on a grid editor with auto-save.
+- **CSV Import** - Bulk-upload student rosters via gradebook export.
+- **PDF Export** - Print-ready seating chart output.
+- **Dark Mode** - Full light/dark theme support.
+- **Demo Mode** - 24 students, 5 pre-seeded constraints, ready to play with — no signup required.
 
 ## Try It Out
 

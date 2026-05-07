@@ -102,7 +102,10 @@ export default function LandingPage() {
 
   const handleTryDemo = () => {
     startDemo();
-    navigate("/periods");
+    // Deep-link straight to the populated seating chart so the demo
+    // user lands on the magic moment (24 students, 5 constraints,
+    // pre-solved arrangement) instead of an empty periods page.
+    navigate("/classrooms/1/seating-charts/1");
   };
 
   return (
