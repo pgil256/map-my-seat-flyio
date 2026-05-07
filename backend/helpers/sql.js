@@ -1,7 +1,3 @@
-// const { sqlForPartialUpdate } = require("./sql");
-const { BadRequestError } = require("../expressError");
-
-//Changes input to SQL-friendly format.
 function sqlForPartialUpdate(data, dataToDbColumnMap) {
   let dbUpdateObject = {};
 

@@ -35,8 +35,7 @@ describe("Home", () => {
 
   it("renders the landing page when user is not logged in", () => {
     renderWithProviders(null);
-    expect(screen.getByText(/Seating charts/)).toBeInTheDocument();
-    expect(screen.getByText(/made easy/)).toBeInTheDocument();
+    expect(screen.getByText(/Seating charts in minutes/)).toBeInTheDocument();
   });
 
   it(
@@ -66,8 +65,7 @@ describe("Home", () => {
 
   it("shows CTA buttons on landing page when not logged in", () => {
     renderWithProviders(null);
-    // Landing page has multiple "Get Started" buttons and "Log In" button
-    expect(screen.getAllByRole("button", { name: /get started/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole("button", { name: /sign up/i }).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: /log in/i })).toBeInTheDocument();
   });
 

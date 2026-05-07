@@ -1,127 +1,53 @@
-<h1 align="center">Map My Seat</h1>
+# Map My Seat
 
-<p align="center">
-  <strong>Automated seating chart generator for K-12 teachers</strong>
-</p>
-
-<p align="center">
-  <a href="https://map-my-seat.vercel.app/">Live Demo</a> &bull;
-  <a href="#try-it-out">Try Demo Mode</a> &bull;
-  <a href="#api-documentation">API Docs</a>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white" alt="React 18" />
-  <img src="https://img.shields.io/badge/Node.js-18-339933?logo=node.js&logoColor=white" alt="Node.js 18" />
-  <img src="https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/Express-4-000000?logo=express&logoColor=white" alt="Express 4" />
-  <img src="https://img.shields.io/badge/Deployed_on-Vercel-000000?logo=vercel&logoColor=white" alt="Vercel" />
-</p>
-
----
-
-<p align="center"><img src="docs/screenshots/demo.gif" width="720" alt="Drag a student into a keep-apart violation, watch the score crash from 75 to -30, then click Re-optimize to recover" /></p>
+Automated seating chart generator for K-12 teachers. [Live demo](https://map-my-seat.vercel.app/).
 
 ## Overview
 
-Map My Seat helps K-12 teachers create optimized seating charts in minutes, not hours. Import your roster, design your classroom layout, set "keep apart" / "seat together" rules, and let a simulated-annealing solver place students against a weighted objective that scores constraint satisfaction, accommodations, and per-row balance.
+Map My Seat creates optimized classroom seating charts. Import a roster, design the room layout, set "keep apart" / "seat together" rules, and a simulated-annealing solver places students against a weighted objective covering constraint satisfaction, accommodations, and per-row balance.
 
-For the design rationale — why simulated annealing over ILP or greedy, the objective function, and the "why this seat?" UX — see the [technical case study](docs/CASE_STUDY.md).
+For the design rationale — why simulated annealing over ILP or greedy, the objective function, and the "why this seat?" UX — see [docs/CASE_STUDY.md](docs/CASE_STUDY.md).
 
 ## Screenshots
 
-| Landing Page | Classroom Setup | Seating Chart |
+| Landing | Classroom | Seating chart |
 |:---:|:---:|:---:|
 | ![Landing](docs/screenshots/landing.png) | ![Classroom](docs/screenshots/classroom.png) | ![Seating](docs/screenshots/seating.png) |
 
-The seating-chart view shows the **arrangement score** at the top (`No keep-apart violations · 2 seat-together rules met`), per-desk **"why this seat?"** tooltips on hover, and **drag-to-swap** any two students with one-click **Undo** and **Re-optimize**.
+The seating-chart view shows the arrangement score, per-desk "why this seat?" tooltips, and drag-to-swap with Undo and Re-optimize.
 
-## Key Features
+## Features
 
-- **Constraint solver** - Simulated annealing over a weighted objective: -100 per "keep apart" pair adjacent, +10 per "seat together" pair adjacent, +5 for accommodation placement (504/EBD/ELL near front, ESE near aisle), plus row-balance penalty for grade/gender clumping. Pure-JS solver, deterministic with an injectable RNG, runs in &lt;300ms for 30 students.
-- **Drag-to-swap** - Manually swap any two students after the solver runs. Score updates live; flips red the moment a hard constraint breaks.
-- **Re-optimize from current** - Roll the solver forward from your manual edits as the seed instead of starting over.
-- **Per-desk rationale** - Hover any desk to see why the solver placed that student there: `✓ Apart from Mason · ✓ Front row (504) · ✓ Next to Olivia (pair)`.
-- **Student accommodations** - Built-in support for ESE, ELL, 504, and EBD flags with priority placement.
-- **Flexible layouts** - Design any desk arrangement on a grid editor with auto-save.
-- **CSV Import** - Bulk-upload student rosters via gradebook export.
-- **PDF Export** - Print-ready seating chart output.
-- **Dark Mode** - Full light/dark theme support.
-- **Demo Mode** - 24 students, 5 pre-seeded constraints, ready to play with — no signup required.
+- **Constraint solver** — simulated annealing over a weighted objective: -100 per "keep apart" pair adjacent, +10 per "seat together" pair adjacent, +5 for accommodation placement (504/EBD/ELL near front, ESE near aisle), plus a row-balance penalty for grade/gender clumping. Pure-JS, deterministic with an injectable RNG, runs in <300ms for 30 students.
+- **Drag-to-swap** — swap any two students after the solver runs. Score updates live and flags hard-constraint breaks.
+- **Re-optimize from current** — runs the solver forward from manual edits instead of starting over.
+- **Per-desk rationale** — hover a desk to see why the solver placed a student there.
+- **Student accommodations** — ESE, ELL, 504, and EBD flags with priority placement.
+- **Flexible layouts** — grid-based desk editor with autosave.
+- **CSV import** — bulk-upload rosters from gradebook exports.
+- **PDF export** — print-ready charts.
+- **Demo mode** — sample data preloaded, no signup needed.
 
-## Try It Out
+## Local development
 
-**Option 1: Demo Mode** (no signup required)
-Visit the [live app](https://map-my-seat.vercel.app/) and click **"Try Demo"** to explore with sample data.
-
-**Option 2: Local Development**
 ```bash
 git clone https://github.com/gilhooley/map-my-seat.git
 cd map-my-seat
 npm run install:all
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your PostgreSQL credentials
-
-# Run migrations
+cp .env.example .env   # set DATABASE_URL and SECRET_KEY
 npm run migrate
-
-# Start development servers
 npm run dev
 ```
 
-This starts:
-- **Frontend:** http://localhost:5173
-- **Backend API:** http://localhost:3001
+Frontend runs on http://localhost:5173, backend on http://localhost:3001.
 
-## Architecture
+## Stack
 
-```
-┌─────────────────────────────────────────────────────┐
-│                    Frontend (React)                   │
-│  Vite  ·  Chakra UI  ·  React Router  ·  Axios      │
-└──────────────────────┬──────────────────────────────┘
-                       │ REST API (JSON)
-┌──────────────────────▼──────────────────────────────┐
-│                   Backend (Express)                   │
-│  JWT Auth  ·  JSON Schema  ·  Helmet  ·  Rate Limit │
-└──────────────────────┬──────────────────────────────┘
-                       │ Knex.js Query Builder
-┌──────────────────────▼──────────────────────────────┐
-│                   PostgreSQL                          │
-│  Users  ·  Periods  ·  Students  ·  Classrooms       │
-│  Seating Charts  ·  Student Constraints              │
-└─────────────────────────────────────────────────────┘
-```
-
-| Layer | Technology |
-|-------|------------|
-| Frontend | React 18, Vite, Chakra UI, React Router v6, Framer Motion |
-| Backend | Node.js 18, Express, Knex.js, JSON Schema validation |
-| Database | PostgreSQL with versioned migrations |
-| Auth | JWT with bcrypt password hashing, rate-limited endpoints |
-| Security | Helmet.js, CORS, rate limiting, input validation |
-| Deployment | Vercel (frontend + serverless functions) |
-
-### Design Decisions
-
-- **Code splitting** via React.lazy() for fast initial page loads
-- **Skeleton loading states** for smooth perceived performance
-- **Autosave** on classroom layout changes to prevent data loss
-- **Demo mode** with full in-memory data simulation (no backend required)
-- **RESTful API** with consistent error codes and JSON Schema validation
-
-## User Flow
-
-1. **Sign Up** - Create your teacher account
-2. **Add Classes** - Enter your class periods and school year
-3. **Add Students** - Import rosters via CSV or add students manually with accommodation flags
-4. **Set Constraints** - Specify which students should sit together or apart
-5. **Design Classroom** - Build your desk layout on the grid editor
-6. **Set Preferences** - Choose seating algorithm and accommodation priorities
-7. **Generate Charts** - Get optimized seating arrangements instantly
-8. **Export** - Download as PDF for printing
+- **Frontend:** React 18, Vite, Chakra UI, React Router v6
+- **Backend:** Node.js 18, Express, Knex.js, JSON Schema validation
+- **Database:** PostgreSQL with versioned migrations
+- **Auth:** JWT with bcrypt, rate-limited login endpoints
+- **Deployment:** Vercel (frontend + serverless functions)
 
 ## API Documentation
 
@@ -185,19 +111,15 @@ Authorization: Bearer <token>
 
 ## Testing
 
-Tests are colocated with source files. Backend uses Jest; frontend uses Vitest with React Testing Library.
+Tests are colocated with source files. Backend uses Jest, frontend uses Vitest with React Testing Library.
 
 ```bash
-npm test                  # Run all tests
-npm run test:backend      # Backend only
-npm run test:frontend     # Frontend only
+npm test                  # all
+npm run test:backend
+npm run test:frontend
 ```
 
-### Coverage areas:
-- **Backend:** Models, routes, middleware, helpers, error handling, migrations
-- **Frontend:** Components, hooks, contexts, API layer, seating algorithms
-
-## Project Structure
+## Project structure
 
 ```
 map-my-seat/
@@ -228,21 +150,8 @@ map-my-seat/
 
 ## Deployment
 
-Optimized for Vercel with serverless functions:
-
-1. Set up PostgreSQL (Neon, Supabase, or similar)
-2. Connect your GitHub repo to Vercel
-3. Add environment variables:
-   - `DATABASE_URL` - PostgreSQL connection string
-   - `SECRET_KEY` - JWT signing key
-4. Deploy - Vercel handles the rest
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
+Deployed on Vercel as serverless functions. PostgreSQL via Neon/Supabase. See [DEPLOYMENT.md](DEPLOYMENT.md) for the full setup.
 
 ## License
 
 MIT
-
----
-
-<p align="center">Built with care for educators everywhere.</p>

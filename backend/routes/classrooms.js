@@ -14,11 +14,7 @@ const seatingChartUpdateSchema = require("../schemas/seatingChart/seatingChartUp
 
 const router = new express.Router();
 
-// const seatingChartRouter = express.Router({ mergeParams: true });
-
-// router.use("/:classroomId/seating-charts", seatingChartRouter);
-
-//Route for retrieving all classrooms for a user
+// List all classrooms for a user
 router.get("/:username/all", adminOrCorrectUser, async function (req, res, next) {
   try {
     const classrooms = await Classroom.getClassrooms(req.params.username);
@@ -28,7 +24,7 @@ router.get("/:username/all", adminOrCorrectUser, async function (req, res, next)
   }
 });
 
-//Route for retrieving classroom via username (legacy - returns first classroom)
+// Get a user's primary (first) classroom — used by Home and SeatingChart for the default view
 router.get("/:username", adminOrCorrectUser, async function (req, res, next) {
   try {
     const classroom = await Classroom.getClassroom(req.params.username);

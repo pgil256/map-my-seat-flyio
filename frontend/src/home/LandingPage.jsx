@@ -7,7 +7,6 @@ import {
   Heading,
   Icon,
   SimpleGrid,
-  Stack,
   Text,
   VStack,
   HStack,
@@ -18,7 +17,6 @@ import {
   TimeIcon,
   SettingsIcon,
   ViewIcon,
-  CheckCircleIcon,
 } from "@chakra-ui/icons";
 import { useDemo } from "../demo/DemoContext";
 
@@ -84,17 +82,10 @@ export default function LandingPage() {
     "linear(to-b, brand.100, brand.50)",
     "linear(to-b, brand.900, brand.800)"
   );
-  const heroHighlightColor = useColorModeValue("accent.600", "accent.400");
   const heroTextColor = useColorModeValue("brand.600", "brand.300");
   const sectionHeadingColor = useColorModeValue("brand.800", "brand.100");
-  const sectionTextColor = useColorModeValue("brand.600", "brand.300");
-  const checkIconColor = useColorModeValue("accent.500", "accent.400");
   const subtleTextColor = useColorModeValue("brand.500", "brand.400");
   const sectionBg = useColorModeValue("brand.50", "brand.900");
-  const previewBg = useColorModeValue("white", "brand.700");
-  const previewInnerBg = useColorModeValue("brand.100", "brand.800");
-  const deskHighlight = useColorModeValue("accent.400", "accent.500");
-  const deskDefault = useColorModeValue("brand.300", "brand.600");
   const footerBorderColor = useColorModeValue("brand.200", "brand.700");
   const footerLinkColor = useColorModeValue("brand.600", "brand.300");
   const footerLinkHoverColor = useColorModeValue("accent.600", "accent.400");
@@ -102,9 +93,6 @@ export default function LandingPage() {
 
   const handleTryDemo = () => {
     startDemo();
-    // Deep-link straight to the populated seating chart so the demo
-    // user lands on the magic moment (24 students, 5 constraints,
-    // pre-solved arrangement) instead of an empty periods page.
     navigate("/classrooms/1/seating-charts/1");
   };
 
@@ -112,103 +100,46 @@ export default function LandingPage() {
     <Box>
       {/* Hero Section */}
       <Box bgGradient={bgGradient} pt={20} pb={16}>
-        <Container maxW="6xl">
-          <Stack
-            direction={{ base: "column", lg: "row" }}
-            spacing={12}
-            align="center"
-          >
-            <VStack align="start" spacing={6} flex={1}>
-              <Heading
-                as="h1"
-                size="3xl"
-                fontWeight="800"
-                lineHeight="1.1"
-                color={sectionHeadingColor}
-              >
-                Seating charts{" "}
-                <Text as="span" color={heroHighlightColor}>
-                  made easy
-                </Text>
-              </Heading>
-              <Text fontSize="xl" color={heroTextColor} maxW="lg">
-                Create optimized classroom seating arrangements in minutes.
-                Import your roster, set your preferences, and let Map My Seat
-                do the rest.
-              </Text>
-              <HStack spacing={4} pt={4} flexWrap="wrap">
-                <Button
-                  size="lg"
-                  variant="solid"
-                  onClick={() => navigate("/signup")}
-                  px={8}
-                >
-                  Get Started Free
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  onClick={() => navigate("/login")}
-                >
-                  Log In
-                </Button>
-                <Button
-                  size="lg"
-                  variant="ghost"
-                  onClick={handleTryDemo}
-                >
-                  Try Demo
-                </Button>
-              </HStack>
-              <HStack spacing={6} pt={2} color={subtleTextColor} fontSize="sm">
-                <HStack>
-                  <CheckCircleIcon color={checkIconColor} />
-                  <Text>No credit card required</Text>
-                </HStack>
-                <HStack>
-                  <CheckCircleIcon color={checkIconColor} />
-                  <Text>Free for teachers</Text>
-                </HStack>
-              </HStack>
-            </VStack>
-
-            {/* App Preview/Mockup */}
-            <Box
-              flex={1}
-              bg={previewBg}
-              p={4}
-              borderRadius="xl"
-              boxShadow="2xl"
-              maxW="500px"
+        <Container maxW="3xl">
+          <VStack align="start" spacing={6}>
+            <Heading
+              as="h1"
+              size="3xl"
+              fontWeight="800"
+              lineHeight="1.1"
+              color={sectionHeadingColor}
             >
-              <Box
-                bg={previewInnerBg}
-                borderRadius="lg"
-                p={6}
-                minH="300px"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
+              Seating charts in minutes.
+            </Heading>
+            <Text fontSize="xl" color={heroTextColor} maxW="2xl">
+              Import a roster, set "keep apart" and "seat together" rules,
+              and generate an optimized arrangement.
+            </Text>
+            <HStack spacing={4} pt={4} flexWrap="wrap">
+              <Button
+                size="lg"
+                variant="solid"
+                onClick={() => navigate("/signup")}
+                px={8}
               >
-                <VStack spacing={4}>
-                  <SimpleGrid columns={4} spacing={2}>
-                    {[...Array(16)].map((_, i) => (
-                      <Box
-                        key={i}
-                        w={10}
-                        h={8}
-                        bg={i % 5 === 0 ? deskHighlight : deskDefault}
-                        borderRadius="sm"
-                      />
-                    ))}
-                  </SimpleGrid>
-                  <Text fontSize="sm" color={subtleTextColor} fontWeight="medium">
-                    Classroom Layout Preview
-                  </Text>
-                </VStack>
-              </Box>
-            </Box>
-          </Stack>
+                Sign up
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => navigate("/login")}
+              >
+                Log in
+              </Button>
+              <Button
+                size="lg"
+                variant="ghost"
+                onClick={handleTryDemo}
+              >
+                Try demo
+              </Button>
+            </HStack>
+          </VStack>
         </Container>
       </Box>
 
@@ -217,29 +148,25 @@ export default function LandingPage() {
         <Container maxW="6xl">
           <VStack spacing={4} mb={12} textAlign="center">
             <Heading size="xl" color={sectionHeadingColor}>
-              Why teachers love Map My Seat
+              Features
             </Heading>
-            <Text fontSize="lg" color={sectionTextColor} maxW="2xl">
-              Built by educators, for educators. Save hours of manual seating
-              arrangement with smart automation.
-            </Text>
           </VStack>
 
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
             <Feature
               icon={TimeIcon}
-              title="Save Hours"
-              description="Generate optimized seating charts in minutes instead of hours. Update arrangements with a single click."
+              title="Constraint solver"
+              description="Simulated annealing places students against keep-apart, seat-together, and accommodation rules."
             />
             <Feature
               icon={SettingsIcon}
-              title="Smart Seating"
-              description="Automatically accommodate IEPs, 504 plans, ELL students, and behavior considerations."
+              title="Accommodations"
+              description="ESE, ELL, 504, and EBD flags get priority placement with per-desk rationale."
             />
             <Feature
               icon={ViewIcon}
-              title="Flexible Layouts"
-              description="Design any classroom layout - rows, groups, U-shapes, or custom arrangements."
+              title="Flexible layouts"
+              description="Build rows, groups, U-shapes, or any custom arrangement on a grid editor with autosave."
             />
           </SimpleGrid>
         </Container>
@@ -252,9 +179,6 @@ export default function LandingPage() {
             <Heading size="xl" color={sectionHeadingColor}>
               How it works
             </Heading>
-            <Text fontSize="lg" color={sectionTextColor}>
-              Three simple steps to your perfect seating chart
-            </Text>
           </VStack>
 
           <Flex
@@ -265,18 +189,18 @@ export default function LandingPage() {
           >
             <Step
               number="1"
-              title="Add Your Students"
-              description="Import your class roster or add students manually with their accommodation needs."
+              title="Add students"
+              description="Import a roster or add students manually with accommodation flags."
             />
             <Step
               number="2"
-              title="Design Your Classroom"
-              description="Create your classroom layout by placing desks, tables, and the teacher station."
+              title="Design the room"
+              description="Place desks, tables, and the teacher station on a grid."
             />
             <Step
               number="3"
-              title="Generate Charts"
-              description="Click generate and get an optimized seating arrangement based on your preferences."
+              title="Generate"
+              description="Run the solver and adjust by hand with drag-to-swap."
             />
           </Flex>
 
@@ -287,7 +211,7 @@ export default function LandingPage() {
               onClick={() => navigate("/signup")}
               px={10}
             >
-              Start Creating Seating Charts
+              Sign up
             </Button>
           </VStack>
         </Container>
@@ -311,18 +235,18 @@ export default function LandingPage() {
                 _hover={{ color: footerLinkHoverColor }}
                 onClick={() => navigate("/login")}
               >
-                Login
+                Log in
               </Text>
               <Text
                 cursor="pointer"
                 _hover={{ color: footerLinkHoverColor }}
                 onClick={() => navigate("/signup")}
               >
-                Sign Up
+                Sign up
               </Text>
             </HStack>
             <Text fontSize="sm" color={subtleTextColor}>
-              &copy; {new Date().getFullYear()} Map My Seat. Built for teachers.
+              &copy; {new Date().getFullYear()} Map My Seat
             </Text>
           </Flex>
         </Container>

@@ -16,10 +16,6 @@ const studentUpdateSchema = require("../schemas/student/studentUpdate.json");
 
 const router = new express.Router();
 
-// const studentRouter = express.Router({ mergeParams: true });
-
-// router.use(":periodId/students", studentRouter);
-
 //Route for creating new period
 router.post("/:username", adminOrCorrectUser, async function (req, res, next) {
   try {
