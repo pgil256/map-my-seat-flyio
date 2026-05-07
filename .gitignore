@@ -71,3 +71,7 @@ debug.log
 .claude_settings.json
 .security-key
 logs/security/
+
+# Local tool output
+.claude/
+.playwright-mcp/

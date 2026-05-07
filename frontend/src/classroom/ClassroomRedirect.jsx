@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import UserContext from "../auth/UserContext";
 import { useNavigate } from "react-router-dom";
 import LoadingSpinner from "../common/LoadingSpinner.jsx";
@@ -16,7 +16,7 @@ const ClassroomRedirect = (props) => {
   const navigate = useNavigate();
   const username = currentUser.username;
 
-  const getPeriodsOnMount = async (isMounted) => {
+  const getPeriodsOnMount = useCallback(async (isMounted) => {
     try {
       const periods = await api.getPeriods(username);
       if (isMounted) {
@@ -26,7 +26,7 @@ const ClassroomRedirect = (props) => {
     } catch (error) {
       if (isMounted) setInfoLoading(false);
     }
-  };
+  }, [api, username]);
 
   useEffect(() => {
     let isMounted = true;
@@ -35,7 +35,7 @@ const ClassroomRedirect = (props) => {
     return () => {
       isMounted = false;
     };
-  }, [username]);
+  }, [username, getPeriodsOnMount]);
 
   const getSeatingChart = (e, number) => {
     e.preventDefault();

@@ -1,4 +1,3 @@
-import { render, fireEvent } from "@testing-library/react";
 import { useState } from "react";
 
 describe("formData", () => {
@@ -11,7 +10,7 @@ describe("formData", () => {
       username: "jd123",
     };
 
-    const TestComponent = () => {
+    const _TestComponent = () => {
       const [formData, setFormData] = useState({
         firstName: currentUser.firstName,
         lastName: currentUser.lastName,
@@ -21,7 +20,7 @@ describe("formData", () => {
         password: "",
       });
 
-      const handlePasswordChange = (event) => {
+      const _handlePasswordChange = (event) => {
         setFormData({ ...formData, password: event.target.value });
       };
     };

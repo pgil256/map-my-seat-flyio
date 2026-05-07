@@ -54,8 +54,6 @@ const ProfileForm = () => {
     setFormData((f) => ({ ...f, [name]: value }));
   };
 
-  const initials = `${(formData.firstName || "")[0] || ""}${(formData.lastName || "")[0] || ""}`.toUpperCase();
-
   return (
     <Container maxW="lg" py={{ base: 8, md: 14 }}>
       <VStack spacing={6}>

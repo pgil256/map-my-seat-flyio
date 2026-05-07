@@ -37,7 +37,7 @@ function StudentConstraints({ periodId, students }) {
       }
     }
     if (periodId) fetchConstraints();
-  }, [currentUser.username, periodId, api]);
+  }, [currentUser.username, periodId, api, toast]);
 
   const handleAddConstraint = async () => {
     if (!studentId1 || !studentId2) {

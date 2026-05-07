@@ -34,12 +34,10 @@ const ClassroomForm = () => {
   const toast = useAppToast();
 
   // Color mode values
-  const cardBg = useColorModeValue("white", "brand.800");
-  const cardBorder = useColorModeValue("brand.200", "brand.700");
   const labelColor = useColorModeValue("brand.700", "brand.200");
   const textColor = useColorModeValue("brand.600", "brand.300");
 
-  const [classroom, setClassroom] = useState({});
+  const [, setClassroom] = useState({});
   const [classroomId, setClassroomId] = useState("");
   const [formData, setFormData] = useState({});
   const [seatingConfig, setSeatingConfig] = useState(null);
@@ -91,7 +89,7 @@ const ClassroomForm = () => {
     } catch (err) {
       toast.error(err.message || "Failed to load classroom");
     }
-  }, [username, api]);
+  }, [username, api, toast]);
 
   const setFormDataFromModel = (formModel) => {
     setFormData({
@@ -176,7 +174,7 @@ const ClassroomForm = () => {
 
   useEffect(() => {
     getClassroomOnMount();
-  }, [username]);
+  }, [username, getClassroomOnMount]);
 
   return (
     <Flex maxH="85vh" maxW="95%" m={4} direction="row" gap={6}>

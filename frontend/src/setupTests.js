@@ -1,6 +1,21 @@
 import "@testing-library/jest-dom";
 import { vi } from "vitest";
 
+// Mock matchMedia (happy-dom's stub returns matches:false for everything,
+// which trips up Chakra UI's responsive components like MobileNav).
+if (typeof window !== "undefined" && !window.matchMedia) {
+  window.matchMedia = (query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+  });
+}
+
 // Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(),

@@ -11,11 +11,9 @@ import {
   Heading,
   Container,
   Text,
-  Stack,
   SimpleGrid,
   VStack,
   Icon,
-  Button,
   useColorModeValue,
 } from "@chakra-ui/react";
 import { TimeIcon, SettingsIcon, ViewIcon } from "@chakra-ui/icons";

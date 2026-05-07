@@ -11,7 +11,6 @@ import {
   IconButton,
   useColorMode,
   useColorModeValue,
-  Text,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 

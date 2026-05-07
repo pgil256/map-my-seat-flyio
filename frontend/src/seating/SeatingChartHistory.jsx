@@ -44,7 +44,7 @@ function SeatingChartHistory({ classroomId, periodId, onSelectChart }) {
       }
     }
     if (classroomId) fetchCharts();
-  }, [currentUser.username, classroomId, periodId, api]);
+  }, [currentUser.username, classroomId, periodId, api, toast]);
 
   const handleDuplicate = async (chart) => {
     try {

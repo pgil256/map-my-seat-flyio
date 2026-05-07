@@ -4,11 +4,9 @@ import { fireEvent } from "@testing-library/dom";
 import useKeyboardShortcuts from "./useKeyboardShortcuts";
 
 describe("useKeyboardShortcuts", () => {
-  let originalActiveElement;
-
   beforeEach(() => {
-    // Store original active element
-    originalActiveElement = document.activeElement;
+    // Reset active element reference between tests
+    document.activeElement?.blur?.();
   });
 
   afterEach(() => {
@@ -274,7 +272,6 @@ describe("useKeyboardShortcuts", () => {
   it("updates handler when deps change", () => {
     const handler1 = vi.fn();
     const handler2 = vi.fn();
-    let currentHandler = handler1;
 
     const { rerender } = renderHook(
       ({ handler }) =>

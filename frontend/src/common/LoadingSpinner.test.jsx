@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen, cleanup } from "@testing-library/react";
 import { ChakraProvider } from "@chakra-ui/react";
 import { describe, it, expect, afterEach } from "vitest";

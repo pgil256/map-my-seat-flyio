@@ -5,7 +5,6 @@ import UserContext from "../auth/UserContext";
 import EmptyState from "../common/EmptyState";
 import LoadingSpinner from "../common/LoadingSpinner";
 import {
-  Box,
   Button,
   Card,
   CardBody,

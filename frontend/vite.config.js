@@ -9,9 +9,14 @@ import { resolve } from "path";
 export default defineConfig({
   test: {
     globals: true,
-    environment: "jsdom",
+    environment: "happy-dom",
     setupFiles: "./src/setupTests.js",
     css: true,
+    environmentOptions: {
+      // Match the responsive breakpoint that the existing MobileNav tests
+      // expect (Chakra's `md` cutoff is 48em / 768px).
+      happyDOM: { width: 600, height: 800 },
+    },
   },
   // build: {
   //   // lib: {
