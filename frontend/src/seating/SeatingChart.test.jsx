@@ -1,4 +1,3 @@
-import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -13,6 +12,7 @@ vi.mock("../api", () => ({
     getClassroom: vi.fn(),
     getPeriods: vi.fn(),
     getPeriod: vi.fn(),
+    getConstraints: vi.fn().mockResolvedValue([]),
   },
 }));
 
@@ -101,5 +101,20 @@ describe("SeatingChart Component", () => {
     await waitFor(() => {
       expect(screen.getByText(/Period 1 Seating Chart/)).toBeInTheDocument();
     });
+  });
+
+  it("renders Re-optimize and Undo buttons", async () => {
+    SeatingApi.getClassroom.mockResolvedValue(mockClassroom);
+    SeatingApi.getPeriods.mockResolvedValue(mockPeriods);
+    SeatingApi.getPeriod.mockResolvedValue([]);
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /re-optimize/i })).toBeInTheDocument();
+    });
+    // Undo button is present and starts disabled (empty undo stack).
+    const undoBtn = screen.getByRole("button", { name: /undo/i });
+    expect(undoBtn).toBeInTheDocument();
+    expect(undoBtn).toBeDisabled();
   });
 });
