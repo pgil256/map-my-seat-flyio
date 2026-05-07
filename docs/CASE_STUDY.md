@@ -111,7 +111,11 @@ The tooltip uses the same constraint-evaluation code that scored the
 assignment — there's no chance of the rationale and the score disagreeing.
 When a manual drag breaks a rule, the offending desks immediately surface a
 red `✗ Too close to Mason Miller` line on the moved student's tooltip, and
-the score badge flips red. See [demo.gif](screenshots/demo.gif): score
+the score badge flips red:
+
+![Post-drop violation: score -30, tooltip "Too close to Mason Miller"](screenshots/violation.png)
+
+See [demo.gif](screenshots/demo.gif) for the full sequence: score
 75 → −30 → 80 across drop, view, re-optimize.
 
 ## What I'd do next
