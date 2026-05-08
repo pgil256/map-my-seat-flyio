@@ -18,8 +18,11 @@ import {
 } from "@chakra-ui/react";
 import { TimeIcon, SettingsIcon, ViewIcon } from "@chakra-ui/icons";
 
-function QuickAction({ icon, title, description, onClick, colorScheme = "blue" }) {
-  const bg = useColorModeValue("white", "gray.700");
+function QuickAction({ icon, title, description, onClick }) {
+  const bg = useColorModeValue("white", "brand.800");
+  const borderColor = useColorModeValue("brand.200", "brand.700");
+  const iconColor = useColorModeValue("accent.600", "accent.400");
+  const descColor = useColorModeValue("brand.500", "brand.400");
   return (
     <Box
       bg={bg}
@@ -27,16 +30,16 @@ function QuickAction({ icon, title, description, onClick, colorScheme = "blue" }
       borderRadius="lg"
       boxShadow="sm"
       border="1px"
-      borderColor={useColorModeValue("gray.100", "gray.600")}
+      borderColor={borderColor}
       cursor="pointer"
       onClick={onClick}
-      _hover={{ boxShadow: "md", transform: "translateY(-2px)" }}
-      transition="all 0.2s"
+      _hover={{ boxShadow: "md", borderColor: "accent.300" }}
+      transition="box-shadow 0.15s ease, border-color 0.15s ease"
     >
       <VStack spacing={3} align="start">
-        <Icon as={icon} boxSize={5} color={`${colorScheme}.500`} />
+        <Icon as={icon} boxSize={5} color={iconColor} />
         <Heading size="sm">{title}</Heading>
-        <Text fontSize="sm" color="gray.500">{description}</Text>
+        <Text fontSize="sm" color={descColor}>{description}</Text>
       </VStack>
     </Box>
   );
@@ -46,6 +49,7 @@ export default function Home() {
   const { currentUser } = useContext(UserContext);
   const { api } = useApi();
   const navigate = useNavigate();
+  const subtleTextColor = useColorModeValue("brand.500", "brand.400");
 
   const [setupStatus, setSetupStatus] = useState({
     hasPeriods: false,
@@ -88,24 +92,23 @@ export default function Home() {
 
   return (
     <Box minH="80vh">
-      <Container maxW="4xl" py={{ base: 8, md: 14 }}>
+      <Container maxW="6xl" py={{ base: 8, md: 10 }}>
         <WelcomeModal />
 
-        <VStack spacing={8} textAlign="center" mb={10}>
-          <Heading
-            fontWeight={700}
-            fontSize={{ base: "2xl", sm: "4xl", md: "5xl" }}
-            lineHeight="1.2"
-          >
+        <Box mb={8}>
+          <Text color={subtleTextColor} fontSize="sm" fontWeight="medium">
+            Teacher workspace
+          </Text>
+          <Heading fontWeight={700} fontSize={{ base: "2xl", md: "4xl" }} lineHeight="1.2">
             Welcome back, {currentUser.firstName || currentUser.username}
           </Heading>
-          <Text fontSize="lg" color="gray.500" maxW="lg">
-            Manage your classes, design classroom layouts, and generate seating charts.
+          <Text fontSize="lg" color={subtleTextColor} maxW="2xl" mt={3}>
+            Manage rosters, room layouts, and seating charts from one place.
           </Text>
-        </VStack>
+        </Box>
 
         {!setupStatus.loading && (
-          <Box display="flex" justifyContent="center" mb={10}>
+          <Box mb={8}>
             <SetupProgress
               hasPeriods={setupStatus.hasPeriods}
               hasStudents={setupStatus.hasStudents}
@@ -115,27 +118,25 @@ export default function Home() {
           </Box>
         )}
 
+        <Heading size="md" mb={4}>Next actions</Heading>
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={5}>
           <QuickAction
             icon={TimeIcon}
             title="Set Up Classes"
             description="Create class periods and manage your student rosters."
             onClick={() => navigate("/periods")}
-            colorScheme="green"
           />
           <QuickAction
             icon={SettingsIcon}
             title="Design Classrooms"
             description="Build desk layouts and configure seating preferences."
             onClick={() => navigate(`/classrooms/${currentUser.username}`)}
-            colorScheme="blue"
           />
           <QuickAction
             icon={ViewIcon}
             title="View Profile"
             description="Update your name and account settings."
             onClick={() => navigate("/profile")}
-            colorScheme="purple"
           />
         </SimpleGrid>
       </Container>

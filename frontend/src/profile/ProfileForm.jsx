@@ -29,8 +29,10 @@ const ProfileForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const cardBg = useColorModeValue("white", "gray.700");
-  const subtleBg = useColorModeValue("gray.50", "gray.600");
+  const cardBg = useColorModeValue("white", "brand.800");
+  const subtleBg = useColorModeValue("brand.50", "brand.700");
+  const borderColor = useColorModeValue("brand.200", "brand.700");
+  const labelColor = useColorModeValue("brand.500", "brand.400");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -61,14 +63,14 @@ const ProfileForm = () => {
           <Avatar
             size="xl"
             name={`${formData.firstName} ${formData.lastName}`}
-            bg="green.400"
+            bg="accent.500"
             color="white"
             fontSize="2xl"
           />
           <Heading size="lg">
             {formData.firstName} {formData.lastName}
           </Heading>
-          <Text color="gray.500" fontSize="sm">@{username}</Text>
+          <Text color={labelColor} fontSize="sm">@{username}</Text>
         </VStack>
 
         <Box
@@ -77,21 +79,21 @@ const ProfileForm = () => {
           shadow="sm"
           borderRadius="lg"
           border="1px"
-          borderColor={useColorModeValue("gray.100", "gray.600")}
+          borderColor={borderColor}
           p={6}
         >
           <Heading size="md" mb={4}>Account Details</Heading>
 
           <Box bg={subtleBg} borderRadius="md" p={4} mb={5}>
             <HStack justify="space-between">
-              <Text fontSize="sm" color="gray.500">Username</Text>
+              <Text fontSize="sm" color={labelColor}>Username</Text>
               <Text fontWeight="medium">{username}</Text>
             </HStack>
             {currentUser.email && (
               <>
                 <Divider my={2} />
                 <HStack justify="space-between">
-                  <Text fontSize="sm" color="gray.500">Email</Text>
+                  <Text fontSize="sm" color={labelColor}>Email</Text>
                   <Text fontWeight="medium">{currentUser.email}</Text>
                 </HStack>
               </>
@@ -100,7 +102,7 @@ const ProfileForm = () => {
               <>
                 <Divider my={2} />
                 <HStack justify="space-between">
-                  <Text fontSize="sm" color="gray.500">Title</Text>
+                  <Text fontSize="sm" color={labelColor}>Title</Text>
                   <Text fontWeight="medium">{currentUser.title}</Text>
                 </HStack>
               </>
@@ -132,7 +134,6 @@ const ProfileForm = () => {
               </FormControl>
 
               <Button
-                colorScheme="green"
                 type="submit"
                 w="full"
                 isLoading={isSubmitting}

@@ -62,19 +62,19 @@ class ErrorBoundary extends Component {
             {import.meta.env.DEV && this.state.error && (
               <Box
                 p={4}
-                bg="gray.100"
+                bg="brand.100"
                 borderRadius="md"
                 w="100%"
                 overflow="auto"
               >
-                <Text fontFamily="mono" fontSize="sm" color="red.600">
+                <Text fontFamily="mono" fontSize="sm" color="error.600">
                   {this.state.error.toString()}
                 </Text>
                 {this.state.errorInfo && (
                   <Text
                     fontFamily="mono"
                     fontSize="xs"
-                    color="gray.600"
+                    color="brand.600"
                     mt={2}
                     whiteSpace="pre-wrap"
                   >
@@ -84,7 +84,7 @@ class ErrorBoundary extends Component {
               </Box>
             )}
 
-            <Button colorScheme="blue" onClick={this.handleReset}>
+            <Button onClick={this.handleReset}>
               Return to Home
             </Button>
           </VStack>

@@ -34,6 +34,19 @@ router.get("/:username", adminOrCorrectUser, async function (req, res, next) {
   }
 });
 
+// Get a specific classroom for routes that carry a classroom id.
+router.get("/:username/:classroomId", adminOrCorrectUser, async function (req, res, next) {
+  try {
+    const classroom = await Classroom.getClassroomById(
+      req.params.classroomId,
+      req.params.username
+    );
+    return res.status(200).json({ classroom });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 //Route for creating new classroom
 router.post("/:username", adminOrCorrectUser, async function (req, res, next) {
   try {

@@ -14,7 +14,7 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { spreadStudents } from "./algorithms";
-import { solveSeating, swapAssignment } from "./solver";
+import { mulberry32, solveSeating, swapAssignment } from "./solver";
 import { seatRationale, scoreAssignment } from "./objective";
 import { matrixToSeats, findTeacherDesks } from "./seatGrid";
 import "./SeatingChart.css";
@@ -37,6 +37,7 @@ import {
   StatNumber,
   StatHelpText,
   Flex,
+  Stack,
 } from "@chakra-ui/react";
 
 // Score summary shown above the seating chart.
@@ -44,7 +45,7 @@ function ScoreCard({ score, breakdown }) {
   if (!breakdown) return null;
   const violations = breakdown.hardViolations || 0;
   const satisfactions = breakdown.pairSatisfactions || 0;
-  const color = violations > 0 ? "red.500" : "green.600";
+  const color = violations > 0 ? "error.500" : "success.600";
 
   const helpParts = [];
   helpParts.push(
@@ -61,19 +62,19 @@ function ScoreCard({ score, breakdown }) {
   return (
     <Flex
       className="no-print"
-      justify="center"
+      justify="space-between"
       align="center"
       gap={6}
-      mb={2}
-      px={4}
-      py={2}
+      px={5}
+      py={3}
       borderRadius="md"
-      bg="gray.50"
-      _dark={{ bg: "gray.700" }}
-      maxW="640px"
-      mx="auto"
+      bg="white"
+      borderWidth="1px"
+      borderColor="brand.200"
+      _dark={{ bg: "brand.800", borderColor: "brand.700" }}
+      maxW="720px"
     >
-      <Stat textAlign="center" maxW="200px">
+      <Stat maxW="none">
         <StatLabel fontSize="xs">Arrangement Score</StatLabel>
         <StatNumber color={color}>{Math.round(score)}</StatNumber>
         <StatHelpText fontSize="xs" mb={0}>
@@ -111,7 +112,7 @@ function DroppableSeat({ id, children }) {
       ref={setNodeRef}
       w="100%"
       h="100%"
-      bg={isOver ? "teal.200" : "transparent"}
+      bg={isOver ? "accent.200" : "transparent"}
       transition="background-color 0.1s"
     >
       {children}
@@ -123,10 +124,10 @@ function DroppableSeat({ id, children }) {
 function AccommodationIndicators({ student }) {
   const indicators = [];
 
-  if (student.isESE) indicators.push({ label: "ESE", color: "purple.400" });
-  if (student.has504) indicators.push({ label: "504", color: "blue.400" });
-  if (student.isELL) indicators.push({ label: "ELL", color: "green.400" });
-  if (student.isEBD) indicators.push({ label: "EBD", color: "orange.400" });
+  if (student.isESE) indicators.push({ label: "ESE", color: "accommodation.ese.text" });
+  if (student.has504) indicators.push({ label: "504", color: "accommodation.plan504.text" });
+  if (student.isELL) indicators.push({ label: "ELL", color: "accommodation.ell.text" });
+  if (student.isEBD) indicators.push({ label: "EBD", color: "accommodation.ebd.text" });
 
   if (indicators.length === 0) return null;
 
@@ -150,7 +151,7 @@ function AccommodationIndicators({ student }) {
 }
 
 const SeatingChart = () => {
-  const { number: num } = useParams();
+  const { classroomId, number: num } = useParams();
   const number = parseInt(num);
   const containerRef = useRef(null);
   const { currentUser } = useContext(UserContext);
@@ -220,6 +221,7 @@ const SeatingChart = () => {
     });
     const result = solveSeating(students, classroom, constraints, matrix, {
       initialAssignment: sortedStudents,
+      ...(classroom.solverSeed ? { rng: mulberry32(classroom.solverSeed) } : {}),
     });
     setSortedStudents(result.assignment);
     setSolverScore(result.score);
@@ -282,15 +284,18 @@ const SeatingChart = () => {
         ref={containerRef}
         className="seating-chart-container"
         maxW="100vw"
-        maxH="80vh"
-        border="2px solid teal"
-        m="2"
-        p="2"
+        border="1px solid"
+        borderColor="brand.200"
+        borderRadius="md"
+        bg="white"
+        _dark={{ bg: "brand.800", borderColor: "brand.700" }}
+        m="0"
+        p={{ base: 3, md: 5 }}
       >
         <Center mb="4">
           <Heading>Period {number} Seating Chart</Heading>
         </Center>
-        <Table colorScheme="teal">
+        <Table colorScheme="brand">
           <Tbody>
             {matrix.map((row, rowIndex) => (
               <Tr key={rowIndex}>
@@ -363,13 +368,13 @@ const SeatingChart = () => {
                       }`}
                       bg={
                         cell === "desk"
-                          ? "gray.300"
+                          ? "brand.100"
                           : cell === "teacher-desk"
-                          ? "gray.400"
+                          ? "brand.200"
                           : ""
                       }
                       borderWidth="1px"
-                      borderColor="gray.200"
+                      borderColor="brand.200"
                       cursor={cell === "desk" && studentInDesk ? "grab" : tooltipLabel ? "help" : "default"}
                       width={cellSize.width}
                       height={cellSize.height}
@@ -451,7 +456,7 @@ const SeatingChart = () => {
 
   const getClassroomData = useCallback(async () => {
     try {
-      let classroomData = await api.getClassroom(username);
+      let classroomData = await api.getClassroom(username, classroomId);
       if (classroomData) {
         setClassroom(classroomData);
         // seatingConfig may arrive as a JSON string from the demo / API.
@@ -474,7 +479,7 @@ const SeatingChart = () => {
     } catch (err) {
       // Error is handled by the API layer
     }
-  }, [api, username, number]);
+  }, [api, username, classroomId, number]);
 
   useEffect(() => {
     if (!username || !number) return;
@@ -483,7 +488,13 @@ const SeatingChart = () => {
 
   useEffect(() => {
     if (Object.keys(classroom).length === 0 || students.length === 0) return;
-    const result = solveSeating(students, classroom, constraints, matrix);
+    const result = solveSeating(
+      students,
+      classroom,
+      constraints,
+      matrix,
+      classroom.solverSeed ? { rng: mulberry32(classroom.solverSeed) } : {}
+    );
     setSortedStudents(result.assignment);
     setSolverScore(result.score);
     setSolverBreakdown(result.breakdown);
@@ -499,50 +510,67 @@ const SeatingChart = () => {
       onDragCancel={() => setActiveDragId(null)}
       onDragEnd={handleDragEnd}
     >
-      <Container maxW="100%" width="100vw" p={0}>
-        <Center w="100%" className="no-print">
-          <HStack spacing={2} my={3} flexWrap="wrap" justify="center">
-            <Tooltip label="Re-run the solver from the current arrangement">
+      <Container maxW="7xl" py={{ base: 5, md: 7 }}>
+        <Stack spacing={4}>
+          <Flex
+            className="no-print"
+            justify="space-between"
+            align={{ base: "start", lg: "center" }}
+            gap={4}
+            direction={{ base: "column", lg: "row" }}
+          >
+            <Box>
+              <Heading size="xl">Seating workspace</Heading>
+              <Text color="brand.600" mt={1}>
+                Period {number} arrangement with drag-to-swap and solver feedback.
+              </Text>
+            </Box>
+            <HStack spacing={2} flexWrap="wrap" justify={{ base: "start", lg: "end" }}>
+              <Tooltip label="Re-run the solver from the current arrangement">
+                <Button
+                  size="sm"
+                  variant="accent"
+                  onClick={handleReoptimize}
+                  isDisabled={sortedStudents.length === 0}
+                >
+                  Re-optimize
+                </Button>
+              </Tooltip>
               <Button
-                colorScheme="teal"
-                onClick={handleReoptimize}
-                isDisabled={sortedStudents.length === 0}
+                size="sm"
+                onClick={handleUndo}
+                isDisabled={undoStack.length === 0}
+                variant="outline"
               >
-                Re-optimize
+                Undo ({undoStack.length})
               </Button>
-            </Tooltip>
-            <Button
-              onClick={handleUndo}
-              isDisabled={undoStack.length === 0}
-              variant="outline"
-            >
-              Undo ({undoStack.length})
-            </Button>
-            <Button colorScheme="blue" onClick={handleSpreadButtonClick}>
-              Spread
-            </Button>
-            <Button onClick={exportToPDF}>Export PDF</Button>
-            <Button colorScheme="gray" onClick={() => window.print()}>
-              Print
-            </Button>
-          </HStack>
-        </Center>
+              <Button size="sm" variant="outline" onClick={handleSpreadButtonClick}>
+                Spread
+              </Button>
+              <Button size="sm" variant="outline" onClick={exportToPDF}>Export PDF</Button>
+              <Button size="sm" variant="ghost" onClick={() => window.print()}>
+                Print
+              </Button>
+            </HStack>
+          </Flex>
 
-        <ScoreCard score={solverScore} breakdown={solverBreakdown} />
+          <ScoreCard score={solverScore} breakdown={solverBreakdown} />
 
-        <Center>
-          <Box mr="3" ml="3">
-            {generateTableContent(matrix, sortedStudents, username)}
-          </Box>
-        </Center>
+          <Center>
+            <Box w="100%">
+              {generateTableContent(matrix, sortedStudents, username)}
+            </Box>
+          </Center>
+        </Stack>
       </Container>
 
       <DragOverlay>
         {draggedStudent ? (
           <Box
             bg="white"
+            _dark={{ bg: "brand.800", color: "brand.100" }}
             border="2px solid"
-            borderColor="teal.500"
+            borderColor="accent.500"
             borderRadius="md"
             shadow="lg"
             px={2}

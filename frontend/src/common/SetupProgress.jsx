@@ -5,11 +5,21 @@ import {
   Text,
   Progress,
   Circle,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { CheckIcon } from "@chakra-ui/icons";
 import { Link as RouterLink } from "react-router-dom";
 
 function SetupProgress({ hasPeriods, hasStudents, hasClassroom, username }) {
+  const bg = useColorModeValue("white", "brand.800");
+  const border = useColorModeValue("brand.200", "brand.700");
+  const labelColor = useColorModeValue("brand.700", "brand.200");
+  const subtleColor = useColorModeValue("brand.500", "brand.400");
+  const linkColor = useColorModeValue("accent.600", "accent.300");
+  const doneColor = useColorModeValue("brand.500", "brand.400");
+  const todoColor = useColorModeValue("brand.700", "brand.200");
+  const dotIdle = useColorModeValue("brand.200", "brand.600");
+
   const steps = [
     {
       label: "Create Period",
@@ -37,28 +47,28 @@ function SetupProgress({ hasPeriods, hasStudents, hasClassroom, username }) {
 
   return (
     <Box
-      bg="white"
+      bg={bg}
       p={6}
       borderRadius="lg"
-      boxShadow="sm"
+      boxShadow="card"
       border="1px"
-      borderColor="gray.200"
+      borderColor={border}
       maxW="md"
       w="full"
     >
       <VStack spacing={4} align="stretch">
         <HStack justify="space-between">
-          <Text fontWeight="semibold" color="gray.700">
+          <Text fontWeight="semibold" color={labelColor}>
             Getting Started
           </Text>
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color={subtleColor}>
             {completedCount} of {steps.length} complete
           </Text>
         </HStack>
 
         <Progress
           value={progressPercent}
-          colorScheme="green"
+          colorScheme="success"
           borderRadius="full"
           size="sm"
         />
@@ -68,7 +78,7 @@ function SetupProgress({ hasPeriods, hasStudents, hasClassroom, username }) {
             <HStack key={step.label} spacing={3}>
               <Circle
                 size={6}
-                bg={step.done ? "green.500" : "gray.200"}
+                bg={step.done ? "success.500" : dotIdle}
                 color="white"
               >
                 {step.done && <CheckIcon boxSize={3} />}
@@ -77,7 +87,7 @@ function SetupProgress({ hasPeriods, hasStudents, hasClassroom, username }) {
                 <Text
                   as={RouterLink}
                   to={step.link}
-                  color="blue.500"
+                  color={linkColor}
                   _hover={{ textDecoration: "underline" }}
                   fontSize="sm"
                 >
@@ -86,7 +96,7 @@ function SetupProgress({ hasPeriods, hasStudents, hasClassroom, username }) {
               ) : (
                 <Text
                   fontSize="sm"
-                  color={step.done ? "gray.500" : "gray.600"}
+                  color={step.done ? doneColor : todoColor}
                   textDecoration={step.done ? "line-through" : "none"}
                 >
                   {step.label}

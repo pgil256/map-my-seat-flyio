@@ -320,6 +320,20 @@ describe("SeatingApi", () => {
       expect(classroom.classroomId).toBe(1);
     });
 
+    it("getClassroom fetches a specific classroom when classroomId is provided", async () => {
+      axios.mockResolvedValue({ data: { classroom: { classroomId: 42 } } });
+
+      const classroom = await SeatingApi.getClassroom("user1", 42);
+
+      expect(axios).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: expect.stringContaining("/classrooms/user1/42"),
+          method: "get",
+        })
+      );
+      expect(classroom.classroomId).toBe(42);
+    });
+
     it("getClassrooms fetches all classrooms", async () => {
       axios.mockResolvedValue({ data: { classrooms: [{ classroomId: 1 }, { classroomId: 2 }] } });
 

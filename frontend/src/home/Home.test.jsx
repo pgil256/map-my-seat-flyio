@@ -4,6 +4,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import UserContext from "../auth/UserContext";
 import { DemoProvider } from "../demo/DemoContext";
+import { demoHeroPreview } from "../demo/demoData";
 import Home from "./Home";
 
 // Mock the API
@@ -67,6 +68,11 @@ describe("Home", () => {
     renderWithProviders(null);
     expect(screen.getAllByRole("button", { name: /sign up/i }).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: /log in/i })).toBeInTheDocument();
+  });
+
+  it("renders the canonical demo score in the landing preview", () => {
+    renderWithProviders(null);
+    expect(screen.getByText(String(demoHeroPreview.score))).toBeInTheDocument();
   });
 
   it("shows quick action cards when logged in", async () => {

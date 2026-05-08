@@ -95,23 +95,27 @@ function SeatingChartHistory({ classroomId, periodId, onSelectChart }) {
       <Heading size="md" mb={4}>Seating Chart History</Heading>
 
       {charts.length === 0 ? (
-        <Text color="gray.500">No saved charts yet. Generate a chart to get started.</Text>
+        <Text color="brand.500">No saved charts yet. Generate a chart to get started.</Text>
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
           {charts.map(chart => (
-            <Card key={chart.seatingChartId} variant="outline">
+            <Card
+              key={chart.seatingChartId}
+              variant="outline"
+              _hover={{ transform: "translateY(-2px)", boxShadow: "md", borderColor: "accent.400" }}
+            >
               <CardBody>
                 <VStack align="start" spacing={2}>
                   <HStack justify="space-between" w="full">
                     <Heading size="sm">
                       {chart.label || `Chart ${chart.number}`}
                     </Heading>
-                    <Badge colorScheme="gray">
+                    <Badge colorScheme="brand">
                       Period {chart.number}
                     </Badge>
                   </HStack>
 
-                  <Text fontSize="sm" color="gray.500">
+                  <Text fontSize="sm" color="brand.500">
                     {formatDate(chart.createdAt)}
                   </Text>
 
@@ -132,8 +136,9 @@ function SeatingChartHistory({ classroomId, periodId, onSelectChart }) {
                     <IconButton
                       size="sm"
                       icon={<DeleteIcon />}
-                      colorScheme="red"
                       variant="ghost"
+                      color="error.600"
+                      _hover={{ bg: "error.50" }}
                       onClick={() => handleDelete(chart.seatingChartId)}
                       aria-label="Delete"
                     />

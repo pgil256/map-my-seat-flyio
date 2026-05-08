@@ -162,8 +162,11 @@ class SeatingApi {
 
   // Classroom specific routes
 
-  static async getClassroom(username) {
-    let res = await this.request(`/classrooms/${username}`);
+  static async getClassroom(username, classroomId = null) {
+    const endpoint = classroomId
+      ? `/classrooms/${username}/${classroomId}`
+      : `/classrooms/${username}`;
+    let res = await this.request(endpoint);
     return res.classroom;
   }
 

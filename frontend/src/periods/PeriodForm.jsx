@@ -11,14 +11,14 @@ import {
   Container,
   Card,
   SimpleGrid,
-  Center,
   CardBody,
   Button,
   FormLabel,
   Input,
   Text,
   Flex,
-  Spacer,
+  HStack,
+  VStack,
 } from "@chakra-ui/react";
 
 //Gets all periods on mount, returns message if there are none yet
@@ -139,177 +139,149 @@ const PeriodForm = () => {
   };
 
   return (
-    <>
-      <Flex direction="row" justifyContent="space-between" w="100vw">
-        <Card mt={2} w="29%" id="forms">
-          <CardBody mt={1} ml={1} p={1}>
-            <form id="newPeriodForm" onSubmit={createPeriod}>
-              <Center>
-                <Heading mb={2} as="h3" size="md">
-                  New Period
-                </Heading>
-              </Center>
+    <Container maxW="7xl" py={{ base: 6, md: 8 }}>
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        justify="space-between"
+        align={{ base: "start", md: "end" }}
+        gap={4}
+        mb={6}
+      >
+        <Box>
+          <Heading size="xl">Enter Class Periods</Heading>
+          <Text color="brand.600" mt={2} maxW="3xl">
+            Create each course section, then open a roster to add students and
+            seating rules.
+          </Text>
+        </Box>
+        <Text color="brand.500" fontSize="sm">
+          {periods.length} period{periods.length === 1 ? "" : "s"}
+        </Text>
+      </Flex>
 
-              <Flex mb={2}>
-                <FormLabel htmlFor="schoolYear" flex="29%">
-                  School Year:
-                </FormLabel>
-                <Input
-                  flex="70%"
-                  type="text"
-                  id="schoolYearInput"
-                  placeholder="2024"
-                  value={formData.schoolYear}
-                  onChange={(e) =>
-                    setFormData((f) => ({ ...f, schoolYear: e.target.value }))
-                  }
-                />
-              </Flex>
+      <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={5} alignItems="start">
+        <VStack spacing={5} align="stretch">
+          <Card id="forms">
+            <CardBody>
+              <form id="newPeriodForm" onSubmit={createPeriod}>
+                <VStack spacing={4} align="stretch">
+                  <Heading as="h3" size="md">New Period</Heading>
+                  <Box>
+                    <FormLabel htmlFor="schoolYearInput">School year</FormLabel>
+                    <Input
+                      type="text"
+                      id="schoolYearInput"
+                      placeholder="2025-2026"
+                      value={formData.schoolYear}
+                      onChange={(e) =>
+                        setFormData((f) => ({ ...f, schoolYear: e.target.value }))
+                      }
+                    />
+                  </Box>
+                  <Box>
+                    <FormLabel htmlFor="titleInput">Class title</FormLabel>
+                    <Input
+                      type="text"
+                      id="titleInput"
+                      placeholder="Algebra 1 Honors"
+                      value={formData.title}
+                      onChange={(e) =>
+                        setFormData((f) => ({ ...f, title: e.target.value }))
+                      }
+                    />
+                  </Box>
+                  <Box>
+                    <FormLabel htmlFor="numberInput">Period number</FormLabel>
+                    <Input
+                      type="number"
+                      id="numberInput"
+                      placeholder="5"
+                      value={formData.number}
+                      onChange={(e) =>
+                        setFormData((f) => ({ ...f, number: e.target.value }))
+                      }
+                    />
+                  </Box>
+                  <Button type="submit">Create Period</Button>
+                </VStack>
+              </form>
+            </CardBody>
+          </Card>
 
-              <Flex mb={2}>
-                <FormLabel htmlFor="title" flex="29%">
-                  Class title:
-                </FormLabel>
-                <Input
-                  flex="70%"
-                  type="text"
-                  id="titleInput"
-                  placeholder="Algebra 1 Honors"
-                  defaultValue={formData.title}
-                  onChange={(e) =>
-                    setFormData((f) => ({ ...f, title: e.target.value }))
-                  }
-                />
-              </Flex>
+          <Card>
+            <CardBody>
+              <form id="selectedPeriodForm">
+                <VStack spacing={4} align="stretch">
+                  <Box>
+                    <Heading as="h3" size="md">Edit Period</Heading>
+                    <Text color="brand.500" fontSize="sm" mt={1}>
+                      Select a period from the list before editing.
+                    </Text>
+                  </Box>
+                  <Box>
+                    <FormLabel htmlFor="selectedSchoolYearInput">School year</FormLabel>
+                    <Input
+                      type="text"
+                      id="selectedSchoolYearInput"
+                      value={selectedPeriod.schoolYear || ""}
+                      onChange={(e) =>
+                        setSelectedPeriod((p) => ({
+                          ...p,
+                          schoolYear: e.target.value,
+                        }))
+                      }
+                    />
+                  </Box>
+                  <Box>
+                    <FormLabel htmlFor="selectedTitleInput">Class title</FormLabel>
+                    <Input
+                      type="text"
+                      id="selectedTitleInput"
+                      value={selectedPeriod.title || ""}
+                      onChange={(e) =>
+                        setSelectedPeriod((p) => ({ ...p, title: e.target.value }))
+                      }
+                    />
+                  </Box>
+                  <Box>
+                    <FormLabel htmlFor="selectedNumberInput">Period number</FormLabel>
+                    <Input
+                      type="number"
+                      id="selectedNumberInput"
+                      value={selectedPeriod.number || ""}
+                      onChange={(e) =>
+                        setSelectedPeriod((p) => ({ ...p, number: e.target.value }))
+                      }
+                    />
+                  </Box>
+                  <HStack>
+                    <Button
+                      id="saveButton"
+                      onClick={(e) => updatePeriod(e, selectedPeriod)}
+                      isDisabled={!selectedPeriod.periodId}
+                    >
+                      Save
+                    </Button>
+                    <Button
+                      variant="danger"
+                      id="deleteButton"
+                      onClick={(e) => deletePeriod(e, selectedPeriod)}
+                      isDisabled={!selectedPeriod.periodId}
+                    >
+                      Delete
+                    </Button>
+                  </HStack>
+                  {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
+                  {saveConfirmed ? (
+                    <MakeAlert messages={["Changes saved successfully."]} />
+                  ) : null}
+                </VStack>
+              </form>
+            </CardBody>
+          </Card>
+        </VStack>
 
-              <Flex mb={2}>
-                <FormLabel htmlFor="number" flex="30%">
-                  Period number:
-                </FormLabel>
-                <Input
-                  flex="70%"
-                  type="number"
-                  id="numberInput"
-                  placeholder="5"
-                  defaultValue={formData.number}
-                  onChange={(e) =>
-                    setFormData((f) => ({ ...f, number: e.target.value }))
-                  }
-                />
-              </Flex>
-
-              <Center>
-                <Button mb={2} colorScheme="green" onClick={createPeriod}>
-                  Create Period
-                </Button>
-              </Center>
-            </form>
-          </CardBody>
-
-          <CardBody m={1} p={2} key={selectedPeriod.id}>
-            <form id="selectedPeriodForm">
-              <Center>
-                <Heading mb={2} as="h3" size="md">
-                  Edit Period
-                </Heading>
-              </Center>
-
-              <Flex mb={2}>
-                <FormLabel htmlFor="schoolYear" flex="30%">
-                  School Year:
-                </FormLabel>
-                <Input
-                  flex="70%"
-                  type="text"
-                  id="schoolYearInput"
-                  value={selectedPeriod.schoolYear || ""}
-                  onChange={(e) =>
-                    setSelectedPeriod((p) => ({
-                      ...p,
-                      schoolYear: e.target.value,
-                    }))
-                  }
-                />
-              </Flex>
-
-              <Flex mb={2}>
-                <FormLabel htmlFor="title" flex="30%">
-                  Class title:
-                </FormLabel>
-                <Input
-                  flex="74%"
-                  type="text"
-                  id="titleInput"
-                  value={selectedPeriod.title || ""}
-                  onChange={(e) =>
-                    setSelectedPeriod((p) => ({ ...p, title: e.target.value }))
-                  }
-                />
-              </Flex>
-
-              <Flex mb={2}>
-                <FormLabel htmlFor="number" flex="30%">
-                  Period number:
-                </FormLabel>
-                <Input
-                  flex="70%"
-                  type="number"
-                  id="numberInput"
-                  value={selectedPeriod.number || ""}
-                  onChange={(e) =>
-                    setSelectedPeriod((p) => ({ ...p, number: e.target.value }))
-                  }
-                />
-              </Flex>
-
-              <Center>
-                <Button
-                  mb={2}
-                  mr={2}
-                  colorScheme="green"
-                  id="saveButton"
-                  onClick={(e) => updatePeriod(e, selectedPeriod)}
-                >
-                  Save
-                </Button>
-                <Button
-                  mb={2}
-                  ml={2}
-                  colorScheme="red"
-                  variant="outline"
-                  id="deleteButton"
-                  onClick={(e) => deletePeriod(e, selectedPeriod)}
-                >
-                  Delete
-                </Button>
-              </Center>
-
-              <Center>
-                {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
-                {saveConfirmed ? (
-                  <MakeAlert messages={["Changes saved successfully."]} />
-                ) : null}
-              </Center>
-            </form>
-          </CardBody>
-        </Card>
-
-        <Card m={3} w="69%" id="periodContainer">
-          <Center>
-            <Box mt={1} p={1} flex="1">
-              <Center>
-                <Heading>Enter Class Periods</Heading>
-              </Center>
-              <Container mt={2} maxW="4xl" centerContent>
-                <Box padding="1" color="black">
-                  Use this page to enter each of your course sections. Once
-                  finished, hit the 'Add Students' Button to add student
-                  rosters. Each period will populate below and can be modified
-                  by hitting the 'Edit Period' button.
-                </Box>
-              </Container>
-            </Box>
-          </Center>
+        <Card id="periodContainer" gridColumn={{ base: "auto", lg: "span 2" }}>
           <CardBody>
             {periods && periods.length === 0 ? (
               <EmptyState
@@ -319,64 +291,51 @@ const PeriodForm = () => {
                 onAction={() => document.getElementById("titleInput")?.focus()}
               />
             ) : (
-              <SimpleGrid columns={3} spacing={2}>
+              <Stack spacing={3}>
                 {periods.map((period, index) => (
-                  <Box py={4} key={period.periodId}>
-                    <Box
-                      maxW={"280px"}
-                      w={"full"}
-                      bg={"white"}
-                      boxShadow={"2xl"}
-                      rounded={"lg"}
-                      p={2}
-                      textAlign={"center"}
-                    >
-                      <Heading fontSize={"2xl"} fontFamily={"body"}>
-                        Period {period.number}
-                      </Heading>
-                      <Center>
-                        <Stack direction="row">
-                          <Text fontWeight={600} color={"gray.500"} mb={2}>
-                            {period.title}
-                          </Text>
-                          <Text fontWeight={600} color={"gray.500"}>
-                            {period.schoolYear}
-                          </Text>
-                        </Stack>
-                      </Center>
-
-                      <Stack mt={2} direction={"row"} spacing={2}>
-                        <Button
-                          onClick={() => handleEdit(index)}
-                          flex={1}
-                          fontSize={"sm"}
-                          _focus={{
-                            bg: "gray.200",
-                          }}
-                        >
-                          Edit Period
-                        </Button>
-                        <Button
-                          onClick={() =>
-                            navigate(`/periods/${period.periodId}`)
-                          }
-                          flex={1}
-                          fontSize={"sm"}
-                          colorScheme="green"
-                        >
-                          Add Students
-                        </Button>
-                      </Stack>
+                  <Flex
+                    key={period.periodId}
+                    align={{ base: "start", md: "center" }}
+                    justify="space-between"
+                    gap={4}
+                    direction={{ base: "column", md: "row" }}
+                    p={4}
+                    borderWidth="1px"
+                    borderColor="brand.200"
+                    borderRadius="md"
+                    bg="white"
+                    _dark={{ bg: "brand.800", borderColor: "brand.700" }}
+                  >
+                    <Box>
+                      <Heading size="md">Period {period.number}</Heading>
+                      <HStack spacing={3} mt={1} color="brand.500" fontSize="sm">
+                        <Text fontWeight="medium">{period.title}</Text>
+                        <Text>{period.schoolYear}</Text>
+                      </HStack>
                     </Box>
-                    <Spacer />
-                  </Box>
+                    <Stack direction={{ base: "column", sm: "row" }} spacing={2} w={{ base: "full", md: "auto" }}>
+                      <Button
+                        onClick={() => handleEdit(index)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Edit Period
+                      </Button>
+                      <Button
+                        onClick={() => navigate(`/periods/${period.periodId}`)}
+                        size="sm"
+                      >
+                        Add Students
+                      </Button>
+                    </Stack>
+                  </Flex>
                 ))}
-              </SimpleGrid>
+              </Stack>
             )}
           </CardBody>
         </Card>
-      </Flex>
-    </>
+      </SimpleGrid>
+    </Container>
   );
 };
 

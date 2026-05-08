@@ -115,8 +115,14 @@ the score badge flips red:
 
 ![Post-drop violation: score -30, tooltip "Too close to Mason Miller"](screenshots/violation.png)
 
-See [demo.gif](screenshots/demo.gif) for the full sequence: score
-75 → −30 → 80 across drop, view, re-optimize.
+The portfolio preview, demo mode, and live seating screen now share one
+canonical fixture. The seeded Period 1 demo loads Room 101 with a score of
+95, no hard violations, and two seat-together pairs satisfied. That keeps
+the public screenshot, no-signup demo, and real chart flow from drifting.
+
+See [demo.gif](screenshots/demo.gif) for the full sequence: generate a chart,
+inspect rationale, make a manual swap, then re-optimize from the current
+layout.
 
 ## What I'd do next
 

@@ -93,7 +93,7 @@ function ClassroomList() {
     <Container maxW="6xl" py={8}>
       <HStack justify="space-between" mb={6}>
         <Heading size="lg">My Classrooms</Heading>
-        <Button leftIcon={<AddIcon />} colorScheme="blue" onClick={onOpen}>
+        <Button leftIcon={<AddIcon />} onClick={onOpen}>
           New Classroom
         </Button>
       </HStack>
@@ -108,11 +108,15 @@ function ClassroomList() {
       ) : (
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
           {classrooms.map((classroom) => (
-            <Card key={classroom.classroomId} variant="outline">
+            <Card
+              key={classroom.classroomId}
+              variant="outline"
+              _hover={{ transform: "translateY(-2px)", boxShadow: "md", borderColor: "accent.400" }}
+            >
               <CardBody>
                 <VStack align="start" spacing={3}>
                   <Heading size="md">{classroom.name}</Heading>
-                  <Text color="gray.500" fontSize="sm">
+                  <Text color="brand.500" fontSize="sm">
                     {getDeskCount(classroom.seatingConfig) > 0
                       ? `${getDeskCount(classroom.seatingConfig)} desks`
                       : "No layout configured"}
@@ -120,15 +124,13 @@ function ClassroomList() {
                   <HStack spacing={2} w="full">
                     <Button
                       flex={1}
-                      colorScheme="blue"
                       onClick={() => navigate(`/classrooms/${currentUser.username}/${classroom.classroomId}`)}
                     >
                       Edit Layout
                     </Button>
                     <IconButton
                       icon={<DeleteIcon />}
-                      colorScheme="red"
-                      variant="outline"
+                      variant="danger"
                       onClick={() => handleDeleteClassroom(classroom.classroomId)}
                       aria-label="Delete classroom"
                     />
@@ -155,7 +157,7 @@ function ClassroomList() {
             <Button variant="ghost" mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme="blue" onClick={handleCreateClassroom}>
+            <Button onClick={handleCreateClassroom}>
               Create
             </Button>
           </ModalFooter>

@@ -1,4 +1,4 @@
-import { VStack, Text, Button, Box, Heading, useColorModeValue } from "@chakra-ui/react";
+import { VStack, Text, Button, Box, Heading, Circle, useColorModeValue } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 
 function EmptyState({
@@ -9,34 +9,36 @@ function EmptyState({
   actionTo,
   onAction
 }) {
-  // Design system colors
   const bgColor = useColorModeValue("brand.50", "brand.800");
   const borderColor = useColorModeValue("brand.200", "brand.700");
-  const iconColor = useColorModeValue("brand.400", "brand.400");
+  const accentBg = useColorModeValue("accent.100", "accent.900");
+  const accentFg = useColorModeValue("accent.600", "accent.300");
   const headingColor = useColorModeValue("brand.800", "brand.100");
-  const textColor = useColorModeValue("brand.500", "brand.400");
+  const textColor = useColorModeValue("brand.600", "brand.400");
 
   return (
     <VStack
       spacing={4}
-      py={12}
+      py={14}
       px={6}
       bg={bgColor}
-      borderRadius="lg"
-      border="2px dashed"
+      borderRadius="xl"
+      borderWidth="1px"
       borderColor={borderColor}
       textAlign="center"
     >
-      {icon && (
-        <Box color={iconColor} fontSize="4xl">
-          {icon}
-        </Box>
-      )}
+      <Circle size="56px" bg={accentBg} color={accentFg}>
+        {icon ? (
+          <Box fontSize="2xl">{icon}</Box>
+        ) : (
+          <Box w="10px" h="10px" borderRadius="full" bg={accentFg} />
+        )}
+      </Circle>
       <Heading as="h3" size="md" color={headingColor}>
         {title}
       </Heading>
       {description && (
-        <Text color={textColor} maxW="sm">
+        <Text color={textColor} maxW="sm" lineHeight="tall">
           {description}
         </Text>
       )}

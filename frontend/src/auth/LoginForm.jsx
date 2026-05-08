@@ -60,7 +60,7 @@ const LoginForm = ({ login }) => {
       height={"100vh"}
       alignContent={"center"}
       justifyContent={"center"}
-      bg={useColorModeValue("gray.50", "gray.800")}
+      bg={useColorModeValue("brand.50", "brand.900")}
     >
       <Stack spacing={6} mx={"auto"} maxW={"lg"} py={12} px={6}>
         <Stack align={"center"}>
@@ -68,9 +68,11 @@ const LoginForm = ({ login }) => {
         </Stack>
         <Box
           rounded={"lg"}
-          bg={useColorModeValue("white", "gray.700")}
+          bg={useColorModeValue("white", "brand.800")}
           boxShadow={"lg"}
           p={8}
+          borderWidth="1px"
+          borderColor={useColorModeValue("brand.200", "brand.700")}
         >
           <Stack spacing={6}>
             <form onSubmit={handleSubmit}>
@@ -102,8 +104,7 @@ const LoginForm = ({ login }) => {
               <Center mt={6}>
                 <Button
                   type="submit"
-                  colorScheme={"green"}
-                  rounded={"full"}
+                  variant="solid"
                   px={6}
                   w="full"
                   isLoading={isSubmitting}
@@ -113,9 +114,9 @@ const LoginForm = ({ login }) => {
                 </Button>
               </Center>
               {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
-              <Text mt={4} textAlign="center" fontSize="sm" color="gray.500">
+              <Text mt={4} textAlign="center" fontSize="sm" color={useColorModeValue("brand.500", "brand.400")}>
                 Don't have an account?{" "}
-                <Link as={RouterLink} to="/signup" color="blue.400" fontWeight="medium">
+                <Link as={RouterLink} to="/signup" color={useColorModeValue("accent.600", "accent.400")} fontWeight="medium">
                   Sign up
                 </Link>
               </Text>

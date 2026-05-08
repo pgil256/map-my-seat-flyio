@@ -79,6 +79,70 @@ describe("GET /classrooms/:username", () => {
   });
 });
 
+describe("GET /classrooms/:username/:classroomId", () => {
+  test("works for correct user", async () => {
+    const classroom = await db("classrooms")
+      .where("user_username", "u1")
+      .first();
+
+    const resp = await request(app)
+      .get(`/classrooms/u1/${classroom.classroom_id}`)
+      .set("authorization", `Bearer ${getU1Token()}`);
+
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.body).toHaveProperty("classroom");
+    expect(resp.body.classroom).toHaveProperty("classroomId", classroom.classroom_id);
+  });
+
+  test("works for admin", async () => {
+    const classroom = await db("classrooms")
+      .where("user_username", "u1")
+      .first();
+
+    const resp = await request(app)
+      .get(`/classrooms/u1/${classroom.classroom_id}`)
+      .set("authorization", `Bearer ${getAdminToken()}`);
+
+    expect(resp.statusCode).toEqual(200);
+  });
+
+  test("unauth for wrong user", async () => {
+    const classroom = await db("classrooms")
+      .where("user_username", "u1")
+      .first();
+
+    const resp = await request(app)
+      .get(`/classrooms/u1/${classroom.classroom_id}`)
+      .set("authorization", `Bearer ${getU2Token()}`);
+
+    expect(resp.statusCode).toEqual(401);
+  });
+
+  test("not found when classroom id belongs to another user", async () => {
+    const [classroom] = await db("classrooms")
+      .insert({
+        user_username: "u2",
+        name: "U2 Classroom",
+        seat_alphabetical: false,
+        seat_randomize: false,
+        seat_high_low: false,
+        seat_male_female: false,
+        ese_is_priority: false,
+        ell_is_priority: false,
+        fivezerofour_is_priority: false,
+        ebd_is_priority: false,
+        seating_config: "[[\"desk\"]]",
+      })
+      .returning(["classroom_id"]);
+
+    const resp = await request(app)
+      .get(`/classrooms/u1/${classroom.classroom_id}`)
+      .set("authorization", `Bearer ${getU1Token()}`);
+
+    expect(resp.statusCode).toEqual(404);
+  });
+});
+
 describe("POST /classrooms/:username", () => {
   test("works for correct user", async () => {
     const resp = await request(app)

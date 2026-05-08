@@ -7,11 +7,11 @@ function LoadingSpinner({ message = "Loading..." }) {
         <Spinner
           thickness="4px"
           speed="0.65s"
-          emptyColor="gray.200"
-          color="blue.500"
+          emptyColor="brand.200"
+          color="accent.500"
           size="xl"
         />
-        <Text color="gray.500">{message}</Text>
+        <Text color="brand.500">{message}</Text>
       </VStack>
     </Center>
   );

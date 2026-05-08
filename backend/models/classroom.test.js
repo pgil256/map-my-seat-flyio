@@ -31,6 +31,25 @@ describe("Classroom", () => {
     });
   });
 
+  describe("getClassroomById", () => {
+    it("returns the requested classroom by id", async () => {
+      const primary = await Classroom.getClassroom("u1");
+      const classroom = await Classroom.getClassroomById(primary.classroomId, "u1");
+
+      expect(classroom).toHaveProperty("classroomId", primary.classroomId);
+      expect(classroom).toHaveProperty("username", "u1");
+      expect(classroom).toHaveProperty("seatingConfig");
+    });
+
+    it("throws NotFoundError when the classroom does not belong to the user", async () => {
+      const u2Classroom = await Classroom.createClassroom("u2");
+
+      await expect(
+        Classroom.getClassroomById(u2Classroom.classroomId, "u1")
+      ).rejects.toThrow(NotFoundError);
+    });
+  });
+
   describe("createClassroom", () => {
     it("creates a new classroom for a user", async () => {
       // First check if u2 doesn't have a classroom

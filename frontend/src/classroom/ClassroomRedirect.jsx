@@ -58,7 +58,6 @@ const ClassroomRedirect = (props) => {
               <Button
                 size="md"
                 m={2}
-                colorScheme="blue"
                 onClick={(e) => getSeatingChart(e, period.number)}
                 value={period.number}
                 key={period.number}

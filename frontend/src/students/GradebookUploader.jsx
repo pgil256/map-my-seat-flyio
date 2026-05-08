@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Flex, Box, Heading, Collapse, Center, Stack, SimpleGrid, Text, Button } from "@chakra-ui/react"; 
+import { Flex, Box, Heading, Collapse, Center, Stack, SimpleGrid, Text, Button } from "@chakra-ui/react";
 
 const StudentGrid = ({ students }) => {
 
@@ -21,30 +21,31 @@ return(
           <React.Fragment key={student.studentId}>
             <Flex py={5} position="relative">
               <Box
-                maxW={"510px"}
-                w={"full"}
-                bg={"white"}
-                boxShadow={"2xl"}
-                rounded={"lg"}
+                maxW="510px"
+                w="full"
+                bg="white"
+                _dark={{ bg: "brand.800" }}
+                boxShadow="md"
+                rounded="lg"
                 p={5}
-                textAlign={"center"}
-                   >
+                textAlign="center"
+              >
                 <Heading
                   fontSize={"2xl"}
                   fontFamily={"body"}
                   onClick={() => handleCardClick(student)}
-              
+
                   style={{ cursor: "pointer" }}
                 >
                   {student.name}
                 </Heading>
                 <Collapse in={expandedCard === student.studentId}>
-                  
+
                     <>
                       <Center>
                         <Stack
                           fontWeight={600}
-                          color={"gray.500"}
+                          color="brand.500"
                           m={1}
                           w="250px"
                         >
@@ -70,16 +71,16 @@ return(
                         <Button
                           flex={1}
                           fontSize={"sm"}
-                          rounded={"full"}
+                          variant="outline"
                           _focus={{
-                            bg: "gray.200",
+                            bg: "brand.100",
                           }}
                         >
                           Edit Student
                         </Button>
                       </Stack>
                     </>
-                  
+
                 </Collapse>
               </Box>
             </Flex>

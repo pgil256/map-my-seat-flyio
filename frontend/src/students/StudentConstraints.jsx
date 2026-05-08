@@ -121,7 +121,7 @@ function StudentConstraints({ periodId, students }) {
               ))}
             </Select>
 
-            <Button colorScheme="blue" onClick={handleAddConstraint}>
+            <Button onClick={handleAddConstraint}>
               Add
             </Button>
           </HStack>
@@ -134,13 +134,13 @@ function StudentConstraints({ periodId, students }) {
                   <HStack
                     key={c.constraintId}
                     p={2}
-                    bg="gray.50"
+                    bg="brand.50"
                     borderRadius="md"
                     justify="space-between"
                   >
                     <HStack>
                       <Text>{c.studentName1}</Text>
-                      <Badge colorScheme={c.constraintType === 'separate' ? 'red' : 'green'}>
+                      <Badge colorScheme={c.constraintType === 'separate' ? 'error' : 'success'}>
                         {c.constraintType === 'separate' ? 'apart from' : 'with'}
                       </Badge>
                       <Text>{c.studentName2}</Text>
@@ -149,7 +149,8 @@ function StudentConstraints({ periodId, students }) {
                       icon={<DeleteIcon />}
                       size="sm"
                       variant="ghost"
-                      colorScheme="red"
+                      color="error.600"
+                      _hover={{ bg: "error.50" }}
                       onClick={() => handleDeleteConstraint(c.constraintId)}
                       aria-label="Remove constraint"
                     />

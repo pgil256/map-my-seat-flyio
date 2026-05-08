@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Center, Box, Table, Tbody, Tr, Td, Button, HStack, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, Table, Tbody, Tr, Td, Button, HStack, Text, useColorModeValue } from "@chakra-ui/react";
 
 //Creates the dynamic table for the classroom
 //Uses state to apply css classes at various divs in in the table matrix
@@ -41,10 +41,15 @@ const Classroom = (props) => {
 
   return (
     <Box>
-      <Center>
-        <HStack mb={4} spacing={4}>
+      <HStack
+        mb={4}
+        spacing={3}
+        justify="space-between"
+        align={{ base: "start", md: "center" }}
+        flexWrap="wrap"
+      >
+        <HStack spacing={3}>
           <Button
-            width="200px"
             size="sm"
             onClick={() => setSelected("teacher-desk")}
             variant={selected === "teacher-desk" ? "solid" : "outline"}
@@ -52,7 +57,6 @@ const Classroom = (props) => {
             Teacher Desk
           </Button>
           <Button
-            width="200px"
             size="sm"
             onClick={() => setSelected("desk")}
             variant={selected === "desk" ? "solid" : "outline"}
@@ -60,9 +64,10 @@ const Classroom = (props) => {
             Student Desk
           </Button>
         </HStack>
-      </Center>
-      <Center>
-        <HStack spacing={4} mb={4} fontSize="sm" color={textColor}>
+        <HStack spacing={4} fontSize="sm" color={textColor}>
+          <Text>
+            Selected: <strong>{selected === "teacher-desk" ? "Teacher desk" : selected === "desk" ? "Student desk" : "None"}</strong>
+          </Text>
           <Text>
             Student Desks: <strong>{deskCount}</strong>
           </Text>
@@ -70,36 +75,38 @@ const Classroom = (props) => {
             Teacher Desk: <strong>{teacherDeskCount}</strong>
           </Text>
         </HStack>
-      </Center>
-      <Table h="375px" w="925px">
-        <Tbody>
-          {tableMatrix.map((row, rowIndex) => (
-            <Tr key={rowIndex}>
-              {row.map((cell, colIndex) => (
-                <Td
-                  key={colIndex}
-                  className={cell}
-                  onClick={() => handleClick(rowIndex, colIndex)}
-                  bg={
-                    cell === "desk"
-                      ? deskBg
-                      : cell === "teacher-desk"
-                      ? teacherDeskBg
-                      : emptyBg
-                  }
-                  borderWidth="1px"
-                  borderColor={cell === "desk" ? deskBorder : borderColor}
-                  p={2}
-                  _hover={{ bg: hoverBg, boxShadow: "sm" }}
-                  cursor="pointer"
-                  transition="all 0.15s ease"
-                  borderRadius="md"
-                ></Td>
-              ))}
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+      </HStack>
+      <Box overflowX="auto" borderWidth="1px" borderColor={borderColor} borderRadius="md">
+        <Table w="100%" minW="720px" sx={{ tableLayout: "fixed" }}>
+          <Tbody>
+            {tableMatrix.map((row, rowIndex) => (
+              <Tr key={rowIndex}>
+                {row.map((cell, colIndex) => (
+                  <Td
+                    key={colIndex}
+                    className={cell}
+                    onClick={() => handleClick(rowIndex, colIndex)}
+                    bg={
+                      cell === "desk"
+                        ? deskBg
+                        : cell === "teacher-desk"
+                        ? teacherDeskBg
+                        : emptyBg
+                    }
+                    borderWidth="1px"
+                    borderColor={cell === "desk" ? deskBorder : borderColor}
+                    p={2}
+                    h="42px"
+                    _hover={{ bg: hoverBg }}
+                    cursor="pointer"
+                    transition="background-color 0.15s ease"
+                  />
+                ))}
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </Box>
     </Box>
   );
 };

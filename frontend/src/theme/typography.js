@@ -5,13 +5,14 @@ export const fonts = {
 };
 
 export const fontSizes = {
-  xs: '0.625rem',   // 10px - badges
-  sm: '0.75rem',    // 12px - labels, small text
-  md: '0.875rem',   // 14px - body
-  lg: '1.125rem',   // 18px - section headers
-  xl: '1.5rem',     // 24px - page titles
-  '2xl': '1.875rem', // 30px
-  '3xl': '2.25rem',  // 36px
+  xs: '0.6875rem',   // 11px - badges
+  sm: '0.8125rem',   // 13px - labels, small text
+  md: '1rem',        // 16px - body
+  lg: '1.25rem',     // 20px - section headers
+  xl: '1.75rem',     // 28px - page titles
+  '2xl': '2.25rem',  // 36px
+  '3xl': '3rem',     // 48px
+  '4xl': '3.75rem',  // 60px - hero display
 };
 
 export const fontWeights = {
@@ -19,6 +20,7 @@ export const fontWeights = {
   medium: 500,
   semibold: 600,
   bold: 700,
+  extrabold: 800,
 };
 
 export const lineHeights = {
@@ -31,8 +33,8 @@ export const lineHeights = {
 };
 
 export const letterSpacings = {
-  tighter: '-0.025em',
-  tight: '-0.0125em',
+  tighter: '0',
+  tight: '0',
   normal: '0',
   wide: '0.025em',
 };

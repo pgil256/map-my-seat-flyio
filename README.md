@@ -6,6 +6,8 @@ Automated seating chart generator for K-12 teachers. [Live demo](https://map-my-
 
 Map My Seat creates optimized classroom seating charts. Import a roster, design the room layout, set "keep apart" / "seat together" rules, and a simulated-annealing solver places students against a weighted objective covering constraint satisfaction, accommodations, and per-row balance.
 
+The demo now runs on the same canonical classroom, roster, constraints, and solver path as the live seating workflow, so the portfolio preview and in-app demo stay in sync.
+
 For the design rationale — why simulated annealing over ILP or greedy, the objective function, and the "why this seat?" UX — see [docs/CASE_STUDY.md](docs/CASE_STUDY.md).
 
 ## Screenshots
@@ -14,7 +16,14 @@ For the design rationale — why simulated annealing over ILP or greedy, the obj
 |:---:|:---:|:---:|
 | ![Landing](docs/screenshots/landing.png) | ![Classroom](docs/screenshots/classroom.png) | ![Seating](docs/screenshots/seating.png) |
 
-The seating-chart view shows the arrangement score, per-desk "why this seat?" tooltips, and drag-to-swap with Undo and Re-optimize.
+The seating-chart view shows the arrangement score, per-desk "why this seat?" tooltips, drag-to-swap, Undo, Re-optimize, and print/PDF export controls.
+
+To refresh portfolio screenshots, start the frontend locally and run:
+
+```bash
+cd frontend
+SCREENSHOT_BASE_URL=http://127.0.0.1:5177 npm run screenshots
+```
 
 ## Features
 
@@ -26,7 +35,7 @@ The seating-chart view shows the arrangement score, per-desk "why this seat?" to
 - **Flexible layouts** — grid-based desk editor with autosave.
 - **CSV import** — bulk-upload rosters from gradebook exports.
 - **PDF export** — print-ready charts.
-- **Demo mode** — sample data preloaded, no signup needed.
+- **Demo mode** — sample data preloaded, no signup needed, with the landing preview generated from the same solver-backed fixture.
 
 ## Local development
 
@@ -89,6 +98,7 @@ Authorization: Bearer <token>
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/classrooms/:username/all` | List classrooms |
+| GET | `/classrooms/:username/:classroomId` | Get one classroom |
 | POST | `/classrooms/:username` | Create classroom |
 | PATCH | `/classrooms/:username/:classroomId` | Update classroom |
 | DELETE | `/classrooms/:username/:classroomId` | Delete classroom |

@@ -56,8 +56,8 @@ class Classroom {
     return classrooms;
   }
 
-  static async getClassroomById(classroomId) {
-    const classroom = await db
+  static async getClassroomById(classroomId, username) {
+    const query = db
       .select([
         db.raw('classroom_id AS "classroomId"'),
         db.raw('user_username AS "username"'),
@@ -73,8 +73,13 @@ class Classroom {
         db.raw('seating_config AS "seatingConfig"')
       ])
       .from('classrooms')
-      .where('classroom_id', classroomId)
-      .first();
+      .where('classroom_id', classroomId);
+
+    if (username) {
+      query.where('user_username', username);
+    }
+
+    const classroom = await query.first();
 
     if (!classroom) {
       throw new NotFoundError(`Classroom with id ${classroomId} does not exist`);
@@ -159,7 +164,7 @@ class Classroom {
 
     return classroom[0];
   }
-  
+
 
   static async deleteClassroom(classroomId) {
     const classroom = await db('classrooms')

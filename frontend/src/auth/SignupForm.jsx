@@ -89,7 +89,7 @@ const SignupForm = ({ signup }) => {
       height={"70vh"}
       alignContent={"center"}
       justifyContent={"center"}
-      bg={useColorModeValue("gray.50", "gray.800")}
+      bg={useColorModeValue("brand.50", "brand.900")}
     >
       <Stack spacing={12} mx={"auto"} maxW={"5xl"} maxH={"5xl"} py={4} px={4}>
         <Stack align={"center"}>
@@ -97,9 +97,11 @@ const SignupForm = ({ signup }) => {
         </Stack>
         <Box
           rounded={"lg"}
-          bg={useColorModeValue("white", "gray.700")}
+          bg={useColorModeValue("white", "brand.800")}
           boxShadow={"lg"}
           p={10}
+          borderWidth="1px"
+          borderColor={useColorModeValue("brand.200", "brand.700")}
         >
           <Center>
             <Stack spacing={5}>
@@ -195,8 +197,7 @@ const SignupForm = ({ signup }) => {
                 <Center>
                   <Button
                     type="submit"
-                    colorScheme={"green"}
-                    rounded={"full"}
+                    variant="solid"
                     px={6}
                     isLoading={isSubmitting}
                     loadingText="Signing up..."
@@ -205,9 +206,9 @@ const SignupForm = ({ signup }) => {
                   </Button>
                 </Center>
                 {formErrors.length ? <MakeAlert messages={formErrors} /> : null}
-                <Text mt={4} textAlign="center" fontSize="sm" color="gray.500">
+                <Text mt={4} textAlign="center" fontSize="sm" color={useColorModeValue("brand.500", "brand.400")}>
                   Already have an account?{" "}
-                  <Link as={RouterLink} to="/login" color="blue.400" fontWeight="medium">
+                  <Link as={RouterLink} to="/login" color={useColorModeValue("accent.600", "accent.400")} fontWeight="medium">
                     Log in
                   </Link>
                 </Text>

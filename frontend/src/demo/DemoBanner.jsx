@@ -12,8 +12,9 @@ import { useDemo } from "./DemoContext";
 export default function DemoBanner() {
   const { isDemo, exitDemo } = useDemo();
   const navigate = useNavigate();
-  const bgColor = useColorModeValue("orange.100", "orange.800");
-  const textColor = useColorModeValue("orange.800", "orange.100");
+  const bgColor = useColorModeValue("warning.100", "warning.800");
+  const textColor = useColorModeValue("brand.800", "warning.100");
+  const borderColor = useColorModeValue("warning.200", "warning.700");
 
   if (!isDemo) return null;
 
@@ -36,6 +37,8 @@ export default function DemoBanner() {
       position="sticky"
       top={0}
       zIndex={1000}
+      borderBottom="1px solid"
+      borderColor={borderColor}
     >
       <HStack justify="center" spacing={4} flexWrap="wrap">
         <HStack>
@@ -47,7 +50,7 @@ export default function DemoBanner() {
         <HStack spacing={2}>
           <Button
             size="sm"
-            colorScheme="green"
+            variant="solid"
             onClick={handleSignUp}
           >
             Sign Up to Save
@@ -55,7 +58,6 @@ export default function DemoBanner() {
           <Button
             size="sm"
             variant="outline"
-            colorScheme="orange"
             onClick={handleExit}
           >
             Exit Demo

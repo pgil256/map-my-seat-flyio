@@ -77,7 +77,7 @@ describe("SeatingChart Component", () => {
     renderWithProviders();
 
     await waitFor(() => {
-      expect(SeatingApi.getClassroom).toHaveBeenCalledWith("testuser");
+      expect(SeatingApi.getClassroom).toHaveBeenCalledWith("testuser", "1");
     });
   });
 

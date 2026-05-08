@@ -80,8 +80,8 @@ function MobileNav({ currentUser, logout }) {
                     w="full"
                     justifyContent="flex-start"
                     onClick={handleLogout}
-                    color="red.500"
-                    _hover={{ bg: "red.50" }}
+                    color="error.600"
+                    _hover={{ bg: "error.50" }}
                   >
                     Logout
                   </Button>

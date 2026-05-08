@@ -7,10 +7,8 @@ import MakeAlert from "../common/MakeAlert";
 import useAutosave from "../hooks/useAutosave";
 import { useAppToast } from "../common/ToastContext";
 import {
-  Center,
   Box,
   FormLabel,
-  Flex,
   Heading,
   Text,
   VStack,
@@ -22,6 +20,8 @@ import {
   Checkbox,
   Card,
   CardBody,
+  Container,
+  Stack,
   useColorModeValue,
 } from "@chakra-ui/react";
 
@@ -176,150 +176,122 @@ const ClassroomForm = () => {
     getClassroomOnMount();
   }, [username, getClassroomOnMount]);
 
+  const seatStyleValue =
+    (formData.seatAlphabetical && "Alphabetical") ||
+    (formData.seatRandomize && "Random") ||
+    (formData.seatHighLow && "High-Low") ||
+    (formData.seatMaleFemale && "Male-Female") ||
+    "";
+
   return (
-    <Flex maxH="85vh" maxW="95%" m={4} direction="row" gap={6}>
-      {/* Settings Card */}
-      <Card p={6} minW="320px" maxW="400px">
-        <CardBody>
-          <VStack spacing={5} align="stretch">
-            <FormLabel fontSize="lg" color={labelColor} mb={0}>
-              Seat near front:
-            </FormLabel>
-            <HStack spacing={5}>
-              <Checkbox
-                colorScheme="brand"
-                name="eseIsPriority"
-                isChecked={formData.eseIsPriority}
-                onChange={handleChange}
-                id="eseIsPriority"
-              >
-                ESE
-              </Checkbox>
-
-              <Checkbox
-                colorScheme="brand"
-                name="fiveZeroFourIsPriority"
-                isChecked={formData.fiveZeroFourIsPriority}
-                onChange={handleChange}
-                id="fiveZeroFourIsPriority"
-              >
-                504
-              </Checkbox>
-
-              <Checkbox
-                colorScheme="brand"
-                name="ellIsPriority"
-                isChecked={formData.ellIsPriority}
-                onChange={handleChange}
-                id="ellIsPriority"
-              >
-                ELL
-              </Checkbox>
-
-              <Checkbox
-                colorScheme="brand"
-                name="ebdIsPriority"
-                isChecked={formData.ebdIsPriority}
-                onChange={handleChange}
-                id="ebdIsPriority"
-              >
-                EBD
-              </Checkbox>
-            </HStack>
-
-            <FormLabel fontSize="lg" color={labelColor} mb={0}>
-              Seating style:
-            </FormLabel>
-            <RadioGroup>
-              <SimpleGrid columns={2} spacing={4} w="100%">
-                <Radio
-                  colorScheme="brand"
-                  name="seatStyle"
-                  value="Alphabetical"
-                  isChecked={formData.seatAlphabetical === "Alphabetical"}
-                  onChange={handleChange}
-                  id="seatAlphabetical"
-                >
-                  Alphabetical
-                </Radio>
-
-                <Radio
-                  colorScheme="brand"
-                  name="seatStyle"
-                  value="Random"
-                  isChecked={formData.seatRandomize === "Random"}
-                  onChange={handleChange}
-                  id="seatRandomize"
-                >
-                  Random
-                </Radio>
-
-                <Radio
-                  colorScheme="brand"
-                  name="seatStyle"
-                  value="High-Low"
-                  isChecked={formData.seatHighLow === "High-Low"}
-                  onChange={handleChange}
-                  id="seatHighLow"
-                >
-                  High-Low
-                </Radio>
-
-                <Radio
-                  colorScheme="brand"
-                  name="seatStyle"
-                  value="Male-Female"
-                  isChecked={formData.seatMaleFemale === "Male-Female"}
-                  onChange={handleChange}
-                  id="seatMaleFemale"
-                >
-                  Male-Female
-                </Radio>
-              </SimpleGrid>
-            </RadioGroup>
-
-            <Center>
-              <Button
-                onClick={handleSubmit}
-                w="50%"
-                variant="solid"
-                type="submit"
-              >
-                Save Changes
-              </Button>
-            </Center>
-            {saveConfirmed ? (
-              <MakeAlert status="success" variant="subtle" fontSize="md" messages={["Changes saved successfully."]} />
-            ) : null}
-            <Box w="100%" id="classroomRedirectButtons">
-              <ClassroomRedirect classroomId={classroomId} />
-            </Box>
-          </VStack>
-        </CardBody>
-      </Card>
-
-      {/* Classroom Grid Card */}
-      <Card p={6} flex={1}>
-        <CardBody>
-          <Center>
-            <Heading size="lg" mb={4}>Classroom Setup</Heading>
-          </Center>
-          <Text color={textColor} mb={4}>
-            Use this page to add seating configuration settings. Click the
-            buttons and table below to add the layout of your classroom. The
-            form to the left serves to orient students by gender, grade,
-            alphabetically, or randomly. Any student categorized as "priority"
-            will be seated towards the front of the class.
+    <Container maxW="7xl" py={{ base: 6, md: 8 }}>
+      <Stack spacing={6}>
+        <Box>
+          <Heading size="xl">Classroom Setup</Heading>
+          <Text color={textColor} mt={2} maxW="3xl">
+            Choose seating priorities, build the room layout, then generate
+            seating charts for each period.
           </Text>
-          {seatingConfig && (
-            <Classroom
-              seatingConfig={seatingConfig}
-              updateSeatingConfig={updateSeatingConfig}
-            />
-          )}
-        </CardBody>
-      </Card>
-    </Flex>
+        </Box>
+
+        <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={5} alignItems="start">
+          <Card>
+            <CardBody>
+              <VStack spacing={5} align="stretch">
+                <Box>
+                  <Heading size="md">Seating preferences</Heading>
+                  <Text color="brand.500" fontSize="sm" mt={1}>
+                    These rules guide the solver while leaving room for manual
+                    teacher judgment.
+                  </Text>
+                </Box>
+
+                <Box>
+                  <FormLabel fontSize="sm" color={labelColor}>
+                    Seat near front
+                  </FormLabel>
+                  <HStack spacing={4} flexWrap="wrap">
+                    {[
+                      ["eseIsPriority", "ESE"],
+                      ["fiveZeroFourIsPriority", "504"],
+                      ["ellIsPriority", "ELL"],
+                      ["ebdIsPriority", "EBD"],
+                    ].map(([name, label]) => (
+                      <Checkbox
+                        key={name}
+                        colorScheme="accent"
+                        name={name}
+                        isChecked={!!formData[name]}
+                        onChange={handleChange}
+                        id={name}
+                      >
+                        {label}
+                      </Checkbox>
+                    ))}
+                  </HStack>
+                </Box>
+
+                <Box>
+                  <FormLabel fontSize="sm" color={labelColor}>
+                    Seating style:
+                  </FormLabel>
+                  <RadioGroup
+                    value={seatStyleValue}
+                    onChange={(value) =>
+                      handleChange({ target: { type: "radio", name: "seatStyle", value } })
+                    }
+                  >
+                    <SimpleGrid columns={2} spacing={3} w="100%">
+                      {["Alphabetical", "Random", "High-Low", "Male-Female"].map((value) => (
+                        <Radio
+                          key={value}
+                          colorScheme="accent"
+                          name="seatStyle"
+                          value={value}
+                          id={`seat${value.replace("-", "")}`}
+                        >
+                          {value}
+                        </Radio>
+                      ))}
+                    </SimpleGrid>
+                  </RadioGroup>
+                </Box>
+
+                <Button onClick={handleSubmit} type="submit">
+                  Save Changes
+                </Button>
+                {saveConfirmed ? (
+                  <MakeAlert status="success" variant="subtle" fontSize="md" messages={["Changes saved successfully."]} />
+                ) : null}
+                <Box w="100%" id="classroomRedirectButtons">
+                  <ClassroomRedirect classroomId={classroomId} />
+                </Box>
+              </VStack>
+            </CardBody>
+          </Card>
+
+          <Card gridColumn={{ base: "auto", lg: "span 2" }}>
+            <CardBody>
+              <Stack spacing={4}>
+                <Box>
+                  <Heading size="md">Room layout</Heading>
+                  <Text color={textColor} mt={1}>
+                    Select a desk type, then click cells to place or remove
+                    desks. Layout changes autosave.
+                  </Text>
+                </Box>
+                {seatingConfig && (
+                  <Classroom
+                    seatingConfig={seatingConfig}
+                    updateSeatingConfig={updateSeatingConfig}
+                  />
+                )}
+              </Stack>
+            </CardBody>
+          </Card>
+        </SimpleGrid>
+      </Stack>
+    </Container>
   );
 };
 
