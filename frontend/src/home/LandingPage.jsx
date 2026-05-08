@@ -6,7 +6,9 @@ import {
   Flex,
   Heading,
   Icon,
+  Image,
   SimpleGrid,
+  Stack,
   Text,
   VStack,
   HStack,
@@ -85,7 +87,9 @@ export default function LandingPage() {
   const heroTextColor = useColorModeValue("brand.600", "brand.300");
   const sectionHeadingColor = useColorModeValue("brand.800", "brand.100");
   const subtleTextColor = useColorModeValue("brand.500", "brand.400");
+  const sectionTextColor = useColorModeValue("brand.600", "brand.300");
   const sectionBg = useColorModeValue("brand.50", "brand.900");
+  const previewBorderColor = useColorModeValue("brand.200", "brand.700");
   const footerBorderColor = useColorModeValue("brand.200", "brand.700");
   const footerLinkColor = useColorModeValue("brand.600", "brand.300");
   const footerLinkHoverColor = useColorModeValue("accent.600", "accent.400");
@@ -100,46 +104,70 @@ export default function LandingPage() {
     <Box>
       {/* Hero Section */}
       <Box bgGradient={bgGradient} pt={20} pb={16}>
-        <Container maxW="3xl">
-          <VStack align="start" spacing={6}>
-            <Heading
-              as="h1"
-              size="3xl"
-              fontWeight="800"
-              lineHeight="1.1"
-              color={sectionHeadingColor}
+        <Container maxW="6xl">
+          <Stack
+            direction={{ base: "column", lg: "row" }}
+            spacing={12}
+            align="center"
+          >
+            <VStack align="start" spacing={6} flex={1}>
+              <Heading
+                as="h1"
+                size="3xl"
+                fontWeight="800"
+                lineHeight="1.1"
+                color={sectionHeadingColor}
+              >
+                Seating charts in minutes.
+              </Heading>
+              <Text fontSize="xl" color={heroTextColor} maxW="lg">
+                Import a roster, set "keep apart" and "seat together" rules,
+                and generate an optimized arrangement.
+              </Text>
+              <HStack spacing={4} pt={4} flexWrap="wrap">
+                <Button
+                  size="lg"
+                  variant="solid"
+                  onClick={() => navigate("/signup")}
+                  px={8}
+                >
+                  Sign up
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate("/login")}
+                >
+                  Log in
+                </Button>
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  onClick={handleTryDemo}
+                >
+                  Try demo
+                </Button>
+              </HStack>
+            </VStack>
+
+            <Box
+              flex={1}
+              borderRadius="xl"
+              boxShadow="2xl"
+              overflow="hidden"
+              borderWidth="1px"
+              borderColor={previewBorderColor}
+              maxW="600px"
             >
-              Seating charts in minutes.
-            </Heading>
-            <Text fontSize="xl" color={heroTextColor} maxW="2xl">
-              Import a roster, set "keep apart" and "seat together" rules,
-              and generate an optimized arrangement.
-            </Text>
-            <HStack spacing={4} pt={4} flexWrap="wrap">
-              <Button
-                size="lg"
-                variant="solid"
-                onClick={() => navigate("/signup")}
-                px={8}
-              >
-                Sign up
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => navigate("/login")}
-              >
-                Log in
-              </Button>
-              <Button
-                size="lg"
-                variant="ghost"
-                onClick={handleTryDemo}
-              >
-                Try demo
-              </Button>
-            </HStack>
-          </VStack>
+              <Image
+                src="/seating-preview.png"
+                alt="Seating chart with arrangement score and per-desk rationale"
+                w="100%"
+                h="auto"
+                display="block"
+              />
+            </Box>
+          </Stack>
         </Container>
       </Box>
 
@@ -150,6 +178,10 @@ export default function LandingPage() {
             <Heading size="xl" color={sectionHeadingColor}>
               Features
             </Heading>
+            <Text fontSize="lg" color={sectionTextColor} maxW="2xl">
+              A solver, accommodation flags, and a flexible layout editor —
+              built around how teachers actually arrange a room.
+            </Text>
           </VStack>
 
           <SimpleGrid columns={{ base: 1, md: 3 }} spacing={8}>
@@ -179,6 +211,9 @@ export default function LandingPage() {
             <Heading size="xl" color={sectionHeadingColor}>
               How it works
             </Heading>
+            <Text fontSize="lg" color={sectionTextColor} maxW="xl">
+              Three steps from roster to printable chart.
+            </Text>
           </VStack>
 
           <Flex
