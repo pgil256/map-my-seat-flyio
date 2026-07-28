@@ -75,3 +75,8 @@ logs/security/
 # Local tool output
 .claude/
 .playwright-mcp/
+
+# Local agent config
+CLAUDE.md
+AGENTS.md
+.mcp.json
