@@ -24,29 +24,30 @@ VALUES
    'Advanced Mathematics',
    1);
 
+-- Generated demo roster with fictional grades and support settings.
 INSERT INTO students (period_id, name, grade, gender, is_ese, has_504, is_ell, is_ebd)
 VALUES
-  (1, 'Alderman, Blaison', '82', 'M', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Blockom, Anthony', '75', 'M', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Brenner, Jamisyn', '71', 'F', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Comolyn, Kevin', '43', 'M', TRUE, FALSE, FALSE, FALSE),
-  (1, 'Consta, Isabella', '52', 'F', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Compano, Carter', '55', 'M', TRUE, FALSE, FALSE, FALSE),
-  (1, 'Daven, Leiam', '11', 'M', FALSE, FALSE, FALSE, TRUE),
-  (1, 'Donahue, Rashaun', '102', 'M', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Famala, Ryder S', '81', 'M', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Goh Ramirez, Beatriz', '90', 'M', FALSE, FALSE, TRUE, FALSE),
-  (1, 'Hamlin, Ella Margaret', '50', 'F', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Imbala-Fernandez, Jocelyn', '90', 'F', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Plato, Hailey Jade', '85', 'F', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Phang, Joseph Dong', '87', 'M', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Quincy, Giavana Hope', '71', 'F', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Robinson, Thomas William', '98', 'M', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Savannah-Cintago, Andrea', '50', 'F', FALSE, FALSE, TRUE, FALSE),
-  (1, 'Stanley, Reighna', '77', 'F', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Telhen-Lumando, Brissa', '48', 'F', FALSE, FALSE, TRUE, FALSE),
-  (1, 'Timhault, Sharon Elizabeth', '81', 'F', FALSE, FALSE, FALSE, FALSE),
-  (1, 'Wilgun, Delaney', '65', 'F', FALSE, TRUE, FALSE, FALSE);
+  (1, 'Sample Student 01', '69', 'F', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 02', '76', 'M', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 03', '83', 'F', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 04', '90', 'M', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 05', '97', 'F', TRUE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 06', '67', 'M', FALSE, FALSE, TRUE, FALSE),
+  (1, 'Sample Student 07', '74', 'F', FALSE, TRUE, FALSE, FALSE),
+  (1, 'Sample Student 08', '81', 'M', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 09', '88', 'F', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 10', '95', 'M', TRUE, FALSE, FALSE, TRUE),
+  (1, 'Sample Student 11', '65', 'F', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 12', '72', 'M', FALSE, FALSE, TRUE, FALSE),
+  (1, 'Sample Student 13', '79', 'F', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 14', '86', 'M', FALSE, TRUE, FALSE, FALSE),
+  (1, 'Sample Student 15', '93', 'F', TRUE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 16', '63', 'M', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 17', '70', 'F', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 18', '77', 'M', FALSE, FALSE, TRUE, FALSE),
+  (1, 'Sample Student 19', '84', 'F', FALSE, FALSE, FALSE, FALSE),
+  (1, 'Sample Student 20', '91', 'M', TRUE, FALSE, FALSE, TRUE),
+  (1, 'Sample Student 21', '98', 'F', FALSE, TRUE, FALSE, FALSE);
 
 INSERT INTO classrooms
   (user_username, seat_alphabetical, seat_randomize, seat_high_low, seat_male_female, ese_is_priority, ell_is_priority, fivezerofour_is_priority, ebd_is_priority, seating_config)
@@ -57,5 +58,5 @@ INSERT INTO seating_charts(classroom_id, number, seating_chart)
 VALUES(
         1,
         1,
-        '[{"id": "5-0","class":"teacher-desk","name":"Mr. Gilhooley"},{"id":"1-2","class":"desk","name":"Phang, Joseph Dong"},{"id":"3-2","class":"desk","name":"Hamlin, Ella Margaret"},{"id":"5-2","class":"desk","name":"Robinson, Thomas William"},{"id":"7-2","class":"desk","name":"Goh Ramirez, Beatriz"},{"id":"9-2","class":"desk","name":"Tetrault, Sharon Elizabeth"},{"id":"11-2","class":"desk","name":"Quincy, Giavana Hope"},{"id":"1-4","class":"desk","name":"Donahue, Rashaun"},{"id":"3-4","class":"desk","name":"Consta, Isabella"},{"id":"5-4","class":"desk","name":"Comolyn, Kevin"},{"id":"7-4","class":"desk","name":"Famala, Ryder S"},{"id":"9-4","class":"desk","name":"Stanley, Reighna"},{"id":"11-4","class":"desk","name":"Compano, Carter"},{"id":"1-6","class":"desk","name":"Savannah-Cintago, Andrea"},{"id":"3-6","class":"desk","name":"Imbala-Fernandez, Jocelyn"},{"id":"5-6","class":"desk","name":"Telhen-Lumando, Brissa"},{"id":"7-6","class":"desk","name":"Blockom, Anthony"},{"id":"9-6","class":"desk","name":"Wilgun, Delaney"},{"id":"11-6","class":"desk","name":"Daven, Leiam"},{"id":"1-8","class":"desk","name":"Alderman, Blaison"},{"id":"3-8","class":"desk","name":"Brenner, Jamisyn"},{"id":"5-8","class":"desk","name":"Plato, Hailey Jade"}]'
+        '[{"id":"5-0","class":"teacher-desk","name":"Demo Teacher"},{"id":"1-2","class":"desk","name":"Sample Student 01"},{"id":"3-2","class":"desk","name":"Sample Student 02"},{"id":"5-2","class":"desk","name":"Sample Student 03"},{"id":"7-2","class":"desk","name":"Sample Student 04"},{"id":"9-2","class":"desk","name":"Sample Student 05"},{"id":"11-2","class":"desk","name":"Sample Student 06"},{"id":"1-4","class":"desk","name":"Sample Student 07"},{"id":"3-4","class":"desk","name":"Sample Student 08"},{"id":"5-4","class":"desk","name":"Sample Student 09"},{"id":"7-4","class":"desk","name":"Sample Student 10"},{"id":"9-4","class":"desk","name":"Sample Student 11"},{"id":"11-4","class":"desk","name":"Sample Student 12"},{"id":"1-6","class":"desk","name":"Sample Student 13"},{"id":"3-6","class":"desk","name":"Sample Student 14"},{"id":"5-6","class":"desk","name":"Sample Student 15"},{"id":"7-6","class":"desk","name":"Sample Student 16"},{"id":"9-6","class":"desk","name":"Sample Student 17"},{"id":"11-6","class":"desk","name":"Sample Student 18"},{"id":"1-8","class":"desk","name":"Sample Student 19"},{"id":"3-8","class":"desk","name":"Sample Student 20"},{"id":"5-8","class":"desk","name":"Sample Student 21"}]'
 );
