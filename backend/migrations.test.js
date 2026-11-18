@@ -1,49 +1,12 @@
 "use strict";
 
 const knex = require("knex");
-const knexConfig = require("../knexfile");
+const knexConfig = require("./knexfile");
 const bcrypt = require("bcrypt");
-const path = require("path");
-const fs = require("fs");
-
-/**
- * Custom migration source that excludes test files from the migrations
- * directory, preventing Knex from treating them as migration files.
- */
-class FilteredMigrationSource {
-  constructor(migrationDir) {
-    this.migrationDir = migrationDir;
-  }
-
-  getMigrations() {
-    const files = fs
-      .readdirSync(this.migrationDir)
-      .filter((f) => f.endsWith(".js") && !f.includes(".test."))
-      .sort();
-    return Promise.resolve(files);
-  }
-
-  getMigrationName(migration) {
-    return migration;
-  }
-
-  getMigration(migration) {
-    return require(path.join(this.migrationDir, migration));
-  }
-}
-
 let db;
-const migrationDir = path.resolve(__dirname);
-const migrationConfig = {
-  migrationSource: new FilteredMigrationSource(migrationDir),
-};
 
-beforeAll(async () => {
-  const config = {
-    ...knexConfig.test,
-    migrations: migrationConfig,
-  };
-  db = knex(config);
+beforeAll(() => {
+  db = knex(knexConfig.test);
 });
 
 afterAll(async () => {

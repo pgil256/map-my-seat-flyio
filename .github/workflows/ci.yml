@@ -42,6 +42,11 @@ jobs:
         run: cd backend && npm ci
       - name: Run migrations
         run: cd backend && npx knex migrate:latest
+      - name: Build the frontend served by Express
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
       - name: Run backend tests
         run: cd backend && npm test
 

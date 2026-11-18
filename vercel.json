@@ -4,11 +4,6 @@
   "outputDirectory": "frontend/dist",
   "installCommand": "npm install",
   "devCommand": "cd frontend && npm run dev",
-  "functions": {
-    "api/[[...path]].js": {
-      "runtime": "@vercel/node@3.2.0"
-    }
-  },
   "routes": [
     {
       "src": "/api/(.*)",
